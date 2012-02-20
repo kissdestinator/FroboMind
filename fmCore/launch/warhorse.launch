@@ -1,0 +1,43 @@
+<launch>
+	<group ns="fmSensors">
+		<node pkg="fmSensors" name="Encoder1" type="phidget_encoder_node" output="screen" >
+			<param name="publisher_topic" value="encoder1" />
+			<param name="update_frequency" value="50" />		 
+		</node>
+		<node pkg="fmSensors" name="Encoder2" type="phidget_encoder_node" output="screen" >
+			<param name="publisher_topic" value="encoder2" /> 
+			<param name="update_frequency" value="50" />
+		</node>
+		<node pkg="fmSensors" name="Odometry" type="corobot_wheel_feedback_node" output="screen" >
+			<param name="left_odo_pub_topic" value="left_odometry" /> 
+			<param name="right_odo_pub_topic" value="right_odometry" /> 
+			<param name="encoder1" value="/fmSensors/encoder1" /> 
+			<param name="encoder2" value="/fmSensors/encoder2" /> 
+		</node>
+	</group>
+
+	<group ns="fmExtractors">
+	</group>
+
+	<group ns="fmProcessors">
+	</group>
+
+ 	<group ns="fmDecisionMakers">
+	</group>
+
+	<group ns="fmExecutors">
+	</group>
+
+	<group ns="fmControllers">
+	</group>
+
+ 	<group ns="fmActuators">
+ 	</group>
+
+ 	<group ns="fmKinematics">
+	</group>
+
+	<group ns="fmBSP">
+	</group>
+</launch>
+
