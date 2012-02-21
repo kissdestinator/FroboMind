@@ -27,6 +27,10 @@ rosbuild_add_boost_directories()
 rosbuild_add_executable(serial_node src/serial/serial_node.cpp)
 rosbuild_add_executable(serial_node src/serial/serialInterface.cpp)
 
+#Pololu Motor Controller
+rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller_node.cpp)
+rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller.cpp)
+
 IF(EXISTS /usr/include/can4linux.h)
 rosbuild_add_executable(can_node src/can/can_node.cpp)
 ENDIF(EXISTS /usr/include/can4linux.h)
@@ -38,4 +42,3 @@ ENDIF(EXISTS /usr/include/can4linux.h)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
-rosbuild_add_executable(pololu src/pololu.cpp)

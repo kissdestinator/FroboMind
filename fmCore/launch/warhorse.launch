@@ -32,7 +32,6 @@
 	</group>
 
 	<group ns="fmHMI">
-
 		<node pkg="fmHMI" name="joystick_speed" type="joystick_speed" output="screen" >	 
 		</node>
 
@@ -56,6 +55,14 @@
 	</group>
 
 	<group ns="fmBSP">
+		<node pkg="fmBSP" name="MotorController" type="pololu_motor_controller_node" output="screen" >
+			<param name="serial_publisher_topic" value="target_velocity" /> 
+			<param name="desired_speed_subscriber_topic" value="speed_from_joystick" />
+		</node>
+		<node pkg="fmBSP" name="MotorControllerSerial" type="serial_node" output="screen" >
+			<param name="port" value="/dev/ttyACM0" /> 
+			<param name="subscriber_topic" value="/fmBSP/target_velocity" /> 
+		</node>
 	</group>
 </launch>
 
