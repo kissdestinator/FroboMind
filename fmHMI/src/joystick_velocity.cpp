@@ -7,7 +7,7 @@ class JoyToTurtle
 {
 	public:
 		JoyToTurtle();
-	  int tjek;
+	 	int tjek;
 	private:
 };
 
@@ -41,7 +41,7 @@ static void mainLoop()
 
     ros::Rate loop_rate(50);
 
-    while(true)
+    while(ros::ok())
     {	
     	fmMsgs::desired_speed hastighed;
     	hastighed.speed_right = joy.axes[4];
@@ -50,9 +50,8 @@ static void mainLoop()
     	vel_pub_.publish(hastighed);
     	
     	ros::spinOnce(); 
-
+	
 	loop_rate.sleep();
- 
     }
 }
 
