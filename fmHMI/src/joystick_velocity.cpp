@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include "fmMsgs/desired_speed.h"
 #include <stdio.h>
-#include </opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/cpp/include/sensor_msgs/Joy.h>
+#include <fmMsgs/Joy.h>
 
 class JoyToTurtle
 {
@@ -11,7 +11,7 @@ class JoyToTurtle
 	private:
 };
 
-sensor_msgs::Joy joy;
+fmMsgs::Joy joy;
 int start;
 
 JoyToTurtle::JoyToTurtle()
@@ -20,7 +20,7 @@ JoyToTurtle::JoyToTurtle()
 
 
 
-void callback(sensor_msgs::Joy joyIn)
+void callback(fmMsgs::Joy joyIn)
 {
     joy = joyIn;
     ROS_INFO("%f", (double)joy.axes[4]);
