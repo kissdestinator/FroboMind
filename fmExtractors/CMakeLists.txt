@@ -26,6 +26,7 @@ rosbuild_add_executable(lidar_row_detector src/lidar_feature_extractors/lidar_ro
 rosbuild_add_executable(lidar_row_detector src/lidar_feature_extractors/lidar_row_detect_opencv/maize_detection.cpp)
 
 rosbuild_add_executable(gps_state src/global_pose_extractors/gps_state_node.cpp)
+rosbuild_add_executable(imu_ypr src/imu_data_extractors/imu_ypr_extractor.cpp)
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
