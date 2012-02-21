@@ -135,7 +135,7 @@ int main(int argc, char **argv)
   out << serial;
   serialString = out.str();
 
-  ros::Rate loop_rate(frequency); //Run loop at 50 Hz
+  ros::Rate loop_rate(frequency); //Encoder loop frequency
 
   while (ros::ok())
   {

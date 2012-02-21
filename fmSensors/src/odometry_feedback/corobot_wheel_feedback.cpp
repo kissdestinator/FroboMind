@@ -7,6 +7,8 @@ CorobotWheelFeedback::CorobotWheelFeedback() {
 	enc2_id = -1;
 	_PreviousLeftEncoderCounts = 0;
 	_PreviousRightEncoderCounts = 0;
+	_PreviousTimeLeftEncoder = ros::Time::now();
+	_PreviousTimeRightEncoder = ros::Time::now();
 }
 
 void CorobotWheelFeedback::callbackHandlerEncoder1(const fmMsgs::encoderConstPtr& msg)
@@ -22,22 +24,21 @@ void CorobotWheelFeedback::callbackHandlerEncoder1(const fmMsgs::encoderConstPtr
 	  if (enc2_id != -1 && enc1_id != -1)
 	  {
 		  odo_msg.header.stamp = ros::Time::now();
-		  odo_msg.position = msg->encoderticks * DistancePerCount;
 		  if (enc1_id < enc2_id)
 		  {
 			  odo_msg.position = -1 * (msg->encoderticks * DistancePerCount);
-			  odo_msg.speed = -1 * ((msg->encoderticks - _PreviousLeftEncoderCounts) * DistancePerCount)/ (msg->header.stamp - last_time_left_encoder).toSec();
+			  odo_msg.speed = -1 * ((msg->encoderticks - _PreviousLeftEncoderCounts) * DistancePerCount)/ (msg->header.stamp - _PreviousTimeLeftEncoder).toSec();
 			  left_odometry_pub.publish(odo_msg);
 			  _PreviousLeftEncoderCounts = msg->encoderticks;
-			  last_time_left_encoder = msg->header.stamp;
+			  _PreviousTimeLeftEncoder = msg->header.stamp;
 		  }
 		  else
 		  {
 			  odo_msg.position = msg->encoderticks * DistancePerCount;
-			  odo_msg.speed = ((msg->encoderticks - _PreviousRightEncoderCounts) * DistancePerCount)/ (msg->header.stamp - last_time_right_encoder).toSec();
+			  odo_msg.speed = ((msg->encoderticks - _PreviousRightEncoderCounts) * DistancePerCount)/ (msg->header.stamp - _PreviousTimeRightEncoder).toSec();
 			  right_odometry_pub.publish(odo_msg);
 			  _PreviousRightEncoderCounts = msg->encoderticks;
-			  last_time_right_encoder = msg->header.stamp;
+			  _PreviousTimeRightEncoder = msg->header.stamp;
 		  }
 	  }
 }
@@ -58,18 +59,18 @@ void CorobotWheelFeedback::callbackHandlerEncoder2(const fmMsgs::encoderConstPtr
 		  if (enc2_id < enc1_id)
 		  {
 			  odo_msg.position = -1 * (msg->encoderticks * DistancePerCount);
-			  odo_msg.speed = -1 * ((msg->encoderticks - _PreviousLeftEncoderCounts) * DistancePerCount)/ (msg->header.stamp - last_time_left_encoder).toSec();
+			  odo_msg.speed = -1 * ((msg->encoderticks - _PreviousLeftEncoderCounts) * DistancePerCount)/ (msg->header.stamp - _PreviousTimeLeftEncoder).toSec();
 			  left_odometry_pub.publish(odo_msg);
 			  _PreviousLeftEncoderCounts = msg->encoderticks;
-			  last_time_left_encoder = msg->header.stamp;
+			  _PreviousTimeLeftEncoder = msg->header.stamp;
 		  }
 		  else
 		  {
 			  odo_msg.position = msg->encoderticks * DistancePerCount;
-			  odo_msg.speed = ((msg->encoderticks - _PreviousRightEncoderCounts) * DistancePerCount)/ (msg->header.stamp - last_time_right_encoder).toSec();
+			  odo_msg.speed = ((msg->encoderticks - _PreviousRightEncoderCounts) * DistancePerCount)/ (msg->header.stamp - _PreviousTimeRightEncoder).toSec();
 			  right_odometry_pub.publish(odo_msg);
 			  _PreviousRightEncoderCounts = msg->encoderticks;
-			  last_time_right_encoder = msg->header.stamp;
+			  _PreviousTimeRightEncoder = msg->header.stamp;
 		  }
 	  }
 }

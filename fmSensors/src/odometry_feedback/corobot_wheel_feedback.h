@@ -15,8 +15,8 @@ private:
    int _PreviousLeftEncoderCounts;
    int _PreviousRightEncoderCounts;
 
-   ros::Time last_time_left_encoder;
-   ros::Time last_time_right_encoder;
+   ros::Time _PreviousTimeLeftEncoder;
+   ros::Time _PreviousTimeRightEncoder;
 
    fmMsgs::odometry odo_msg;
 
