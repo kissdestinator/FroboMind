@@ -42,6 +42,10 @@ rosbuild_add_boost_directories()
 rosbuild_link_boost(neato_lidar_node system)
 target_link_libraries(neato_lidar_node neato_lidar_driver)
 
+#Phidget 8/8/8 board (for CoroBot)
+rosbuild_add_executable(phidget_888_node src/system_feedback/phidget_888_node.cpp)
+target_link_libraries(phidget_888_node /usr/lib/libphidget21.so)
+
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
