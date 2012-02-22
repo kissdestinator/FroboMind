@@ -76,8 +76,8 @@
 			<param name="device" value="/dev/ttyACM0" /> 
 			<param name="subscriber_topic" value="/fmBSP/target_velocity" /> 
 		</node>
-		<node pkg="fmBSP" name="COM1" type="serial_node" output="screen" >	 
-			<param name="device" value="/dev/ttyUSB0" />	
+		<node pkg="fmBSP" name="IMUSerial" type="serial_node" output="screen" >	 
+			<param name="device" value="/dev/ttyUSB1" />	
 			<param name="baudrate" value="57600" />
 			<param name="publisher_topic" value="ypr_serial"/>
 		</node>
