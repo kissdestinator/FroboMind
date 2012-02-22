@@ -28,14 +28,27 @@ void yprCallback(fmMsgs::serial serialInput)
 
 int main(int argc, char **argv)
 {
+	std::string publisher_topic;
+	std::string subscriber_topic;
+	int update_frequency;
 	ros::init(argc, argv, "imu_ypr_extractor");
 
+
+	// Nodehandlers
 	ros::NodeHandle n;
+	ros::NodeHandle nh("~");
 
-	ros::Subscriber serialSub = n.subscribe("/fmBSP/S0_rx_msg", 1, yprCallback);
-	ros::Publisher	yprPub = n.advertise<fmMsgs::ypr>("ypr", 1);
+  	/* read parameters from ros parameter server if available otherwise use default values */
+ 	 nh.param<std::string> ("publisher_topic", publisher_topic, "ypr"); //Specify the publisher name
+ 	 nh.param<std::string> ("subscriber_topic", subscriber_topic, "/fmBSP/S0_rx_msg"); //Specify the subscriber name
+	 nh.param<int> ("update_frequency", update_frequency, 50); //Specify the subscriber name
 
-	ros::Rate loop_rate(50);
+
+
+	ros::Subscriber serialSub = n.subscribe(subscriber_topic, 1, yprCallback);
+	ros::Publisher	yprPub = n.advertise<fmMsgs::ypr>(publisher_topic, 1);
+
+	ros::Rate loop_rate(update_frequency);
 
 	while (ros::ok())
 	{

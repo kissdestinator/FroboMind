@@ -37,6 +37,10 @@ static void mainLoop()
 	}
 	
     ros::NodeHandle h;
+    ros::NodeHandle nh("~");
+
+    
+
     ros::Publisher vel_pub_ = h.advertise<fmMsgs::desired_speed>("/speed_from_joystick", 1);
 
     ros::Rate loop_rate(50);
