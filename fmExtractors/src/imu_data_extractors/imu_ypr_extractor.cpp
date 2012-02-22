@@ -35,11 +35,15 @@ int main(int argc, char **argv)
 	ros::Subscriber serialSub = n.subscribe("/fmBSP/S0_rx_msg", 1, yprCallback);
 	ros::Publisher	yprPub = n.advertise<fmMsgs::ypr>("ypr", 1);
 
+	ros::Rate loop_rate(50);
+
 	while (ros::ok())
 	{
 		yprPub.publish(ypr);
 
 		ros::spinOnce();
+
+		loop_rate.sleep();
 	}
 
 	return 0;
