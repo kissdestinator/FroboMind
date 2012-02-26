@@ -23,14 +23,6 @@
 			<param name="lidar_publisher_topic" value="lidar_scan_data" /> 
 			
 		</node>
-		<node pkg="fmSensors" name="Phidget888" type="phidget_888_node" output="screen" >
-			<param name="ir_publisher_topic" value="/fmSensors/ir_distance" /> 
-			<param name="power_publisher_topic" value="/fmSensors/battery_voltage" /> 
-			<param name="update_frequency" value="5" />
-			<param name="battery_port" value="0" /> 
-			<param name="ir_front_port" value="1" /> 
-			<param name="ir_back_port" value="2" /> 
-		</node>
 	</group>
 
 	<group ns="fmExtractors">
