@@ -32,9 +32,9 @@ static void mainLoop(ros::NodeHandle &h)
     	fmMsgs::desired_speed hastighed;
 
 	
-	if(joy.button[6]==1)
+	if(joy.buttons[6]==1)
 		hastighed.speed_right = hastighed.speed_left = -1;
-	else if(joy.button[7]==1)
+	else if(joy.buttons[7]==1)
 		hastighed.speed_right = hastighed.speed_left = 1;
 	else
 	{ 
