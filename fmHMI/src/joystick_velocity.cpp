@@ -30,8 +30,16 @@ static void mainLoop(ros::NodeHandle &h)
     while(ros::ok())
     {	
     	fmMsgs::desired_speed hastighed;
+
     	hastighed.speed_right = joy.axes[4];
     	hastighed.speed_left = joy.axes[1];
+	
+	if(joy.button[6]==1)
+		hastighed.speed_right = hastighed.speed_left = -1;
+	
+	if(joy.button[7]==1)
+		hastighed.speed_right = hastighed.speed_left = 1;
+	
     	
     	vel_pub_.publish(hastighed);
     	
