@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 		
 		ros::NodeHandle h;
 		
-		vl = vr = vy = vx = th = x = y = vth =0;
+		vl = vr = vy = vx = th = x = y = vth = 0;
 
 		ros::Subscriber sub_left = h.subscribe("/fmSensors/left_odometry", 1, left_callback);
 		ros::Subscriber sub_right = h.subscribe("/fmSensors/right_odometry", 1, right_callback);
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	    fmMsgs::Vector3 pub_msg;
 	
 		while(h.ok()){
-			current_time = ros::Time::now();
+			current_time = ros::Time::now();    
 			vx = (vl+vr)/2;
 			vy = 0;
 			vth = (vr-vl)/lengthBetweenTwoWheels; //angular velocity in radian per second. 
