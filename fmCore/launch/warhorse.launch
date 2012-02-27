@@ -31,7 +31,11 @@
 			<param name="subscriber_topic" value="/fmBSP/ypr_serial"/>
 			<param name="update_frequency" value="50"/>
 		</node>
+
+		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node" >
+		</node>
 	</group>
+
 
 	<group ns="fmProcessors">
 	</group>
