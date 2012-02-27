@@ -23,14 +23,14 @@ int main(int argc, char **argv)
   std::string encoder1;
   std::string encoder2;
 
-  CorobotWheelFeedback cwf;
-
   /* initialize ros usage */
   ros::init(argc, argv, "corobot_wheel_feedback_node");
 
   /* private nodehandlers */
   ros::NodeHandle nh;
   ros::NodeHandle n("~");
+
+  CorobotWheelFeedback cwf;
 
   /* read parameters from ros parameter server if available otherwise use default values */
   n.param<std::string> ("left_odo_pub_topic", left_odo_pub_topic, "left_odometry"); //Specify the publisher name

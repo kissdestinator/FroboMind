@@ -90,6 +90,7 @@ int ErrorHandler(CPhidgetHandle IFK, void *userptr, int ErrorCode, const char *u
   	{
           	fmMsgs::battery_power powerdata;
           	powerdata.battery_volts = (float) (analog_inputs_value[batteryPort] - 500) * 0.0734;
+		powerdata.header.stamp = ros::Time::now();
           	powerdata_pub.publish(powerdata);
   	}
 
@@ -108,6 +109,7 @@ int ErrorHandler(CPhidgetHandle IFK, void *userptr, int ErrorCode, const char *u
   			irData.voltage2=0;
   		irData.range1=irVoltageToDistance(irData.voltage1);
   		irData.range2=irVoltageToDistance(irData.voltage2);
+		irData.header.stamp = ros::Time::now();
   		irData_pub.publish(irData);
   	}
 
@@ -120,9 +122,9 @@ int ErrorHandler(CPhidgetHandle IFK, void *userptr, int ErrorCode, const char *u
   //Index - Index of the sensor that generated the event, Value - the sensor read value
   int SensorChangeHandler(CPhidgetInterfaceKitHandle IFK, void *usrptr, int Index, int Value)
   {
-  	printf("Sensor: %d > Value: %d\n", Index, Value);
+  	//printf("Sensor: %d > Value: %d\n", Index, Value);
 
-  		//sensorValue 0-1000 ==> 0-5V
+  	//sensorValue 0-1000 ==> 0-5V
 
       	analog_inputs_value[Index]=Value;      //SEGMENTATION FAULT!!
 
@@ -164,12 +166,6 @@ int ErrorHandler(CPhidgetHandle IFK, void *userptr, int ErrorCode, const char *u
 
   	phidget888_connected = true;
 
-/*	//Change the sensitivity trigger of the sensors
-	for(int i = 0; i < num_analog_inputs; i++)
-	{
-		CPhidgetInterfaceKit_setSensorChangeTrigger(ifKit, i, 100);  //we'll just use 10 for fun
-	}
-*/
   	CPhidgetInterfaceKit_setRatiometric(ifKit, 0);//
 
   	return 0;
@@ -194,9 +190,9 @@ int main(int argc, char **argv)
   n.param<std::string> ("ir_publisher_topic", ir_data_pub_topic, "ir_data"); //Specify the publisher name
   n.param<std::string> ("power_publisher_topic", power_data_pub_topic, "power_data"); //Specify the publisher name
   n.param<int> ("update_frequency", frequency, 10); //Update frequency
-  n.param("battery", batteryPort, 0);
-  n.param("irFront", irFrontPort, 1);
-  n.param("irBack", irBackPort, 2);
+  n.param("battery_port", batteryPort, 0);
+  n.param("ir_front_port", irFrontPort, 1);
+  n.param("ir_back_port", irBackPort, 2);
   
   init_phidget888();
 
