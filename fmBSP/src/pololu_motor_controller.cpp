@@ -4,9 +4,6 @@
 #include <unistd.h>
 #include <sys/io.h>
 
-#define base 0x378           /* printer port base address */
-#define value 255            /* numeric value to send to printer port */
-
 PololuMotorController::PololuMotorController() {
 
 }
@@ -19,11 +16,6 @@ void PololuMotorController::callbackHandler(const fmMsgs::desired_speedConstPtr&
     std::string data;
     data.assign(pololu_data,6);
     serial_msg.data = data;
-
-   if (ioperm(base,1,1))
-    fprintf(stderr, "Couldn't get the port at %x\n", base), exit(1);
-
-   outb(value, base);
 
     pololu_pub.publish(serial_msg);
 }
