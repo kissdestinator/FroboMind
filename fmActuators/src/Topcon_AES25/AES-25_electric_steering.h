@@ -1,5 +1,10 @@
+
+#include <ros/ros.h>
+#include <ros/console.h>
+
 #include "fmMsgs/can.h"
-#include "ros/ros.h"
+#include "fmMsgs/steering_angle_cmd.h"
+
 
 union AES25_UInt
 {
@@ -39,7 +44,7 @@ enum
 // Package for Controller status info
 #define MAX_CONTROLLER_INFO_ITEMS      8
 
-#define CONTROLLER_CAN_TIMEOUT_TICKS 100*0.02
+#define CONTROLLER_CAN_TIMEOUT_TICKS 400*0.02
 
 #define AES_MC_SLAVE_ENABLE         0x01
 #define AES_MC_TORQUE_ENABLE        0x02
@@ -74,14 +79,25 @@ private:
    unsigned int motorWaitTimer_;
 
    fmMsgs::can aes_tx_msg_;
+   fmMsgs::steering_angle_cmd wheel_angle_msg;
+
+
+   bool engaged_;
+   bool oldstate_;
+
+   signed int inrow_;
+   float error_angle_;
+   float error_distance_;
+
+   signed short setangle_;
 
   void resetControllerVariables();
   void updateMotorControl();
-
 public:
 
   AES25();
   fmMsgs::can processCanTxEvent();
   void processCanRxEvent(const fmMsgs::can::ConstPtr& can_rx_msg);
-  bool turnSteeringWheel(unsigned short max_turning_speed, unsigned short max_motor_torque, signed short motor_angle);
+  void setSteeringWheel(const fmMsgs::steering_angle_cmd::ConstPtr& wheel_angle_msg);
+  bool turnSteeringWheel(unsigned short max_turning_speed, unsigned char max_motor_torque, signed short motor_angle);
 };

@@ -13,8 +13,8 @@
 fmMsgs::can can_tx_msg;
 
 ros::Publisher can_tx_pub;
-ros::Subscriber can_rx_pub;
-ros::Subscriber wii_pub;
+ros::Subscriber can_rx_sub;
+ros::Subscriber steering_sub;
 ros::Timer can_tx_timer;
 
 AES25 aes25;
@@ -34,12 +34,15 @@ int main(int argc, char **argv)
 
   std::string publisher_topic;
   std::string subscriber_topic;
+  std::string steering_subscriber_topic;
 
-  nh.param<std::string>("publisher_topic", publisher_topic, "/vic_interfaces/can0_tx");
-  nh.param<std::string>("subscriber_topic", subscriber_topic, "/vic_interfaces/can0_rx");
+  nh.param<std::string>("publisher_topic", publisher_topic, "/fmBSP/can0_tx");
+  nh.param<std::string>("subscriber_topic", subscriber_topic, "/fmBSP/can0_rx");
+  nh.param<std::string>("steering_angle_cmd", steering_subscriber_topic, "/fmActuators/steering_angle_cmd");
 
   can_tx_pub = nh.advertise<fmMsgs::can> (publisher_topic.c_str(), 1);
-  can_rx_pub = nh.subscribe<fmMsgs::can> (subscriber_topic.c_str(), 1000, &AES25::processCanRxEvent, &aes25);
+  can_rx_sub = nh.subscribe<fmMsgs::can> (subscriber_topic.c_str(), 1000, &AES25::processCanRxEvent, &aes25);
+  steering_sub = nh.subscribe<fmMsgs::steering_angle_cmd> (steering_subscriber_topic.c_str(),10,&AES25::setSteeringWheel,&aes25);
 
   can_tx_timer = nh.createTimer(ros::Duration(0.02), aes25NodePeriodicCallback);
 
