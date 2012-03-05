@@ -3,11 +3,11 @@
 	<group ns="fmSensors">
 		<node pkg="fmSensors" name="Encoder1" type="phidget_encoder_node" output="screen" >
 			<param name="publisher_topic" value="encoder1" />
-			<param name="update_frequency" value="10" />		 
+			<param name="update_frequency" value="50" />		 
 		</node>
 		<node pkg="fmSensors" name="Encoder2" type="phidget_encoder_node" output="screen" >
 			<param name="publisher_topic" value="encoder2" /> 
-			<param name="update_frequency" value="10" />
+			<param name="update_frequency" value="50" />
 		</node>
 		<node pkg="fmSensors" name="Odometry" type="corobot_wheel_feedback_node" output="screen" >
 			<param name="left_odo_pub_topic" value="left_odometry" /> 

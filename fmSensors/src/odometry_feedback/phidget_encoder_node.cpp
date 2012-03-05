@@ -129,15 +129,21 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(frequency); //Encoder loop frequency
 
-  int encoder_value;
+
 
   while (ros::ok())
   {
     ros::spinOnce();
     
-    CPhidgetEncoder_getPosition(encoder, 0, &encoder_value); //Get encoderposition
-    
-    enc_msg.encoderticks = encoder_value;
+    int phidgetEncoderStatus = 0;
+
+    CPhidget_getDeviceStatus((CPhidgetHandle) encoder, &phidgetEncoderStatus);
+    if (phidgetEncoderStatus != 0)
+    {
+	int encoder_value;        
+	CPhidgetEncoder_getPosition(encoder, 0, &encoder_value); //Get encoderposition
+	enc_msg.encoderticks = encoder_value;
+    }
     enc_msg.header.stamp = ros::Time::now();
     enc_msg.header.frame_id = serialString;
 
