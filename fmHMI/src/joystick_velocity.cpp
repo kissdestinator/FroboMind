@@ -39,6 +39,7 @@ static void mainLoop(ros::NodeHandle &h)
 	else
 	{ 
 	    	hastighed.speed_right = joy.axes[4];
+	    	hastighed.speed_right = joy.axes[3];
 	    	hastighed.speed_left = joy.axes[1];
 	}	
     	
