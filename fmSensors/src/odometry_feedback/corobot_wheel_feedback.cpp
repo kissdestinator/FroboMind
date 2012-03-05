@@ -13,11 +13,6 @@ CorobotWheelFeedback::CorobotWheelFeedback() {
 
 void CorobotWheelFeedback::callbackHandlerEncoder1(const fmMsgs::encoderConstPtr& msg)
 {
-	  if (enc1_id == -1)
-	  {
-		  std::istringstream iss(msg->header.frame_id);
-		  iss >> enc1_id;
-	  }
 	  if (enc2_id != -1 && enc1_id != -1)
 	  {
 		  odo_msg.header.stamp = ros::Time::now();
@@ -38,15 +33,15 @@ void CorobotWheelFeedback::callbackHandlerEncoder1(const fmMsgs::encoderConstPtr
 			  _PreviousTimeRightEncoder = msg->header.stamp;
 		  }
 	  }
+	  else if (enc1_id == -1)
+	  {
+		  std::istringstream iss(msg->header.frame_id);
+		  iss >> enc1_id;
+	  }
 }
 
 void CorobotWheelFeedback::callbackHandlerEncoder2(const fmMsgs::encoderConstPtr& msg)
 {
-	  if (enc2_id == -1)
-	  {
-	    std::istringstream iss(msg->header.frame_id);
-	    iss >> enc2_id;
-	  }
 	  if (enc2_id != -1 && enc1_id != -1)
 	  {
 		  odo_msg.header.stamp = ros::Time::now();
@@ -66,6 +61,11 @@ void CorobotWheelFeedback::callbackHandlerEncoder2(const fmMsgs::encoderConstPtr
 			  _PreviousRightEncoderCounts = msg->encoderticks;
 			  _PreviousTimeRightEncoder = msg->header.stamp;
 		  }
+	  }
+	  else if (enc2_id == -1)
+	  {
+		  std::istringstream iss(msg->header.frame_id);
+		  iss >> enc2_id;
 	  }
 }
 
