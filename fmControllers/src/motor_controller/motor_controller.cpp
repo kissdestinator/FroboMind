@@ -25,11 +25,13 @@ void MotorController::desiredSpeedHandler(const fmMsgs::desired_speedConstPtr& m
 void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 {
 	power_msg.power_left = target_speed_left / max_speed;
+	motor_power_pub.publish(power_msg);
 }
 
 void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 {
 	power_msg.power_right = target_speed_right / max_speed;
+	motor_power_pub.publish(power_msg);
 }
 
 void MotorController::setMaxSpeed(float speed)

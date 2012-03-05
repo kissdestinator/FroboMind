@@ -133,6 +133,8 @@ int main(int argc, char **argv)
 
   while (ros::ok())
   {
+    ros::spinOnce();
+    
     CPhidgetEncoder_getPosition(encoder, 0, &encoder_value); //Get encoderposition
     
     enc_msg.encoderticks = encoder_value;
@@ -141,12 +143,8 @@ int main(int argc, char **argv)
 
     enc_publisher.publish(enc_msg); //Publish message
 
-    ros::spinOnce();
-
     loop_rate.sleep();
   }
-
-  ros::spin();
 
   CPhidget_close((CPhidgetHandle)encoder); //Close encoder connection
   CPhidget_delete((CPhidgetHandle)encoder); //Delete the encoder handle
