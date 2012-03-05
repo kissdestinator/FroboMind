@@ -1,0 +1,94 @@
+<launch>
+
+	<group ns="fmSensors">
+		<node pkg="fmSensors" name="Encoder1" type="phidget_encoder_node" output="screen" >
+			<param name="publisher_topic" value="encoder1" />
+			<param name="update_frequency" value="50" />		 
+		</node>
+		<node pkg="fmSensors" name="Encoder2" type="phidget_encoder_node" output="screen" >
+			<param name="publisher_topic" value="encoder2" /> 
+			<param name="update_frequency" value="50" />
+		</node>
+		<node pkg="fmSensors" name="Odometry" type="corobot_wheel_feedback_node" output="screen" >
+			<param name="left_odo_pub_topic" value="left_odometry" /> 
+			<param name="right_odo_pub_topic" value="right_odometry" /> 
+			<param name="encoder1" value="/fmSensors/encoder1" /> 
+			<param name="encoder2" value="/fmSensors/encoder2" /> 
+		</node>
+		<node pkg="fmSensors" name="Lidar" type="neato_lidar_node" output="screen" >
+			<param name="port" value="/dev/ttyUSB0" /> 
+			<param name="baud_rate" value="115200" /> 
+			<param name="frame_id" value="neato_lidar" /> 
+			<param name="firmware_version" value="2" /> 
+			<param name="lidar_publisher_topic" value="lidar_scan_data" /> 
+			
+		</node>
+	</group>
+
+	<group ns="fmExtractors">
+		<node pkg="fmExtractors" name="imu_ypr_extractor" type="imu_ypr" >
+			<param name="publisher_topic" value="ypr" />
+			<param name="subscriber_topic" value="/fmBSP/ypr_serial"/>
+			<param name="update_frequency" value="50"/>
+		</node>
+
+		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node" >
+		</node>
+	</group>
+
+
+	<group ns="fmProcessors">
+	</group>
+
+	<group ns="fmHMI">
+		<node pkg="fmHMI" name="joystick_speed" type="joystick_speed" output="screen" >	 
+		</node>
+
+		<node pkg="fmHMI" name="joy_node" type="joy_node" output="screen" >
+		</node>
+	</group>
+
+ 	<group ns="fmDecisionMakers">
+	</group>
+
+	<group ns="fmExecutors">
+	</group>
+
+	<group ns="fmControllers">
+		<node pkg="fmControllers" name="motor_controller" type="motor_controller_node" output="screen" >
+			<param name="left_odo_subscriber_topic" value="/fmSensors/left_odometry" /> 
+			<param name="right_odo_subscriber_topic" value="/fmSensors/right_odometry" /> 
+			<param name="motor_power_topic" value="motor_power" /> 
+			<param name="maximum_speed" value="0.5" /> 
+			<param name="p_left" value="1" /> 
+			<param name="i_left" value="0" /> 
+			<param name="d_left" value="0" /> 
+			<param name="p_right" value="1" /> 
+			<param name="i_right" value="0" /> 
+			<param name="d_right" value="0" /> 
+		</node>
+	</group>
+
+ 	<group ns="fmActuators">
+ 	</group>
+
+ 	<group ns="fmKinematics">
+	</group>
+
+	<group ns="fmBSP">
+		<node pkg="fmBSP" name="MotorController" type="pololu_motor_controller_node" output="screen" >
+			<param name="serial_publisher_topic" value="/fmBSP/target_velocity" /> 
+			<param name="desired_speed_subscriber_topic" value="/speed_from_joystick" />
+		</node>
+		<node pkg="fmBSP" name="MotorControllerSerial" type="serial_node" output="screen" >
+			<param name="device" value="/dev/ttyACM0" /> 
+			<param name="subscriber_topic" value="/fmBSP/target_velocity" /> 
+		</node>
+		<node pkg="fmBSP" name="IMUSerial" type="serial_node" output="screen" >	 
+			<param name="device" value="/dev/ttyUSB1" />	
+			<param name="baudrate" value="57600" />
+			<param name="publisher_topic" value="ypr_serial"/>
+		</node>
+	</group>
+</launch>
+
