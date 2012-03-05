@@ -2,7 +2,7 @@
 #include "std_msgs/Int8.h"
 #include "std_msgs/String.h"
 #include "fmMsgs/serial.h"
-#include "fmMsgs/desired_speed.h"
+#include "fmMsgs/motor_power.h"
 #include "pololu_motor_controller.h"
 
 int main(int argc, char **argv)
@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 
 	/* parameters */
 	std::string serial_pub_topic;
-	std::string desired_speed_sub_topic;
+	std::string motor_power_sub_topic;
 
 	/* private nodehandlers */
 	ros::NodeHandle nh;
@@ -20,12 +20,12 @@ int main(int argc, char **argv)
 
 	/* read parameters from ros parameter server if available otherwise use default values */
 	n.param<std::string> ("serial_publisher_topic", serial_pub_topic, "pololu_serial"); //Specify the publisher name
-	n.param<std::string> ("desired_speed_subscriber_topic", desired_speed_sub_topic, "desired_speed"); //Specify the publisher name
+	n.param<std::string> ("desired_speed_subscriber_topic", motor_power_sub_topic, "/fmControllers/desired_speed"); //Specify the publisher name
 
 	PololuMotorController pmc;
 
 	pmc.pololu_pub = n.advertise<fmMsgs::serial>(serial_pub_topic.c_str(), 1);
-	pmc.pololu_sub = n.subscribe<fmMsgs::desired_speed>(desired_speed_sub_topic.c_str(),1,&PololuMotorController::callbackHandler,&pmc);
+	pmc.pololu_sub = n.subscribe<fmMsgs::motor_power>(motor_power_sub_topic.c_str(),1,&PololuMotorController::callbackHandler,&pmc);
 
 	ros::spin();
 
