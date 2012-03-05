@@ -1,6 +1,6 @@
 #include "corobot_wheel_feedback.h"
 
-const double DistancePerCount = (M_PI*0.105)/(12*52*4);
+const double DistancePerCount = (M_PI*0.105)/(12*52*4); // Traveled distance per encodertick ((pi * wheeldiameter) / (ticks per wheelrotation))
 
 CorobotWheelFeedback::CorobotWheelFeedback() {
 	enc1_id = -1;
@@ -15,11 +15,8 @@ void CorobotWheelFeedback::callbackHandlerEncoder1(const fmMsgs::encoderConstPtr
 {
 	  if (enc1_id == -1)
 	  {
-		  int test;
 		  std::istringstream iss(msg->header.frame_id);
-		  iss >> test;
-		  std::cout << test << std::endl;
-		  enc1_id = test;
+		  iss >> enc1_id;
 	  }
 	  if (enc2_id != -1 && enc1_id != -1)
 	  {
@@ -47,11 +44,8 @@ void CorobotWheelFeedback::callbackHandlerEncoder2(const fmMsgs::encoderConstPtr
 {
 	  if (enc2_id == -1)
 	  {
-	    int test;
 	    std::istringstream iss(msg->header.frame_id);
-	    iss >> test;
-	    std::cout << test << std::endl;
-	    enc2_id = test;
+	    iss >> enc2_id;
 	  }
 	  if (enc2_id != -1 && enc1_id != -1)
 	  {

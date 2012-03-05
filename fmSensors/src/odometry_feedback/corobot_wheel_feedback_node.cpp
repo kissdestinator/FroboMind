@@ -9,9 +9,6 @@
 
 #include "corobot_wheel_feedback.h"
 
-/* Instanciate objects */
-
-
 int main(int argc, char **argv)
 {
   /* ros messages */
@@ -30,6 +27,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   ros::NodeHandle n("~");
 
+  /* Instanciate objects */
   CorobotWheelFeedback cwf;
 
   /* read parameters from ros parameter server if available otherwise use default values */
@@ -41,8 +39,8 @@ int main(int argc, char **argv)
   cwf.left_odometry_pub = nh.advertise<fmMsgs::odometry> (left_odo_pub_topic.c_str(), 1);
   cwf.right_odometry_pub = nh.advertise<fmMsgs::odometry> (right_odo_pub_topic.c_str(), 1);
   
-  cwf.enc1_sub = nh.subscribe(encoder1, 1, &CorobotWheelFeedback::callbackHandlerEncoder1,&cwf);
-  cwf.enc2_sub = nh.subscribe(encoder2, 1, &CorobotWheelFeedback::callbackHandlerEncoder2,&cwf);
+  cwf.enc1_sub = nh.subscribe(encoder1, 1, &CorobotWheelFeedback::callbackHandlerEncoder1, &cwf);
+  cwf.enc2_sub = nh.subscribe(encoder2, 1, &CorobotWheelFeedback::callbackHandlerEncoder2, &cwf);
 
   ros::spin();
 

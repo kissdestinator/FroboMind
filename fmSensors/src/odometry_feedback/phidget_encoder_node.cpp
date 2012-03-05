@@ -71,14 +71,6 @@ CPhidgetEncoderHandle init_encoder()
 	CPhidget_set_OnDetach_Handler((CPhidgetHandle)encoder, DetachHandler, NULL);
 	CPhidget_set_OnError_Handler((CPhidgetHandle)encoder, ErrorHandler, NULL);
 
-	//Registers a callback that will run if an input changes.
-	//Requires the handle for the Phidget, the function that will be called, and an arbitrary pointer that will be supplied to the callback function (may be NULL).
-	//CPhidgetEncoder_set_OnInputChange_Handler(encoder, InputChangeHandler, NULL);
-
-	//Registers a callback that will run if the encoder changes.
-	//Requires the handle for the Encoder, the function that will be called, and an arbitrary pointer that will be supplied to the callback function (may be NULL).
-	//CPhidgetEncoder_set_OnPositionChange_Handler (encoder, PositionChangeHandler, NULL);
-
 	CPhidget_open((CPhidgetHandle)encoder, -1);
 
 	//get the program to wait for an encoder device to be attached
@@ -137,10 +129,10 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(frequency); //Encoder loop frequency
 
+  int encoder_value;
+
   while (ros::ok())
   {
-    int encoder_value;
-
     CPhidgetEncoder_getPosition(encoder, 0, &encoder_value); //Get encoderposition
     
     enc_msg.encoderticks = encoder_value;
@@ -156,7 +148,6 @@ int main(int argc, char **argv)
 
   ros::spin();
 
-  printf("Closing...\n");
   CPhidget_close((CPhidgetHandle)encoder); //Close encoder connection
   CPhidget_delete((CPhidgetHandle)encoder); //Delete the encoder handle
 

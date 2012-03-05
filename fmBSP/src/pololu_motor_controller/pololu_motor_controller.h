@@ -1,5 +1,5 @@
 #include "fmMsgs/serial.h"
-#include "fmMsgs/desired_speed.h"
+#include "fmMsgs/motor_power.h"
 #include "ros/ros.h"
 
 #ifndef POLOLU_MOTOR_CONTROLLER_H_
@@ -18,7 +18,7 @@ public:
   ros::Publisher pololu_pub;
 
   PololuMotorController();
-  void callbackHandler(const fmMsgs::desired_speedConstPtr& msg);
+  void callbackHandler(const fmMsgs::motor_powerConstPtr& msg);
 };
 
 #endif
