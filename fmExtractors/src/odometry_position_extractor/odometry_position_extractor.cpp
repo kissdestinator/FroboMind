@@ -7,19 +7,26 @@
 
 using namespace std;
 
-double x,y,th,vl,vr,vx,vy,vth;
+double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl;
 ros::Time current_time, last_time;
 double lengthBetweenTwoWheels = 0.21+0.03;
+ros::Time right_time, right_last_time, left_time, left_last_time;
 
 void right_callback(fmMsgs::odometry odo_msg_in)
 {
-	vr = odo_msg_in.speed;
+	right_last_time = right_time;
+	right_time = odo_msg_in.header.stamp;
+	lxr = xr;
+	xr = odo_msg_in.position;
 	return;
 }
 
 void left_callback(fmMsgs::odometry odo_msg_in)
-{
-	vl = odo_msg_in.speed;
+{	
+	left_last_time = left_time;
+	left_time = odo_msg_in.header.stamp;
+	lxl = xl;
+	xl = odo_msg_in.position;
 	return;
 }
 
@@ -29,18 +36,25 @@ int main(int argc, char** argv)
 	
 	ros::NodeHandle h;
 	
-	vl = vr = vy = vx = th = x = y = vth = 0;
+	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = 0;
+	left_last_time = right_last_time = ros::Time::now();
 
 	ros::Subscriber sub_left = h.subscribe("/fmSensors/left_odometry", 1, left_callback);
 	ros::Subscriber sub_right = h.subscribe("/fmSensors/right_odometry", 1, right_callback);
 	
    	fmMsgs::Vector3 pub_msg;
 
-	ros::Rate loop_rate(10);
+	ros::Rate loop_rate(50);
 
         ros::Publisher odom_pub = h.advertise<fmMsgs::Vector3>("xyz_position", 1); 
 
 	while(h.ok()){
+
+	    ros::spinOnce();
+
+		vl = (xl - lxl)/(left_time - left_last_time).toSec(); 
+		vr = (xr - lxr)/(right_time - right_last_time).toSec(); 
+		
 		current_time = ros::Time::now();    
 		vx = (vl+vr)/2;
 		vy = 0;
@@ -50,7 +64,11 @@ int main(int argc, char** argv)
 	    double dt = (current_time - last_time).toSec();
 	    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
 	    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
-	    double delta_th = vth * dt; 
+	    double delta_th = (vth * dt); 
+		if(th > (2 * M_PI))
+		   th -= 2*M_PI;
+		if(th < (0))
+		   th += 2*M_PI;
 
 	    x += delta_x;
 	    y += delta_y;
@@ -63,8 +81,6 @@ int main(int argc, char** argv)
 	    odom_pub.publish(pub_msg);
 	    
 	    last_time = current_time;
-	    
-	    ros::spinOnce();
 	    
 	    loop_rate.sleep();
 		
