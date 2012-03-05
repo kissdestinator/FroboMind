@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	ros::NodeHandle n("~");
 
 	/* read parameters from ros parameter server if available otherwise use default values */
-	n.param<std::string> ("motor_power_topic", motor_power_pub_topic, "/fmControllers/motor_power"); //Specify the publisher name
+	n.param<std::string> ("motor_power_topic", motor_power_pub_topic, "motor_power"); //Specify the publisher name
 	n.param<std::string> ("desired_speed_subscriber_topic", desired_speed_sub_topic, "/desired_speed"); //Specify the publisher name
 	n.param<std::string> ("left_odometry_subscriber_topic", left_odometry_sub_topic, "/fmSensors/left_odometry"); //Specify the publisher name
 	n.param<std::string> ("right_odometry_subscriber_topic", right_odometry_sub_topic, "/fmSensors/right_odometry"); //Specify the publisher name
