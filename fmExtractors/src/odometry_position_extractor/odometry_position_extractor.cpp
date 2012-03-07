@@ -3,11 +3,13 @@
 #include "fmMsgs/odometry.h"
 #include "fmMsgs/Vector3.h"
 #include "math.h"
+#include "fmMsgs/ypr.h"
 
 
 using namespace std;
 
-double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl;
+bool start;
+double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset;
 ros::Time current_time, last_time;
 double lengthBetweenTwoWheels = 0.21+0.03;
 ros::Time right_time, right_last_time, left_time, left_last_time;
@@ -30,6 +32,18 @@ void left_callback(fmMsgs::odometry odo_msg_in)
 	return;
 }
 
+void ypr_callback(fmMsgs::ypr ypr_msg)
+{
+	if (start == true)
+	{
+		offset = ypr_msg.yaw;
+		start = false;
+	}
+	else
+		th = (ypr_msg.yaw - offset) * M_PI / 180;
+	return;
+}
+
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "odometry_position_extractor");
@@ -38,9 +52,11 @@ int main(int argc, char** argv)
 	
 	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = 0;
 	left_last_time = right_last_time = ros::Time::now();
+	start = true;
 
 	ros::Subscriber sub_left = h.subscribe("/fmSensors/left_odometry", 1, left_callback);
 	ros::Subscriber sub_right = h.subscribe("/fmSensors/right_odometry", 1, right_callback);
+	ros::Subscriber sub_ypr = h.subscribe("/fmExtractors/ypr", 1, ypr_callback);
 	
    	fmMsgs::Vector3 pub_msg;
 
