@@ -28,7 +28,7 @@
 	<group ns="fmExtractors">
 		<node pkg="fmExtractors" name="imu_ypr_extractor" type="imu_ypr" >
 			<param name="publisher_topic" value="ypr" />
-			<param name="subscriber_topic" value="/fmBSP/ypr_serial"/>
+			<param name="subscriber_topic" value="/fmCSP/ypr_serial"/>
 			<param name="update_frequency" value="50"/>
 		</node>
 
@@ -76,16 +76,16 @@
  	<group ns="fmKinematics">
 	</group>
 
-	<group ns="fmBSP">
-		<node pkg="fmBSP" name="MotorController" type="pololu_motor_controller_node" output="screen" >
-			<param name="serial_publisher_topic" value="/fmBSP/target_velocity" /> 
+	<group ns="fmCSP">
+		<node pkg="fmCSP" name="MotorController" type="pololu_motor_controller_node" output="screen" >
+			<param name="serial_publisher_topic" value="/fmCSP/target_velocity" /> 
 			<param name="desired_speed_subscriber_topic" value="/fmControllers/motor_power" />
 		</node>
-		<node pkg="fmBSP" name="MotorControllerSerial" type="serial_node" output="screen" >
+		<node pkg="fmCSP" name="MotorControllerSerial" type="serial_string" output="screen" >
 			<param name="device" value="/dev/ttyACM0" /> 
 			<param name="subscriber_topic" value="/fmBSP/target_velocity" /> 
 		</node>
-		<node pkg="fmBSP" name="IMUSerial" type="serial_node" output="screen" >	 
+		<node pkg="fmCSP" name="IMUSerial" type="serial_string" output="screen" >	 
 			<param name="device" value="/dev/ttyUSB1" />	
 			<param name="baudrate" value="57600" />
 			<param name="publisher_topic" value="ypr_serial"/>
