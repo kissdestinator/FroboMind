@@ -32,6 +32,9 @@ rosbuild_add_executable(serial_binary src/Serial_Port/serial_binary/serial_binar
 rosbuild_add_executable(serial_binary src/Serial_Port/serial_binary/serial_binary_interface.cpp)
 rosbuild_link_boost(serial_binary system)
 
+#Pololu Motor Controller
+rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller/pololu_motor_controller_node.cpp)
+rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller/pololu_motor_controller.cpp)
 
 IF(EXISTS /usr/include/can4linux.h)
 rosbuild_add_executable(can_can4linux src/CAN_bus/can_can4linux/can_can4linux.cpp)
