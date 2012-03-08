@@ -32,20 +32,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(IN_ROW_NAV src/nav_controllers/in_row_nav/in_row_nav.cpp)
 #rosbuild_add_executable(IN_ROW_NAV src/nav_controllers/in_row_nav/pid_regulator.cpp)
 
-<<<<<<< HEAD
-#rosbuild_add_executable(distance_nav 
-#  src/nav_controllers/distance_nav/distance_nav_node.cpp
-#  src/nav_controllers/distance_nav/distance_nav.cpp
-#  src/nav_controllers/distance_nav/pid_regulator.cpp
-#  )
-
 #Motor Controller
 rosbuild_add_executable(motor_controller_node src/motor_controller/motor_controller_node.cpp)
 rosbuild_add_executable(motor_controller_node src/motor_controller/motor_controller.cpp)
 rosbuild_add_executable(motor_controller_node src/motor_controller/pid_regulator.cpp)
 
-=======
->>>>>>> 164ce28958ea37c876672f05ed88db7781438f61
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
