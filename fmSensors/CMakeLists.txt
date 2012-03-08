@@ -22,12 +22,16 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 rosbuild_add_executable(sduimu_node src/global_sensors/sduimu_node.cpp)
+rosbuild_add_executable(imu_razor_node src/global_sensors/imu_sparkfun_razor_node.cpp)
 rosbuild_add_executable(gps_node src/global_sensors/gps_node.cpp)
-rosbuild_add_executable(lms111_node src/local_sensors/lms111_node.cpp)
+#rosbuild_add_executable(lms111_node src/local_sensors/lms111_node.cpp)
+
+rosbuild_add_executable(ll_encoder_node src/odometry_feedback/LeineLindeEncoder.cpp)
+rosbuild_add_executable(ll_encoder_node src/odometry_feedback/ll_encoder_node.cpp)
 
 include_directories(/usr/include/)
 link_directories(/usr/lib/)
-target_link_libraries(lms111_node /usr/lib/libLMS1xx.so)
+#target_link_libraries(lms111_node /usr/lib/libLMS1xx.so)
 
 #Phidget Encoder (for CoroBot)
 rosbuild_add_executable(phidget_encoder_node src/odometry_feedback/phidget_encoder_node.cpp)
