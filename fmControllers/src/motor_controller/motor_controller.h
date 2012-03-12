@@ -13,10 +13,18 @@ private:
 
    fmMsgs::motor_power power_msg;
 
-   float target_speed_left;
-   float target_speed_right;
+   double target_speed_left;
+   double target_speed_right;
 
-   float max_speed;
+   double motor_power_left;
+   double motor_power_right;
+
+   ros::Time last_time_left;
+   ros::Time last_time_right;
+
+   double max_acceleration;
+   double max_deacceleration;
+   double max_speed;
 
    PIDRegulator pid_regulator_left;
    PIDRegulator pid_regulator_right;
@@ -36,6 +44,8 @@ public:
   void rightMotorHandler(const fmMsgs::odometryConstPtr& msg);
 
   void setMaxSpeed(float speed);
+  void setMaxAcceleration(float acceleration);
+  void setMaxDeacceleration(float deacceleration);
 };
 
 #endif

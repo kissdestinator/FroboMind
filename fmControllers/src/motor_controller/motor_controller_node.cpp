@@ -17,9 +17,7 @@ int main(int argc, char **argv)
 	std::string desired_speed_sub_topic;
 	std::string left_odometry_sub_topic;
 	std::string right_odometry_sub_topic;
-	double max_speed, p_left, i_left, d_left, p_right, i_right, d_right;
-
-
+	double max_speed, p_left, i_left, d_left, p_right, i_right, d_right, max_acceleration, max_deacceleration;
 
 	/* private nodehandlers */
 	ros::NodeHandle nh;
@@ -30,17 +28,21 @@ int main(int argc, char **argv)
 	n.param<std::string> ("desired_speed_subscriber_topic", desired_speed_sub_topic, "/desired_speed"); //Specify the publisher name
 	n.param<std::string> ("left_odometry_subscriber_topic", left_odometry_sub_topic, "/fmSensors/left_odometry"); //Specify the publisher name
 	n.param<std::string> ("right_odometry_subscriber_topic", right_odometry_sub_topic, "/fmSensors/right_odometry"); //Specify the publisher name
-	n.param<double> ("maximum_speed", max_speed, 0.5); //Specify the maximum speed
-	n.param<double> ("p_left", p_left, 1); //Specify the maximum speed
-	n.param<double> ("i_left", i_left, 0); //Specify the maximum speed
-	n.param<double> ("d_left", d_left, 0); //Specify the maximum speed
-	n.param<double> ("p_right", p_right, 1); //Specify the maximum speed
-	n.param<double> ("i_right", i_right, 0); //Specify the maximum speed
-	n.param<double> ("d_right", d_right, 0); //Specify the maximum speed
+	n.param<double> ("maximum_speed", max_speed, 1); //Specify the maximum speed in m/s
+	n.param<double> ("maximum_acceleration", max_acceleration, 0); //Specify the maximum acceleration in m/s² (0 = inf acceleration)
+	n.param<double> ("maximum_deacceleration", max_deacceleration, 0); //Specify the maximum deacceleration in m/s² (0 = inf deacceleration)
+	n.param<double> ("p_left", p_left, 1);
+	n.param<double> ("i_left", i_left, 0);
+	n.param<double> ("d_left", d_left, 0);
+	n.param<double> ("p_right", p_right, 1);
+	n.param<double> ("i_right", i_right, 0);
+	n.param<double> ("d_right", d_right, 0);
 
 	MotorController mc = MotorController(p_left,i_left,d_left,p_right,i_right,d_right);
 
 	mc.setMaxSpeed(max_speed);
+	mc.setMaxAcceleration(max_acceleration);
+	mc.setMaxDeacceleration(max_deacceleration);
 
 	mc.target_speed_sub = n.subscribe<fmMsgs::desired_speed>(desired_speed_sub_topic.c_str(),1,&MotorController::desiredSpeedHandler,&mc);
 	mc.left_odo_sub = n.subscribe(left_odometry_sub_topic.c_str(), 1, &MotorController::leftMotorHandler,&mc);
