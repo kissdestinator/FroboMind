@@ -63,10 +63,10 @@
 			<param name="maximum_speed" value="1" /> 
 			<param name="maximum_acceleration" value="0" /> 
 			<param name="maximum_deacceleration" value="0" /> 
-			<param name="p_left" value="1" /> 
+			<param name="p_left" value="0.2" /> 
 			<param name="i_left" value="0" />
 			<param name="d_left" value="0" /> 
-			<param name="p_right" value="1" /> 
+			<param name="p_right" value="0.2" /> 
 			<param name="i_right" value="0" /> 
 			<param name="d_right" value="0" /> 
 		</node>
@@ -85,7 +85,8 @@
 		</node>
 		<node pkg="fmCSP" name="MotorControllerSerial" type="serial_string" output="screen" >
 			<param name="device" value="/dev/ttyACM0" /> 
-			<param name="subscriber_topic" value="/fmBSP/target_velocity" /> 
+			<param name="baudrate" value="115200" />
+			<param name="subscriber_topic" value="/fmCSP/target_velocity" /> 
 		</node>
 		<node pkg="fmCSP" name="IMUSerial" type="serial_string" output="screen" >	 
 			<param name="device" value="/dev/ttyUSB1" />	

@@ -16,8 +16,7 @@ void callback(fmMsgs::Joy joy)
 		hastighed.speed_right = hastighed.speed_left = 1;
 	else
 	{ 
-		hastighed.speed_right = joy.axes[4];
-		hastighed.speed_right = joy.axes[3];
+		hastighed.speed_right = joy.axes[4] + joy.axes[3];
 		hastighed.speed_left = joy.axes[1];
 	}	
 	

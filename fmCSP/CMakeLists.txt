@@ -36,9 +36,9 @@ rosbuild_link_boost(serial_binary system)
 rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller/pololu_motor_controller_node.cpp)
 rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller/pololu_motor_controller.cpp)
 
-IF(EXISTS /usr/include/can4linux.h)
-rosbuild_add_executable(can_can4linux src/CAN_bus/can_can4linux/can_can4linux.cpp)
-ENDIF(EXISTS /usr/include/can4linux.h)
+#IF(EXISTS /usr/include/can4linux.h)
+#rosbuild_add_executable(can_can4linux src/CAN_bus/can_can4linux/can_can4linux.cpp)
+#ENDIF(EXISTS /usr/include/can4linux.h)
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)

@@ -46,15 +46,16 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 {
 	double dt = (ros::Time::now() - last_time_right).toSec();
+	std::cout << dt << std::endl;
 	last_time_right = ros::Time::now();
 	double pid_update_value = pid_regulator_right.update(msg->speed,target_speed_right);
 
-	if (pid_update_value > max_acceleration * dt && max_deacceleration != 0)
+	if (pid_update_value > max_acceleration * dt && max_acceleration != 0)
 		pid_update_value = max_acceleration * dt;
 	else if (pid_update_value < max_deacceleration * dt && max_deacceleration != 0)
 		pid_update_value = max_deacceleration * dt;
 
-	motor_power_left += pid_update_value / max_speed;
+	motor_power_right += pid_update_value / max_speed;
 
 	if (motor_power_right > 1)
 		motor_power_right = 1;
