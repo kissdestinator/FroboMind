@@ -43,9 +43,9 @@ public:
   void leftMotorHandler(const fmMsgs::odometryConstPtr& msg);
   void rightMotorHandler(const fmMsgs::odometryConstPtr& msg);
 
-  void setMaxSpeed(float speed);
-  void setMaxAcceleration(float acceleration);
-  void setMaxDeacceleration(float deacceleration);
+  void setMaxSpeed(double speed);
+  void setMaxAcceleration(double acceleration);
+  void setMaxDeacceleration(double deacceleration);
 };
 
 #endif

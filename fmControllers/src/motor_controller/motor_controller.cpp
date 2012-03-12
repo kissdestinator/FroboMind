@@ -27,10 +27,20 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	last_time_left = ros::Time::now();
 	double pid_update_value = pid_regulator_left.update(msg->speed,target_speed_left);
 
-	if (pid_update_value > max_acceleration * dt && max_deacceleration != 0)
-		pid_update_value = max_acceleration * dt;
-	else if (pid_update_value < max_deacceleration * dt && max_deacceleration != 0)
-		pid_update_value = max_deacceleration * dt;
+	if (pid_update_value > 0)
+	{
+		if (pid_update_value > max_acceleration * dt && max_acceleration != 0)
+			pid_update_value = max_acceleration * dt;
+		else if (pid_update_value < -max_deacceleration * dt && max_deacceleration != 0)
+			pid_update_value = -max_deacceleration * dt;
+	}
+	else
+	{
+		if (pid_update_value > -max_acceleration * dt && max_acceleration != 0)
+			pid_update_value = -max_acceleration * dt;
+		else if (pid_update_value < max_deacceleration * dt && max_deacceleration != 0)
+			pid_update_value = max_deacceleration * dt;
+	}
 
 	motor_power_left += pid_update_value / max_speed;
 
@@ -46,14 +56,23 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 {
 	double dt = (ros::Time::now() - last_time_right).toSec();
-	std::cout << dt << std::endl;
 	last_time_right = ros::Time::now();
 	double pid_update_value = pid_regulator_right.update(msg->speed,target_speed_right);
 
-	if (pid_update_value > max_acceleration * dt && max_acceleration != 0)
-		pid_update_value = max_acceleration * dt;
-	else if (pid_update_value < max_deacceleration * dt && max_deacceleration != 0)
-		pid_update_value = max_deacceleration * dt;
+	if (pid_update_value > 0)
+	{
+		if (pid_update_value > max_acceleration * dt && max_acceleration != 0)
+			pid_update_value = max_acceleration * dt;
+		else if (pid_update_value < -max_deacceleration * dt && max_deacceleration != 0)
+			pid_update_value = -max_deacceleration * dt;
+	}
+	else
+	{
+		if (pid_update_value > -max_acceleration * dt && max_acceleration != 0)
+			pid_update_value = -max_acceleration * dt;
+		else if (pid_update_value < max_deacceleration * dt && max_deacceleration != 0)
+			pid_update_value = max_deacceleration * dt;
+	}
 
 	motor_power_right += pid_update_value / max_speed;
 
@@ -66,17 +85,17 @@ void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	motor_power_pub.publish(power_msg);
 }
 
-void MotorController::setMaxSpeed(float speed)
+void MotorController::setMaxSpeed(double speed)
 {
 	max_speed = speed;
 }
 
-void MotorController::setMaxAcceleration(float acceleration)
+void MotorController::setMaxAcceleration(double acceleration)
 {
 	max_acceleration = acceleration;
 }
 
-void MotorController::setMaxDeacceleration(float deacceleration)
+void MotorController::setMaxDeacceleration(double deacceleration)
 {
 	max_deacceleration = deacceleration;
 }
