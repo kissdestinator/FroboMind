@@ -12,7 +12,7 @@ MotorController::MotorController(double p_left, double i_left, double d_left, do
 
 	max_speed = 1;
 	max_acceleration = 0;
-	max_deacceleration = 0;
+	max_deceleration = 0;
 }
 
 void MotorController::desiredSpeedHandler(const fmMsgs::desired_speedConstPtr& msg)
@@ -27,19 +27,20 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	last_time_left = ros::Time::now();
 	double pid_update_value = pid_regulator_left.update(msg->speed,target_speed_left);
 
-	if (pid_update_value > 0)
+	//implementation of max acceleration and max deceleration
+	if (msg->speed > 0) // Driving forwards
 	{
-		if (pid_update_value > max_acceleration * dt && max_acceleration != 0)
+		if (pid_update_value > max_acceleration * dt) // accelerating
 			pid_update_value = max_acceleration * dt;
-		else if (pid_update_value < -max_deacceleration * dt && max_deacceleration != 0)
-			pid_update_value = -max_deacceleration * dt;
+		else if (pid_update_value < -max_deceleration * dt) // Decelerating
+			pid_update_value = -max_deceleration * dt;
 	}
-	else
+	else if (msg->speed < 0)// Driving backwards
 	{
-		if (pid_update_value > -max_acceleration * dt && max_acceleration != 0)
+		if (pid_update_value < -max_acceleration * dt) // accelerating
 			pid_update_value = -max_acceleration * dt;
-		else if (pid_update_value < max_deacceleration * dt && max_deacceleration != 0)
-			pid_update_value = max_deacceleration * dt;
+		else if (pid_update_value > max_deceleration * dt) // decelerating
+			pid_update_value = max_deceleration * dt;
 	}
 
 	motor_power_left += pid_update_value / max_speed;
@@ -59,22 +60,23 @@ void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	last_time_right = ros::Time::now();
 	double pid_update_value = pid_regulator_right.update(msg->speed,target_speed_right);
 
-	if (pid_update_value > 0)
-	{
-		if (pid_update_value > max_acceleration * dt && max_acceleration != 0)
-			pid_update_value = max_acceleration * dt;
-		else if (pid_update_value < -max_deacceleration * dt && max_deacceleration != 0)
-			pid_update_value = -max_deacceleration * dt;
-	}
-	else
-	{
-		if (pid_update_value > -max_acceleration * dt && max_acceleration != 0)
-			pid_update_value = -max_acceleration * dt;
-		else if (pid_update_value < max_deacceleration * dt && max_deacceleration != 0)
-			pid_update_value = max_deacceleration * dt;
-	}
-
 	motor_power_right += pid_update_value / max_speed;
+
+	//implementation of max acceleration and max deceleration
+	if (msg->speed > 0) // Driving forwards
+	{
+		if (pid_update_value > max_acceleration * dt) // accelerating
+			pid_update_value = max_acceleration * dt;
+		else if (pid_update_value < -max_deceleration * dt) // Decelerating
+			pid_update_value = -max_deceleration * dt;
+	}
+	else // Driving backwards
+	{
+		if (pid_update_value < -max_acceleration * dt) // accelerating
+			pid_update_value = -max_acceleration * dt;
+		else if (pid_update_value > max_deceleration * dt) // decelerating
+			pid_update_value = max_deceleration * dt;
+	}
 
 	if (motor_power_right > 1)
 		motor_power_right = 1;
@@ -95,8 +97,8 @@ void MotorController::setMaxAcceleration(double acceleration)
 	max_acceleration = acceleration;
 }
 
-void MotorController::setMaxDeacceleration(double deacceleration)
+void MotorController::setMaxDeacceleration(double deceleration)
 {
-	max_deacceleration = deacceleration;
+	max_deceleration = deceleration;
 }
 

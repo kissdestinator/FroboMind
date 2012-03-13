@@ -23,7 +23,7 @@ private:
    ros::Time last_time_right;
 
    double max_acceleration;
-   double max_deacceleration;
+   double max_deceleration;
    double max_speed;
 
    PIDRegulator pid_regulator_left;
