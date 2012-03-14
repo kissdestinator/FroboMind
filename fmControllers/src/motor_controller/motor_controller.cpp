@@ -25,31 +25,34 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 {
 	double dt = (ros::Time::now() - last_time_left).toSec();
 	last_time_left = ros::Time::now();
-	double pid_update_value = pid_regulator_left.update(msg->speed,target_speed_left);
+	double speed_left = target_speed_left;
 
 	//implementation of max acceleration and max deceleration
 	if (msg->speed > 0) // Driving forwards
 	{
-		if (pid_update_value > max_acceleration * dt) // accelerating
-			pid_update_value = max_acceleration * dt;
-		else if (pid_update_value < -max_deceleration * dt) // Decelerating
-			pid_update_value = -max_deceleration * dt;
+		if (target_speed_left - msg->speed > max_acceleration * dt && max_acceleration != 0) // accelerating
+			speed_left = max_acceleration * dt + msg->speed;
+		else if (target_speed_left - msg->speed < -max_deceleration * dt && max_deceleration != 0) // Decelerating
+			speed_left = -max_deceleration * dt + msg->speed;
 	}
 	else if (msg->speed < 0)// Driving backwards
 	{
-		if (pid_update_value < -max_acceleration * dt) // accelerating
-			pid_update_value = -max_acceleration * dt;
-		else if (pid_update_value > max_deceleration * dt) // decelerating
-			pid_update_value = max_deceleration * dt;
+		if (target_speed_left + msg->speed < -max_acceleration * dt && max_acceleration != 0) // accelerating
+			speed_left = -max_acceleration * dt + msg->speed;
+		else if (target_speed_left - msg->speed > max_deceleration * dt && max_deceleration != 0) // decelerating
+			speed_left = max_deceleration * dt + msg->speed;
 	}
 
-	motor_power_left += pid_update_value / max_speed;
+	// Calculate the motor power: PID update and directly forwarding the target speed and in the end normalizing by the max_speed
+	motor_power_left = (pid_regulator_left.update(msg->speed,speed_left) + speed_left) / max_speed;
 
+	// making sure the motor power does not exceed 1 or -1
 	if (motor_power_left > 1)
 		motor_power_left = 1;
 	else if (motor_power_left < -1)
 		motor_power_left = -1;
 
+	// publish the motor power
 	power_msg.power_left = motor_power_left;
 	motor_power_pub.publish(power_msg);
 }
@@ -58,47 +61,35 @@ void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 {
 	double dt = (ros::Time::now() - last_time_right).toSec();
 	last_time_right = ros::Time::now();
-	double pid_update_value = pid_regulator_right.update(msg->speed,target_speed_right);
-
-	motor_power_right += pid_update_value / max_speed;
+	double speed_right = target_speed_right;
 
 	//implementation of max acceleration and max deceleration
 	if (msg->speed > 0) // Driving forwards
 	{
-		if (pid_update_value > max_acceleration * dt) // accelerating
-			pid_update_value = max_acceleration * dt;
-		else if (pid_update_value < -max_deceleration * dt) // Decelerating
-			pid_update_value = -max_deceleration * dt;
+		if (target_speed_right - msg->speed > max_acceleration * dt && max_acceleration != 0) // accelerating
+			speed_right = max_acceleration * dt + msg->speed;
+		else if (target_speed_right - msg->speed < -max_deceleration * dt && max_deceleration != 0) // Decelerating
+			speed_right = -max_deceleration * dt + msg->speed;
 	}
-	else // Driving backwards
+	else if (msg->speed < 0)// Driving backwards
 	{
-		if (pid_update_value < -max_acceleration * dt) // accelerating
-			pid_update_value = -max_acceleration * dt;
-		else if (pid_update_value > max_deceleration * dt) // decelerating
-			pid_update_value = max_deceleration * dt;
+		if (target_speed_right + msg->speed < -max_acceleration * dt && max_acceleration != 0) // accelerating
+			speed_right = -max_acceleration * dt + msg->speed;
+		else if (target_speed_right - msg->speed > max_deceleration * dt && max_deceleration != 0) // decelerating
+			speed_right = max_deceleration * dt + msg->speed;
 	}
 
+	// Calculate the motor power: PID update and directly forwarding the target speed and in the end normalizing by the max_speed
+	motor_power_right = (pid_regulator_left.update(msg->speed,speed_right) + speed_right) / max_speed;
+
+	// making sure the motor power does not exceed 1 or -1
 	if (motor_power_right > 1)
 		motor_power_right = 1;
 	else if (motor_power_right < -1)
 		motor_power_right = -1;
 
+	// publish the motor power
 	power_msg.power_right = motor_power_right;
 	motor_power_pub.publish(power_msg);
-}
-
-void MotorController::setMaxSpeed(double speed)
-{
-	max_speed = speed;
-}
-
-void MotorController::setMaxAcceleration(double acceleration)
-{
-	max_acceleration = acceleration;
-}
-
-void MotorController::setMaxDeacceleration(double deceleration)
-{
-	max_deceleration = deceleration;
 }
 
