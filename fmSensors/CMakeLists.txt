@@ -28,14 +28,21 @@ rosbuild_add_executable(gps_node src/global_sensors/gps_node.cpp)
 rosbuild_add_executable(sparkfun_razor_node src/global_sensors/SparkFun9DOF.cpp)
 rosbuild_add_executable(sparkfun_razor_node src/global_sensors/sparkfun_razor_node.cpp)
 
-rosbuild_add_executable(lms111_node src/local_sensors/lms111_node.cpp)
+include(CheckIncludeFiles)
+check_include_files(/usr/lib/libLMS1xx.so HAVE_LMS111_LIB)
+if(HAVE_LMS111_LIB)
+	rosbuild_add_executable(lms111_node src/local_sensors/lms111_node.cpp)
+	target_link_libraries(lms111_node /usr/lib/libLMS1xx.so)
+else(HAVE_LMS111_LIB)
+	message("Warning: no LMS1xx lib found; won't build LMS111 node")
+endif(HAVE_LMS111_LIB)
 
 rosbuild_add_executable(ll_encoder_node src/odometry_feedback/LeineLindeEncoder.cpp)
 rosbuild_add_executable(ll_encoder_node src/odometry_feedback/ll_encoder_node.cpp)
 
 include_directories(/usr/include/)
 link_directories(/usr/lib/)
-#target_link_libraries(lms111_node /usr/lib/libLMS1xx.so)
+
 
 #Phidget Encoder (for CoroBot)
 rosbuild_add_executable(phidget_encoder_node src/odometry_feedback/phidget_encoder_node.cpp)

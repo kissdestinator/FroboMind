@@ -24,13 +24,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 rosbuild_add_boost_directories()
 #rosbuild_link_boost(serial_node boost/asio)
 
-rosbuild_add_executable(serial_node src/serial/serial_node.cpp)
-rosbuild_add_executable(serial_node src/serial/serialInterface.cpp)
-
-#Pololu Motor Controller
-rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller/pololu_motor_controller_node.cpp)
-rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller/pololu_motor_controller.cpp)
-
 IF(EXISTS /usr/include/can4linux.h)
 rosbuild_add_executable(can_node src/can/can_node.cpp)
 ENDIF(EXISTS /usr/include/can4linux.h)
