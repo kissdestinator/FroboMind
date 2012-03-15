@@ -16,6 +16,9 @@ private:
    double target_speed_left;
    double target_speed_right;
 
+   double last_target_speed_left;
+   double last_target_speed_right;
+
    double motor_power_left;
    double motor_power_right;
 
@@ -28,6 +31,8 @@ private:
 
    PIDRegulator pid_regulator_left;
    PIDRegulator pid_regulator_right;
+
+   double maxAcceleration(const double& target_speed, const double& last_target_speed, ros::Time& last_time);
 
 public:
 
@@ -46,6 +51,10 @@ public:
   void setMaxSpeed(double speed) { max_speed = speed; };
   void setMaxAcceleration(double acceleration) { max_acceleration = acceleration; };
   void setMaxDeacceleration(double deceleration) { max_deceleration = deceleration; };
+
+  double getMaxSpeed(void) { return max_speed; };
+  double getMaxAcceleration(void) { return max_acceleration; };
+  double getMaxDeceleration(void) { return max_deceleration; };
 
   void setPleft(double p) { pid_regulator_left.setP(p); };
   void setIleft(double i) { pid_regulator_left.setI(i); };
