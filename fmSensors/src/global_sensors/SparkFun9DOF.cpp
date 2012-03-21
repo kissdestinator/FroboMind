@@ -122,9 +122,9 @@ void SparkFun9DOF::parseIMU(tokenizer& tokens,string raw)
 		{
 			try
 			{
-				a_x = boost::lexical_cast<int>(*tok_iter++) / 1000.0 * 4 * 9.82;
-				a_y = boost::lexical_cast<int>(*tok_iter++) / 1000.0 * 4 * 9.82;
-				a_z = boost::lexical_cast<int>(*tok_iter++) / 1000.0 * 4 * 9.82;
+				a_x = boost::lexical_cast<int>(*tok_iter++) / 1000.0 * 4; // * 9.82;
+				a_y = boost::lexical_cast<int>(*tok_iter++) / 1000.0 * 4; // * 9.82;
+				a_z = boost::lexical_cast<int>(*tok_iter++) / 1000.0 * 4; // * 9.82;
 
 				g_x = boost::lexical_cast<int>(*tok_iter++) * 1/14.375 * DEG2RAD;
 				g_y = boost::lexical_cast<int>(*tok_iter++) * 1/14.375 * DEG2RAD;
