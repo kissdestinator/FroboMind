@@ -16,22 +16,21 @@
 			<param name="encoder2" value="/fmSensors/encoder2" /> 
 		</node>
 		<node pkg="fmSensors" name="Lidar" type="neato_lidar_node" output="screen" >
-			<param name="port" value="/dev/ttyUSB0" /> 
+			<param name="port" value="/dev/ttyUSB1" /> 
 			<param name="baud_rate" value="115200" /> 
 			<param name="frame_id" value="neato_lidar" /> 
 			<param name="firmware_version" value="2" /> 
 			<param name="lidar_publisher_topic" value="lidar_scan_data" /> 
-			
+		</node>
+		<node pkg="fmSensors" name="IMU" type="sparkfun_razor_node" output="screen">
+			<param name="sub_serial_string_topic_id" value="/fmCSP/ypr_serial" />
+			<param name="pub_accelerometer_topic_id" value="/fmSensors/Accelerometer" />
+			<param name="pub_gyroscope_topic_id" value="/fmSensors/Gyroscope" />
+			<param name="pub_magnetometer_topic_id" value="/fmSensors/Magnetometer" />
 		</node>
 	</group>
 
 	<group ns="fmExtractors">
-		<node pkg="fmExtractors" name="imu_ypr_extractor" type="imu_ypr" >
-			<param name="publisher_topic" value="ypr" />
-			<param name="subscriber_topic" value="/fmCSP/ypr_serial"/>
-			<param name="update_frequency" value="50"/>
-		</node>
-
 		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node" >
 		</node>
 	</group>
@@ -89,7 +88,7 @@
 			<param name="subscriber_topic" value="/fmCSP/target_velocity" /> 
 		</node>
 		<node pkg="fmCSP" name="IMUSerial" type="serial_string" output="screen" >	 
-			<param name="device" value="/dev/ttyUSB1" />	
+			<param name="device" value="/dev/ttyUSB0" />	
 			<param name="baudrate" value="57600" />
 			<param name="publisher_topic" value="ypr_serial"/>
 		</node>

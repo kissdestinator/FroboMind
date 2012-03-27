@@ -1,0 +1,47 @@
+<launch>
+
+	<group ns="fmSensors">
+		<node pkg="fmSensors" name="IMU" type="sparkfun_razor_node" output="screen">
+			<param name="sub_serial_string_topic_id" value="/fmCSP/ypr_serial" />
+			<param name="pub_accelerometer_topic_id" value="/fmSensors/Accelerometer" />
+			<param name="pub_gyroscope_topic_id" value="/fmSensors/Gyroscope" />
+			<param name="pub_magnetometer_topic_id" value="/fmSensors/Magnetometer" />
+		</node>
+	</group>
+
+	<group ns="fmExtractors">
+		<node pkg="fmExtractors" name="YawPitchRollExtractor" type="imu_ypr" output="screen">
+			<param name="publisher_topic" value="/fmExtractors/YawPitchRoll" />
+			<param name="subscriber_topic_accel" value="/fmSensors/Accelerometer" />
+			<param name="subscriber_topic_mag" value="/fmSensors/Magnetometer" />
+			<param name="update_frequency" value ="50" />
+		</node>
+	</group>
+
+	<group ns="fmHMI">
+	</group>
+
+ 	<group ns="fmDecisionMakers">
+	</group>
+
+	<group ns="fmExecutors">
+	</group>
+
+	<group ns="fmControllers">
+	</group>
+
+ 	<group ns="fmActuators">
+ 	</group>
+
+ 	<group ns="fmKinematics">
+	</group>
+
+	<group ns="fmCSP">
+		<node pkg="fmCSP" name="IMUSerial" type="serial_string" output="screen" >	 
+			<param name="device" value="/dev/ttyUSB0" />	
+			<param name="baudrate" value="57600" />
+			<param name="publisher_topic" value="ypr_serial"/>
+		</node>
+	</group>
+</launch>
+
