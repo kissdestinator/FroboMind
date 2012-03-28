@@ -32,18 +32,6 @@ void left_callback(fmMsgs::odometry odo_msg_in)
 	return;
 }
 
-void ypr_callback(fmMsgs::ypr ypr_msg)
-{
-	if (start == true)
-	{
-		offset = ypr_msg.yaw;
-		start = false;
-	}
-	else
-		th = (ypr_msg.yaw - offset) * M_PI / 180;
-	return;
-}
-
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "odometry_position_extractor");
@@ -56,7 +44,6 @@ int main(int argc, char** argv)
 
 	ros::Subscriber sub_left = h.subscribe("/fmSensors/left_odometry", 1, left_callback);
 	ros::Subscriber sub_right = h.subscribe("/fmSensors/right_odometry", 1, right_callback);
-	ros::Subscriber sub_ypr = h.subscribe("/fmExtractors/ypr", 1, ypr_callback);
 	
    	fmMsgs::Vector3 pub_msg;
 
@@ -81,14 +68,10 @@ int main(int argc, char** argv)
 	    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
 	    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
 	    double delta_th = (vth * dt); 
-		if(th > (2 * M_PI))
-		   th -= 2*M_PI;
-		if(th < (0))
-		   th += 2*M_PI;
 
 	    x += delta_x;
 	    y += delta_y;
-	    th += delta_th;
+	    th = delta_th;
 	    
 	    pub_msg.x = x;
 	    pub_msg.y = y;
