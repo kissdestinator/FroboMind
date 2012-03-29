@@ -81,18 +81,15 @@ int main(int argc, char** argv)
 	    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
 	    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
 	    double delta_th = (vth * dt); 
-		if(th > (2 * M_PI))
-		   th -= 2*M_PI;
-		if(th < (0))
-		   th += 2*M_PI;
+
 
 	    x += delta_x;
 	    y += delta_y;
-	    th += delta_th;
+	    th = delta_th;
 	    
 	    pub_msg.x = x;
 	    pub_msg.y = y;
-	    pub_msg.th = th;
+	    pub_msg.th = vth;
 
 	    odom_pub.publish(pub_msg);
 	    
