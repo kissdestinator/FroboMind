@@ -195,7 +195,7 @@ def gyro_callback(data):
 
 def odo_callback(data):
     global odoAngVel
-    odoAngVel = data.z
+    odoAngVel = data.th
 
 def Gyro_odo_fusion():
     rospy.init_node('Razor_Kalman')
