@@ -18,6 +18,11 @@
 		</node>
 	</group>
 
+	<group ns="fmProcessors">
+		<node pkg="fmProcessors" name="Gyro_Odo_Fusion" type="Gyro_Odo_Fusion_Kalman_node.py" output="screen">
+		</node>	
+	</group>
+
 	<group ns="fmHMI">
 	</group>
 

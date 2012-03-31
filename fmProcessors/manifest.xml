@@ -13,6 +13,8 @@
   <depend package="sensor_msgs"/>
   <depend package="visualization_msgs"/>
   <depend package="tf"/>
+  <depend package="rospy"/>
+
 </package>
 
 
