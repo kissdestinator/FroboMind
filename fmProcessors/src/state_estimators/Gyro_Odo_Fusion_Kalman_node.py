@@ -10,6 +10,7 @@ odoAngVel = 0.
 gyroAngVel = 0.
 initial_xy = [0., 0.]
 dt = 0.02
+gyroOffset = 0.007
 
 
 
@@ -148,7 +149,7 @@ class matrix:
 P =  matrix([[1,0],[0.,1]])
 F =  matrix([[1., dt], [0.,1.]])
 H =  matrix([[0.,1.],[0.,1.]])
-R =  matrix([[0.0001,0.],[0.,0.8]])
+R =  matrix([[0.1,0.],[0.,0.1]])
 I =  matrix([[1.,0.],[0.,1.]] )
 
 x = matrix([[initial_xy[0]], [initial_xy[1]]]) # initial state (location and velocity)
@@ -190,8 +191,8 @@ def kalman_calc(event):
 
 
 def gyro_callback(data):
-    global gyroAngVel
-    gyroAngVel = data.z
+    global gyroAngVel, gyroOffset
+    gyroAngVel = data.z - gyroOffset
 
 def odo_callback(data):
     global odoAngVel
