@@ -9,6 +9,7 @@ from math import *
 odoAngVel = 0.
 gyroAngVel = 0.
 initial_xy = [0., 0.]
+lastInterruptTime = 0
 dt = 0.02
 gyroOffset = 0.007
 
@@ -431,9 +432,11 @@ def filter(x, P, measurements):
     return x, P
 
 def kalman_calc(event):
-    global gyroAngVel, odoAngVel, x, P
+    global gyroAngVel, odoAngVel, x, P, dt, lastInterruptTime
     temp_mes = [[gyroAngVel,odoAngVel]]
     x, P = filter(x, P, temp_mes)
+    dt = (event.current_real.to_sec()- lastInterruptTime)
+    rospy.loginfo("%f", dt)
     
      #Publish Message
     pub_msg = kalman_output()
@@ -442,6 +445,7 @@ def kalman_calc(event):
     pub_msg.ang_vel = x.value[1][0]
     global pub
     pub.publish(pub_msg)
+    lastInterruptTime = event.current_real.to_sec()
 
 
 
