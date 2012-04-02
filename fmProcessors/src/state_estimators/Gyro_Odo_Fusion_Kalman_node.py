@@ -126,7 +126,7 @@ class matrix:
     def CholeskyInverse(self):
         # Computes inverse of matrix given its Cholesky upper Triangular
         # decomposition of matrix.
-        res = matrix([[]])
+        res = matrix()
         res.zero(self.dimx, self.dimx)
         
         # Backward step for inverse.
