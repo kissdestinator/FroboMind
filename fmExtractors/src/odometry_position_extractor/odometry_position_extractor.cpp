@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 	    
 	    pub_msg.x = x;
 	    pub_msg.y = y;
-	    pub_msg.th = th;
+	    pub_msg.th = vth;
 
 	    odom_pub.publish(pub_msg);
 	    
