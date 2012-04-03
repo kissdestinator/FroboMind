@@ -183,6 +183,7 @@ def kalman_calc(event):
     
      #Publish Message
     pub_msg = kalman_output()
+    pub_msg.header.stamp = rospy.get_rostime()
     pub_msg.yaw = x.value[0][0]
     pub_msg.ang_vel = x.value[1][0]
     global pub
