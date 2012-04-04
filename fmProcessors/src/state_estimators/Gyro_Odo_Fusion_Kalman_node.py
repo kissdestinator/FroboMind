@@ -436,7 +436,6 @@ def kalman_calc(event):
     temp_mes = [[gyroAngVel,odoAngVel]]
     x, P = filter(x, P, temp_mes)
     dt = (event.current_real.to_sec()- lastInterruptTime)
-    rospy.loginfo("%f", dt)
     
      #Publish Message
     pub_msg = kalman_output()
