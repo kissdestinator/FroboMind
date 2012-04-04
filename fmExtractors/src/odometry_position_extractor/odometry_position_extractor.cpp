@@ -11,7 +11,7 @@ using namespace std;
 bool start;
 double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset;
 ros::Time current_time, last_time;
-double lengthBetweenTwoWheels = 0.21+0.03;
+double lengthBetweenTwoWheels = 0.39;
 ros::Time right_time, right_last_time, left_time, left_last_time;
 
 void right_callback(fmMsgs::odometry odo_msg_in)
@@ -73,8 +73,8 @@ int main(int argc, char** argv)
 	    y += delta_y;
 	    th += delta_th;
 	    
-	    pub_msg.x = xl;
-	    pub_msg.y = xr;
+	    pub_msg.x = y;
+	    pub_msg.y = x;
 	    pub_msg.th = th;
 	    pub_msg.header.stamp = ros::Time::now();
 
