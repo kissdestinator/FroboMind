@@ -76,6 +76,7 @@ int main(int argc, char** argv)
 	    pub_msg.x = xl;
 	    pub_msg.y = xr;
 	    pub_msg.th = th;
+	    pub_msg_.header.stamp = ros::Time::now();
 
 	    odom_pub.publish(pub_msg);
 	    
