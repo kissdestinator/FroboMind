@@ -73,8 +73,8 @@ int main(int argc, char** argv)
 	    y += delta_y;
 	    th += delta_th;
 	    
-	    pub_msg.x = x;
-	    pub_msg.y = y;
+	    pub_msg.x = xl;
+	    pub_msg.y = xr;
 	    pub_msg.th = th;
 
 	    odom_pub.publish(pub_msg);
