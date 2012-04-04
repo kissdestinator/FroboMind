@@ -71,11 +71,11 @@ int main(int argc, char** argv)
 
 	    x += delta_x;
 	    y += delta_y;
-	    th = delta_th;
+	    th += delta_th;
 	    
 	    pub_msg.x = x;
 	    pub_msg.y = y;
-	    pub_msg.th = vth;
+	    pub_msg.th = th;
 
 	    odom_pub.publish(pub_msg);
 	    
