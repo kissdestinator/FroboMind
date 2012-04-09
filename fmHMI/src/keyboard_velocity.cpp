@@ -59,14 +59,14 @@ int main(int argc, char** argv)
     {
       case KEYCODE_L:
         ROS_DEBUG("LEFT");
-        hastighed.speed_right = 0.0;
+        hastighed.speed_right = -1.0;
         hastighed.speed_left = 1.0;
         dirty = true;
         break;
       case KEYCODE_R:
         ROS_DEBUG("RIGHT");
         hastighed.speed_right = 1.0;
-        hastighed.speed_left = 0.0;
+        hastighed.speed_left = -1.0;
         dirty = true;
         break;
       case KEYCODE_U:
@@ -89,6 +89,9 @@ int main(int argc, char** argv)
     }
 
     c = 0x00;
+    float scale = 0.5;
+    hastighed.speed_left *= scale;
+    hastighed.speed_right *= scale;
 
     vel_pub.publish(hastighed);   
 
