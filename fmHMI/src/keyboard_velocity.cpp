@@ -42,10 +42,10 @@ int main(int argc, char** argv)
   puts("Reading from keyboard");
   puts("---------------------------");
   puts("Use arrow keys to move the turtle.");
-
+	ros::Rate loop_rate(50);
 
   for(;;)
-  {
+  {	
     // get the next event from the keyboard  
     if(read(kfd, &c, 1) < 0)
     {
@@ -81,13 +81,19 @@ int main(int argc, char** argv)
         hastighed.speed_left = -1.0;
         dirty = true;
         break;
+      default:
+	hastighed.speed_right = 0;
+	hastighed.speed_left = 0;
+	break;
+
     }
-   
-    if(dirty ==true)
-    {
-      vel_pub.publish(hastighed);    
-      dirty=false;
-    }
+
+    c = 0x00;
+
+    vel_pub.publish(hastighed);   
+
+	    loop_rate.sleep(); 
+    
   }
 
 
