@@ -16,7 +16,7 @@
 			<param name="encoder2" value="/fmSensors/encoder2" /> 
 		</node>
 		<node pkg="fmSensors" name="Lidar" type="neato_lidar_node" output="screen" >
-			<param name="port" value="/dev/ttyUSB0" /> 
+			<param name="port" value="/dev/ttyUSB1" /> 
 			<param name="baud_rate" value="115200" /> 
 			<param name="frame_id" value="neato_lidar" /> 
 			<param name="firmware_version" value="2" /> 
@@ -90,7 +90,7 @@
 			<param name="subscriber_topic" value="/fmCSP/target_velocity" /> 
 		</node>
 		<node pkg="fmCSP" name="IMUSerial" type="serial_string" output="screen" >	 
-			<param name="device" value="/dev/ttyUSB1" />	
+			<param name="device" value="/dev/ttyUSB0" />	
 			<param name="baudrate" value="57600" />
 			<param name="publisher_topic" value="ypr_serial"/>
 		</node>
