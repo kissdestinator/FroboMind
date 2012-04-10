@@ -8,7 +8,7 @@ from math import *
 
 odoAngVel = 0.
 gyroAngVel = 0.
-initial_xy = [0., 0.]
+initial_xy = [0., 0.,0.]
 lastInterruptTime = 0
 dt = 0.02
 gyroOffset = 0.007
@@ -162,28 +162,6 @@ class matrix:
                 res.value[j][i] = self.value[i][j]
         return res
 
-    # ------------
-    #
-    # creates a new matrix from the existing matrix elements.
-    #
-    # Example:
-    #       l = matrix([[ 1,  2,  3,  4,  5], 
-    #                   [ 6,  7,  8,  9, 10], 
-    #                   [11, 12, 13, 14, 15]])
-    #
-    #       l.take([0, 2], [0, 2, 3])
-    #
-    # results in:
-    #       
-    #       [[1, 3, 4], 
-    #        [11, 13, 14]]
-    #       
-    # 
-    # take is used to remove rows and columns from existing matrices
-    # list1/list2 define a sequence of rows/columns that shall be taken
-    # is no list2 is provided, then list2 is set to list1 (good for symmetric matrices)
-    #
-
     def take(self, list1, list2 = []):
         if list2 == []:
             list2 = list1
@@ -197,28 +175,6 @@ class matrix:
                 res.value[i][j] = self.value[list1[i]][list2[j]]
         return res
 
-    # ------------
-    #
-    # creates a new matrix from the existing matrix elements.
-    #
-    # Example:
-    #       l = matrix([[1, 2, 3],
-    #                  [4, 5, 6]])
-    #
-    #       l.expand(3, 5, [0, 2], [0, 2, 3])
-    #
-    # results in:
-    #
-    #       [[1, 0, 2, 3, 0], 
-    #        [0, 0, 0, 0, 0], 
-    #        [4, 0, 5, 6, 0]]
-    # 
-    # expand is used to introduce new rows and columns into an existing matrix
-    # list1/list2 are the new indexes of row/columns in which the matrix
-    # elements are being mapped. Elements for rows and columns 
-    # that are not listed in list1/list2 
-    # will be initialized by 0.0.
-    #
 
     def expand(self, dimx, dimy, list1, list2 = []):
         if list2 == []:
@@ -401,14 +357,14 @@ class robot:
 
 
     
-P =  matrix([[1,0],[0.,1]])
-F =  matrix([[1., dt], [0.,1.]])
-H =  matrix([[0.,1.],[0.,1.]])
-R =  matrix([[0.0013,0.],[0.,0.000021]])
-I =  matrix([[1.,0.],[0.,1.]] )
+P =  matrix([[0.1,0.,0.],[0.,0.1,0.],[0.,0.,0.1]])
+F =  matrix([[1., dt/2., dt/2.], [0.,1.,0.], [0.,0.,1.]])
+H =  matrix([[0.,1.,0.],[0.,0.,1.]])
+R =  matrix([[0.01,0.],[0.,0.01]])
+I =  matrix([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]] )
 
-x = matrix([[initial_xy[0]], [initial_xy[1]]]) # initial state (location and velocity)
-u = matrix([[0.], [0.]]) # external motion
+x = matrix([[initial_xy[0]], [initial_xy[1]], [initial_xy[2]]]) # initial state (location and velocity)
+u = matrix([[0.],[0.],[0.]]) # external motion
 ###############################################
 ###############################################
 
