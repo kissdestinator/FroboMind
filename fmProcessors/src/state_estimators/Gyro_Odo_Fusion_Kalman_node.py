@@ -362,6 +362,7 @@ F =  matrix([[1., dt/2., dt/2.], [0.,1.,0.], [0.,0.,1.]])
 H =  matrix([[0.,1.,0.],[0.,0.,1.]])
 R =  matrix([[10.,0.],[0.,10.]])
 I =  matrix([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]] )
+P_Cheat = matrix([[0.2,0.,0.],[0.,0.2,0.],[0.,0.,0.2]])
 
 x = matrix([[initial_xy[0]], [initial_xy[1]], [initial_xy[2]]]) # initial state (location and velocity)
 u = matrix([[0.],[0.],[0.]]) # external motion
@@ -383,7 +384,7 @@ def filter(x, P, measurements):
         S = H * P * H.transpose() + R
         K = P * H.transpose() * S.inverse()
         x = x + (K * y)
-        P = (I - (K * H)) * P
+        P = (I - (K * H)) * P + P_Cheat
     
     return x, P
 
