@@ -360,7 +360,7 @@ class robot:
 P =  matrix([[0.1,0.,0.],[0.,0.1,0.],[0.,0.,0.1]])
 F =  matrix([[1., dt/2., dt/2.], [0.,1.,0.], [0.,0.,1.]])
 H =  matrix([[0.,1.,0.],[0.,0.,1.]])
-R =  matrix([[10.,0.],[0.,10.]])
+R =  matrix([[0.01,0.],[0.,0.010]])
 I =  matrix([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]] )
 
 x = matrix([[initial_xy[0]], [initial_xy[1]], [initial_xy[2]]]) # initial state (location and velocity)
@@ -398,6 +398,7 @@ def kalman_calc(event):
     pub_msg.header.stamp = rospy.get_rostime()
     pub_msg.yaw = x.value[0][0]
     pub_msg.ang_vel = x.value[1][0]
+    pub_msg.ang_vel2 = x.value[2][0]	
     global pub
     pub.publish(pub_msg)
     lastInterruptTime = event.current_real.to_sec()
