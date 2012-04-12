@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 
   /* read parameters from ros parameter server if available otherwise use default values */
   n.param<std::string> ("publisher_topic", publisher_topic, "enc_msg"); //Specify the publisher name
-  n.param<int> ("update_frequency", frequency, 10); //Update frequency
+  n.param<int> ("update_frequency", frequency, 20); //Update frequency
   n.param<int> ("direction", direction, 1); //Set the direction (-1 if the encoder is mounted backwards)
 
   enc_publisher = nh.advertise<fmMsgs::encoder> (publisher_topic.c_str(), 1);
@@ -129,29 +129,32 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(frequency); //Encoder loop frequency
 
-
+  int phidgetEncoderStatus;
+  int encoder_value;
+  ros::Time now;
+  int _PreviousLeftEncoderCounts = 0;
 
   while (ros::ok())
   {
     ros::spinOnce();
     
-    int phidgetEncoderStatus = 0;
+    phidgetEncoderStatus = 0;
 
     CPhidget_getDeviceStatus((CPhidgetHandle) encoder, &phidgetEncoderStatus);
     if (phidgetEncoderStatus != 0)
     {
-	int encoder_value;        
-	CPhidgetEncoder_getPosition(encoder, 0, &encoder_value); //Get encoderposition
-	enc_msg.encoderticks = encoder_value;
+		CPhidgetEncoder_getPosition(encoder, 0, &encoder_value); //Get encoderposition
+
+		now = ros::Time::now();
+
+		enc_msg.encoderticks = encoder_value;
+		enc_msg.header.stamp = now;
+		enc_msg.header.frame_id = serialString;
+
+		enc_publisher.publish(enc_msg); //Publish message
     }
-    enc_msg.header.stamp = ros::Time::now();
-    enc_msg.header.frame_id = serialString;
-
-    enc_publisher.publish(enc_msg); //Publish message
-
     loop_rate.sleep();
   }
-
   CPhidget_close((CPhidgetHandle)encoder); //Close encoder connection
   CPhidget_delete((CPhidgetHandle)encoder); //Delete the encoder handle
 
