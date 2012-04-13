@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include "fmMsgs/desired_speed.h"
+#include "geometry_msgs/TwistStamped.h"
 #include <stdio.h>
 #include <fmMsgs/Joy.h>
 
@@ -8,19 +8,13 @@ ros::Subscriber joy_sub;
 
 void callback(fmMsgs::Joy joy)
 {
-	fmMsgs::desired_speed hastighed;
+	geometry_msgs::TwistStamped pub_msg;
 
-	if(joy.buttons[6]==1)
-		hastighed.speed_right = hastighed.speed_left = -1;
-	else if(joy.buttons[7]==1)
-		hastighed.speed_right = hastighed.speed_left = 1;
-	else
-	{ 
-		hastighed.speed_right = joy.axes[4] + joy.axes[3];
-		hastighed.speed_left = joy.axes[1];
-	}	
+	pub_msg.twist.linear.x = joy.axes[3] ;
+	pub_msg.twist.angular.z = joy.axes[4]/0.12;
 	
-	vel_pub.publish(hastighed);
+	
+	vel_pub.publish(pub_msg);
 }
 
 int main(int argc, char** argv)
@@ -36,7 +30,7 @@ int main(int argc, char** argv)
   nh.param<std::string>("velocity_pub_topic", velocity_pub_topic, "/speed_from_joystick");
   nh.param<std::string>("joystick_sub_topic", joystick_sub_topic, "/fmHMI/joy");
 
-  vel_pub = h.advertise<fmMsgs::desired_speed>(velocity_pub_topic, 1);
+  vel_pub = h.advertise<geometry_msgs::Twist>(velocity_pub_topic, 1);
   joy_sub = h.subscribe(joystick_sub_topic, 1, callback);
 
   ros::spin();
