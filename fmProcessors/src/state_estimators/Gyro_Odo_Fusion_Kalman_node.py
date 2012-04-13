@@ -11,7 +11,7 @@ gyroAngVel = 0.
 initial_xy = [0., 0.,0.]
 lastInterruptTime = 0
 dt = 0.02
-gyroOffset = 0.007
+gyroOffset = -0.027
 
 
 
@@ -355,14 +355,16 @@ class robot:
     def __repr__(self):
         return 'Robot: [x=%.5f y=%.5f]'  % (self.x, self.y)
 
-
+gyroOffset = -0.027
+gyroBelieve = 0.5
+odoBelieve = 0.5
     
 P =  matrix([[0.1,0.,0.],[0.,0.1,0.],[0.,0.,0.1]])
-F =  matrix([[1., dt/2., dt/2.], [0.,1.,0.], [0.,0.,1.]])
+F =  matrix([[1., dt * gyroBelieve, dt * odoBelieve], [0.,1.,0.], [0.,0.,1.]])
 H =  matrix([[0.,1.,0.],[0.,0.,1.]])
 R =  matrix([[0.0001,0.],[0.,0.0001]])
 I =  matrix([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]] )
-Q = matrix([[0.005,0.,0.],[0.,0.005,0.],[0.,0.,0.005]])
+Q = matrix([[0.00005,0.,0.],[0.,0.00005,0.],[0.,0.,0.00005]])
 
 x = matrix([[initial_xy[0]], [initial_xy[1]], [initial_xy[2]]]) # initial state (location and velocity)
 u = matrix([[0.],[0.],[0.]]) # external motion
@@ -389,10 +391,11 @@ def filter(x, P, measurements):
     return x, P
 
 def kalman_calc(event):
-    global gyroAngVel, odoAngVel, x, P, dt, lastInterruptTime
+    global gyroAngVel, odoAngVel, x, P, dt, lastInterruptTime, gyroBelieve, odoBelieve
     temp_mes = [[gyroAngVel,odoAngVel]]
-    x, P = filter(x, P, temp_mes)
+    update_Believes()
     dt = (event.current_real.to_sec()- lastInterruptTime)
+    x, P = filter(x, P, temp_mes)
     
      #Publish Message
     pub_msg = kalman_output()
@@ -404,7 +407,14 @@ def kalman_calc(event):
     pub.publish(pub_msg)
     lastInterruptTime = event.current_real.to_sec()
 
-
+def update_Believes():
+    global gyroAngVel,odoAngVel,gyroBelieve,odoBelieve
+    if gyroAngVel + odoAngVel < 0.02:
+	gyroBelieve = 0.2
+	odoBelieve = 0.8
+    else:
+	gyroBelieve = 0.8
+        odoBelieve = 0.2
 
 def gyro_callback(data):
     global gyroAngVel, gyroOffset
