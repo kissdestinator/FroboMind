@@ -1,4 +1,4 @@
-#include "fmMsgs/desired_speed.h"
+#include "geometry_msgs/TwistStamped.h"
 #include "fmMsgs/motor_power.h"
 #include "fmMsgs/odometry.h"
 #include "ros/ros.h"
@@ -44,7 +44,7 @@ public:
 
   MotorController(double p_left, double i_left, double d_left, double p_right, double i_right, double d_right);
 
-  void desiredSpeedHandler(const fmMsgs::desired_speedConstPtr& msg);
+  void desiredSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg);
   void leftMotorHandler(const fmMsgs::odometryConstPtr& msg);
   void rightMotorHandler(const fmMsgs::odometryConstPtr& msg);
 

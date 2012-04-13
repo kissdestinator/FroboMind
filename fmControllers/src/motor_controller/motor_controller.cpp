@@ -15,10 +15,37 @@ MotorController::MotorController(double p_left, double i_left, double d_left, do
 	max_deceleration = 0;
 }
 
-void MotorController::desiredSpeedHandler(const fmMsgs::desired_speedConstPtr& msg)
+void MotorController::desiredSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg)
 {
-	target_speed_left = msg->speed_left * max_speed;
-	target_speed_right = msg->speed_right * max_speed;
+
+	double W = 0.12; //length from center to meter
+	double vel_right = msg->twist.linear.x - ( W * msg->twist.angular.z );
+	double vel_left =  msg->twist.linear.x + ( W * msg->twist.angular.z );
+
+	// Normalize velocities
+	if (vel_right > 1)
+	{
+		vel_left /= vel_right;
+		vel_right = 1;
+	}
+	if (vel_left > 1)
+	{
+		vel_right /= vel_left;
+		vel_left = 1;
+	}
+	if (vel_right < -1)
+	{
+		vel_left /= abs(vel_right);
+		vel_right = -1;
+	}
+	if (vel_left < -1)
+	{
+		vel_right /= abs(vel_left);
+		vel_left = -1;
+	}
+
+	target_speed_left = vel_left * max_speed;
+	target_speed_right = vel_right * max_speed;
 }
 
 double MotorController::maxAcceleration(const double& target_speed, const double& last_target_speed, ros::Time& last_time)

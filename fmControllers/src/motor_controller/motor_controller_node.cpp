@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	mc.setMaxAcceleration(max_acceleration);
 	mc.setMaxDeacceleration(max_deacceleration);
 
-	mc.target_speed_sub = n.subscribe<fmMsgs::desired_speed>(desired_speed_sub_topic.c_str(),1,&MotorController::desiredSpeedHandler,&mc);
+	mc.target_speed_sub = n.subscribe<geometry_msgs::TwistStamped>(desired_speed_sub_topic.c_str(),1,&MotorController::desiredSpeedHandler,&mc);
 	mc.left_odo_sub = n.subscribe(left_odometry_sub_topic.c_str(), 1, &MotorController::leftMotorHandler,&mc);
 	mc.right_odo_sub = n.subscribe(right_odometry_sub_topic.c_str(), 1, &MotorController::rightMotorHandler,&mc);
 	mc.motor_power_pub = n.advertise<fmMsgs::motor_power>(motor_power_pub_topic.c_str(), 1);
