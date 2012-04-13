@@ -35,6 +35,15 @@
 		</node>
 	</group>
 
+	<group ns="fmTools">
+		<node pkg="usb_cam" name="webcam" type="usb_cam_node" output="screen">
+			<param name="pixel_format" value="yuyv"></param>
+			<param name="video_device" value="/dev/video0"></param>
+			<param name="image_width" value="640"></param>
+			<param name="image_height" value="480"></param>
+		</node>
+	</group>
+
 
 	<group ns="fmProcessors">
 		<node pkg="fmProcessors" name="Gyro_Odo_Fusion" type="Gyro_Odo_Fusion_Kalman_node.py" output="screen">
