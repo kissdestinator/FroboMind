@@ -5,13 +5,11 @@
 #include "sensor_msgs/LaserScan.h"
 #include "geometry_msgs/Point32.h"
 #include "laser_geometry/laser_geometry.h"
-//#include "sensor_msgs/Image.h"
-//#include "pcl/io/pcd_io.h"
 #include "sensor_msgs/PointCloud.h"
 #include "ros/ros.h"
 #include "fmMsgs/row.h"
-//#include "tf/transform_listener.h"
 #include "fmMsgs/Vector3.h"
+#include "fmMsgs/vehicle_position.h"
 
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
@@ -51,6 +49,8 @@ public:
   ros::Publisher marker_pub;
 
   ros::Publisher row_pub;
+
+  ros::Publisher vehicle_position_pub;
 
   ros::Subscriber laser_scan_sub;
   ros::Subscriber position_sub;

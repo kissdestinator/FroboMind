@@ -1,13 +1,13 @@
 #ifndef PARTICLE_FILTER_H_
 #define PARTICLE_FILTER_H_
 
-
 #include "geometry_msgs/Point32.h"
 #include "laser_geometry/laser_geometry.h"
 #include "pcl/io/pcd_io.h"
 #include "sensor_msgs/PointCloud.h"
 #include "ros/ros.h"
 #include "fmMsgs/Vector3.h"
+#include "fmMsgs/vehicle_position.h"
 #include "tf/transform_listener.h"
 #include "visualization_msgs/MarkerArray.h"
 
@@ -71,7 +71,7 @@ private:
   void resampling();
   double gaussian(double mu, double sigma, double x);
   void addRandomGaussianNoise();
-  fmMsgs::Vector3 findVehicle();
+  fmMsgs::vehicle_position findVehicle();
 
 public:
 
@@ -79,7 +79,7 @@ public:
   ParticleFilter(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double x_noise, double y_noise, double theta_noise);
 
   void updateParticlesMarker(void);
-  fmMsgs::Vector3 update(const sensor_msgs::PointCloud& cloud, const double& dx, const double& dy, const double& dtheta);
+  fmMsgs::vehicle_position update(const sensor_msgs::PointCloud& cloud, const double& dx, const double& dy, const double& dtheta);
   visualization_msgs::MarkerArray getParticlesMarker(void);
 };
 
