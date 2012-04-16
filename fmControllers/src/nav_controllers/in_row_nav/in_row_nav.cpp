@@ -39,10 +39,10 @@ IN_ROW_NAV::~IN_ROW_NAV(){
 
 }
 
-void IN_ROW_NAV::maizehandler(const fmMsgs::rowConstPtr & maize_msg){
+void IN_ROW_NAV::pothandler(const fmMsgs::rowConstPtr & pot_msg){
 
-	distance_regulator_output_ = distance_regulator.update(maize_msg->error_distance,0);
-	angle_regulator_output_ = angle_regulator.update(maize_msg->error_angle,0);
+	distance_regulator_output_ = distance_regulator.update(pot_msg->error_distance,0);
+	angle_regulator_output_ = angle_regulator.update(pot_msg->error_angle,0);
 
 	twist_msg.header.stamp = ros::Time::now();
 	twist_msg.twist.linear.x=0.5;
@@ -50,11 +50,4 @@ void IN_ROW_NAV::maizehandler(const fmMsgs::rowConstPtr & maize_msg){
 
 
 	twist_pub_.publish(twist_msg);
-
-
-	ROS_INFO("ao: %f , ae: %f",angle_regulator_output_,maize_msg->error_angle);
-
-
-
-
 }

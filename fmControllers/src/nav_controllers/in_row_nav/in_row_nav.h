@@ -41,22 +41,22 @@ class IN_ROW_NAV {
 private:
 
 	PIDRegulator angle_regulator;
-    PIDRegulator distance_regulator;
+        PIDRegulator distance_regulator;
 
-    geometry_msgs::TwistStamped twist_msg;
+        geometry_msgs::TwistStamped twist_msg;
 
 	double angle_regulator_output_;
 	double distance_regulator_output_;
 
 public:
 
-	ros::Subscriber maize_row_sub_;
+	ros::Subscriber pot_row_sub_;
 	ros::Publisher twist_pub_;
 
-	std::string maize_sub_top_;
+	std::string pot_sub_top_;
 	std::string twist_pub_top_;
 
-	void maizehandler(const fmMsgs::rowConstPtr & row_msg);
+	void pothandler(const fmMsgs::rowConstPtr & row_msg);
 
 	IN_ROW_NAV();
 	virtual ~IN_ROW_NAV();

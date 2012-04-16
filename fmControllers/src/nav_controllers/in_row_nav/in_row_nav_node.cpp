@@ -40,11 +40,11 @@ int main(int argc, char **argv) {
 
 	IN_ROW_NAV irn;
 
-	n.param<std::string> ("maize_sub", irn.maize_sub_top_, "/husmand/kalman_row_estimate");
-	n.param<std::string> ("twist_top", irn.twist_pub_top_, "/auto_cmd_vel");
+	n.param<std::string> ("lidar_sub", irn.pot_sub_top_, "/husmand/kalman_row_estimate");
+	n.param<std::string> ("twist_top", irn.twist_pub_top_, "/speed_from_joystick");
 
 	irn.twist_pub_ = nh.advertise<geometry_msgs::TwistStamped>(irn.twist_pub_top_.c_str(),1);
-	irn.maize_row_sub_ = nh.subscribe<fmMsgs::row>(irn.maize_sub_top_.c_str(),100,&IN_ROW_NAV::maizehandler, &irn);
+	irn.pot_row_sub_ = nh.subscribe<fmMsgs::row>(irn.pot_sub_top_.c_str(),100,&IN_ROW_NAV::pothandler, &irn);
 
 	//Handle callbacks
 	ros::spin();
