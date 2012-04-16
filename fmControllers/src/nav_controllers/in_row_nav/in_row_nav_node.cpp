@@ -38,13 +38,28 @@ int main(int argc, char **argv) {
 	ros::NodeHandle nh;
 	ros::NodeHandle n("~");
 
-	IN_ROW_NAV irn;
+	double angle_regulator_p;
+	double angle_regulator_i;
+	double angle_regulator_d;
+	double linear_regulator_p;
+	double linear_regulator_i;
+	double linear_regulator_d;
+	
+	n.param<double> ("angular_p", angle_regulator_p, 0.2);
+	n.param<double> ("angular_i", angle_regulator_i, 0);
+	n.param<double> ("angular_d", angle_regulator_d, 0);
+	n.param<double> ("linear_p", linear_regulator_p, 0.2);
+	n.param<double> ("linear_i", linear_regulator_i, 0);
+	n.param<double> ("linear_d", linear_regulator_d, 0);
 
-	n.param<std::string> ("lidar_sub", irn.pot_sub_top_, "/husmand/kalman_row_estimate");
-	n.param<std::string> ("twist_top", irn.twist_pub_top_, "/speed_from_joystick");
+	IN_ROW_NAV irn(angle_regulator_p,angle_regulator_i,angle_regulator_d,linear_regulator_p,linear_regulator_i,linear_regulator_d);
+
+	n.param<std::string> ("maize_sub", irn.maize_sub_top_, "/husmand/kalman_row_estimate");
+	n.param<std::string> ("twist_top", irn.twist_pub_top_, "/auto_cmd_vel");
+
 
 	irn.twist_pub_ = nh.advertise<geometry_msgs::TwistStamped>(irn.twist_pub_top_.c_str(),1);
-	irn.pot_row_sub_ = nh.subscribe<fmMsgs::row>(irn.pot_sub_top_.c_str(),100,&IN_ROW_NAV::pothandler, &irn);
+	irn.maize_row_sub_ = nh.subscribe<fmMsgs::vehicle_position>(irn.maize_sub_top_.c_str(),100,&IN_ROW_NAV::maizehandler, &irn);
 
 	//Handle callbacks
 	ros::spin();

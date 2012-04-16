@@ -30,19 +30,23 @@
 
 #include "in_row_nav.h"
 
-IN_ROW_NAV::IN_ROW_NAV(){
-	angle_regulator = PIDRegulator(2.5,0,0);
-	distance_regulator = PIDRegulator(0.2,0,0);
+IN_ROW_NAV::IN_ROW_NAV(double ap,double ai,double ad,double lp,double li,double ld){
+	angle_regulator = PIDRegulator(ap,ai,ad);
+	distance_regulator = PIDRegulator(lp,li,ld);
 }
 
 IN_ROW_NAV::~IN_ROW_NAV(){
 
 }
 
-void IN_ROW_NAV::pothandler(const fmMsgs::rowConstPtr & pot_msg){
+void IN_ROW_NAV::maizehandler(const fmMsgs::vehicle_position maize_msg){
+	
+	float error_angle = maize_msg.position.th;
+	if(error_angle < M_PI)
+		error_angle = -2*M_PI + error_angle; 
 
-	distance_regulator_output_ = distance_regulator.update(pot_msg->error_distance,0);
-	angle_regulator_output_ = angle_regulator.update(pot_msg->error_angle,0);
+	distance_regulator_output_ = distance_regulator.update(maize_msg.position.x,0);
+	angle_regulator_output_ = angle_regulator.update(error_angle,0);
 
 	twist_msg.header.stamp = ros::Time::now();
 	twist_msg.twist.linear.x=0.5;
@@ -50,4 +54,5 @@ void IN_ROW_NAV::pothandler(const fmMsgs::rowConstPtr & pot_msg){
 
 
 	twist_pub_.publish(twist_msg);
+
 }

@@ -33,6 +33,25 @@
 	<group ns="fmExtractors">
 		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node" >
 		</node>
+
+		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector">
+			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
+			<param name="visualization_marker_left_pub_topic" value="/fmExtractors/viz_marker_left" />
+			<param name="visualization_marker_right_pub_topic" value="/fmExtractors/viz_marker_right" />
+			<param name="row_pub_topic" value="/fmExtractors/Rows" />
+			<param name="point_cloud_pub_topic" value="/fmExtractors/point_cloud" />
+			<param name="point_cloud_rotated_pub_topic" value="/fmExtractors/point_cloud_rotated" />
+			<param name="position_sub_topic" value="/fmExtractors/xyz_position" />
+			<param name="vehicle_position_pub_topic" value="/fmExtractors/vehicle_position" />
+		</node>
+
+
+
+
+
+
+
+
 	</group>
 
 	<group ns="fmTools">
@@ -76,8 +95,14 @@
 		</node>
 
 		<node pkg="fmControllers" name="in_row_naw_controller" type="IN_ROW_NAV" output="screen">
-		<param name="lidar_sub" value="/something!!!!!!" />
-		<param name="twist_top" value="/speed_from_joystick">
+			<param name="lidar_sub" value="/fmExtractors/vehicle_position" />
+			<param name="twist_top" value="/speed_from_joystick" />
+			<param name="angular_p" value="0.2" />
+			<param name="angular_i" value= "0" />
+			<param name="angular_d" value= "0" />
+			<param name="linear_p" value="0.2" />
+			<param name="linear_i" value="0" />
+			<param name="linear_d" value="0" />
 		</node>
 	</group>
 

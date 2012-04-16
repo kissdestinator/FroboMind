@@ -35,30 +35,30 @@
 #include <geometry_msgs/TwistStamped.h>
 #include "fmMsgs/row.h"
 #include "pid_regulator.h"
+#include "fmMsgs/vehicle_position.h"
 
 class IN_ROW_NAV {
 
 private:
 
 	PIDRegulator angle_regulator;
-        PIDRegulator distance_regulator;
+    	PIDRegulator distance_regulator;
 
-        geometry_msgs::TwistStamped twist_msg;
+   	geometry_msgs::TwistStamped twist_msg;
 
 	double angle_regulator_output_;
 	double distance_regulator_output_;
 
 public:
-
-	ros::Subscriber pot_row_sub_;
+	ros::Subscriber maize_row_sub_;
 	ros::Publisher twist_pub_;
 
-	std::string pot_sub_top_;
+	std::string maize_sub_top_;
 	std::string twist_pub_top_;
 
-	void pothandler(const fmMsgs::rowConstPtr & row_msg);
+	void maizehandler(const fmMsgs::vehicle_position maize_msg);
 
-	IN_ROW_NAV();
+	IN_ROW_NAV(double ap,double ai,double ad,double lp,double li,double ld);
 	virtual ~IN_ROW_NAV();
 };
 
