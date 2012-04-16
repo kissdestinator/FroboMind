@@ -251,9 +251,9 @@ void ParticleFilter::resampling()
 		particles.push_back(temp[i]);
 }
 
-fmMsgs::Vector3 ParticleFilter::findVehicle()
+fmMsgs::vehicle_position ParticleFilter::findVehicle()
 {
-	fmMsgs::Vector3 r;
+	fmMsgs::vehicle_position r;
 	double x(0),y(0),theta(0);
 	for (int i = 0; i < noParticles; i++)
 	{
@@ -273,9 +273,11 @@ fmMsgs::Vector3 ParticleFilter::findVehicle()
 		theta += temp_theta;
 
 	}
-	r.x = last_x = x / noParticles;
-	r.y = last_y = y / noParticles;
-	r.th = last_theta = theta / noParticles;
+	r.position.x = last_x = x / noParticles;
+	r.position.y = last_y = y / noParticles;
+	r.position.th = last_theta = theta / noParticles;
+	r.probability = max_prob;
+	r.header.stamp = ros::Time::now();
 
 	std::cout << "Row: x: " << last_x << " y: " << last_y << " theta: " << last_theta << std::endl;
 
@@ -299,7 +301,7 @@ void ParticleFilter::newParticles(double ratio)
 
 }
 
-fmMsgs::Vector3 ParticleFilter::update(const sensor_msgs::PointCloud& pointCloud, const double& dx, const double& dy, const double& dtheta)
+fmMsgs::vehicle_position ParticleFilter::update(const sensor_msgs::PointCloud& pointCloud, const double& dx, const double& dy, const double& dtheta)
 {
 //	motionUpdate(dx,dy,dtheta);
 	addRandomGaussianNoise();

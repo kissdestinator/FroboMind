@@ -69,7 +69,9 @@ void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstP
 			cloud_filtered.points.push_back(cloud.points[i]);
 	}
 
-	fmMsgs::Vector3 v3 = particlefilter.update(cloud_filtered,dx,dy,dtheta);
+	fmMsgs::vehicle_position vp = particlefilter.update(cloud_filtered,dx,dy,dtheta);
+
+	vehicle_position_pub.publish(vp);
 
 	sensor_msgs::PointCloud cloud_rotated;
 
@@ -77,8 +79,8 @@ void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstP
 	{
 		geometry_msgs::Point32 t;
 
-		t.x = cloud_filtered.points[i].x * cos(v3.th) - cloud_filtered.points[i].y * sin(v3.th) + v3.x;
-		t.y = cloud_filtered.points[i].x * sin(v3.th) + cloud_filtered.points[i].y * cos(v3.th) + v3.y;
+		t.x = cloud_filtered.points[i].x * cos(vp.position.th) - cloud_filtered.points[i].y * sin(vp.position.th) + vp.position.x;
+		t.y = cloud_filtered.points[i].x * sin(vp.position.th) + cloud_filtered.points[i].y * cos(vp.position.th) + vp.position.y;
 		t.z = 0;
 
 		cloud_rotated.points.push_back(t);
