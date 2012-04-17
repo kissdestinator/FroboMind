@@ -30,7 +30,7 @@ int main(int argc, char** argv)
   nh.param<std::string>("velocity_pub_topic", velocity_pub_topic, "/speed_from_joystick");
   nh.param<std::string>("joystick_sub_topic", joystick_sub_topic, "/fmHMI/joy");
 
-  vel_pub = h.advertise<geometry_msgs::Twist>(velocity_pub_topic, 1);
+  vel_pub = h.advertise<geometry_msgs::TwistStamped>(velocity_pub_topic, 1);
   joy_sub = h.subscribe(joystick_sub_topic, 1, callback);
 
   ros::spin();
