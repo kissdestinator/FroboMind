@@ -412,12 +412,9 @@ def update_Believes():
     if (gyroAngVel + odoAngVel < -0.02) or (gyroAngVel + odoAngVel > 0.02) :
 	gyroBelieve = 0.8
 	odoBelieve = 0.2
-        rospy.loginfo("gyroBelieve")
     else:
 	gyroBelieve = 0.2
         odoBelieve = 0.8
-        rospy.loginfo("odo Beleve")
-
 def gyro_callback(data):
     global gyroAngVel, gyroOffset
     gyroAngVel = data.z - gyroOffset
