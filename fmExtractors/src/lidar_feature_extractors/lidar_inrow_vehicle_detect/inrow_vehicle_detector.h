@@ -48,8 +48,6 @@ public:
 
   ros::Publisher marker_pub;
 
-  ros::Publisher row_pub;
-
   ros::Publisher vehicle_position_pub;
 
   ros::Subscriber laser_scan_sub;

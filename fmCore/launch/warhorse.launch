@@ -34,7 +34,7 @@
 		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node" >
 		</node>
 
-		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector">
+		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector" output="screen">
 			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
 			<param name="visualization_marker_left_pub_topic" value="/fmExtractors/viz_marker_left" />
 			<param name="visualization_marker_right_pub_topic" value="/fmExtractors/viz_marker_right" />
@@ -44,14 +44,6 @@
 			<param name="position_sub_topic" value="/fmExtractors/xyz_position" />
 			<param name="vehicle_position_pub_topic" value="/fmExtractors/vehicle_position" />
 		</node>
-
-
-
-
-
-
-
-
 	</group>
 
 	<group ns="fmTools">

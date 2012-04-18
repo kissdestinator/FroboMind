@@ -10,6 +10,7 @@
 #include "fmMsgs/vehicle_position.h"
 #include "tf/transform_listener.h"
 #include "visualization_msgs/MarkerArray.h"
+#include "geometry_msgs/Point32.h"
 
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -20,11 +21,11 @@ struct Car
 {
 	Car()
 	{
-		x = 0; y = 0; theta = 0; w = 1;
+		x = 0; y = 0; theta = 0; w = 0;
 	}
 	Car(double X, double Y, double Theta)
 	{
-		x = X; y = Y; theta = Theta; w = 1;
+		x = X; y = Y; theta = Theta; w = 0;
 	}
 	Car(double X, double Y, double Theta, double W)
 	{
