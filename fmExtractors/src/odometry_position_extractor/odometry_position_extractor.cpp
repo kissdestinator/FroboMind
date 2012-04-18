@@ -4,12 +4,14 @@
 #include "fmMsgs/Vector3.h"
 #include "math.h"
 #include "fmMsgs/ypr.h"
+#include "fmMsgs/kalman_output.h"
+#include "fmMsgs/vehicle_coordinate.h"
 
 
 using namespace std;
 
 bool start;
-double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset;
+double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset, kalman_th;
 ros::Time current_time, last_time;
 double lengthBetweenTwoWheels = 0.39;
 ros::Time right_time, right_last_time, left_time, left_last_time;
@@ -32,24 +34,32 @@ void left_callback(fmMsgs::odometry odo_msg_in)
 	return;
 }
 
+void kalman_callback(fmMsgs::kalman_output msg)
+{
+	kalman_th = msg.yaw;
+}
+
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "odometry_position_extractor");
 	
 	ros::NodeHandle h;
 	
-	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = 0;
+	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = kalman_th = 0;
 	left_last_time = right_last_time = ros::Time::now();
 	start = true;
 
 	ros::Subscriber sub_left = h.subscribe("/fmSensors/left_odometry", 1, left_callback);
 	ros::Subscriber sub_right = h.subscribe("/fmSensors/right_odometry", 1, right_callback);
+	ros::Subscriber sub_kalman = h.subscribe("/fmProcessors/Kalman_AngularVelocity", 1, kalman_callback);
 	
    	fmMsgs::Vector3 pub_msg;
+	fmMsgs::vehicle_coordinate coord_pub_msg;
 
 	ros::Rate loop_rate(50);
 
         ros::Publisher odom_pub = h.advertise<fmMsgs::Vector3>("xyz_position", 1); 
+        ros::Publisher coordi_pub = h.advertise<fmMsgs::vehicle_coordinate>("vehicle_coordinate", 1); 
 
 	while(h.ok()){
 
@@ -71,12 +81,18 @@ int main(int argc, char** argv)
 
 	    x += delta_x;
 	    y += delta_y;
-	    th += delta_th;
+	    th = kalman_th;
 	    
 	    pub_msg.x = y;
 	    pub_msg.y = x;
 	    pub_msg.th = vth;
 	    pub_msg.header.stamp = ros::Time::now();
+
+	    coord_pub_msg.x = x;
+	    coord_pub_msg.y = y;
+	    coord_pub_msg.th = th;
+
+	    coordi_pub.publish(coord_pub_msg);
 
 	    odom_pub.publish(pub_msg);
 	    
