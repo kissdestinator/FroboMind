@@ -49,6 +49,8 @@ private:
 
 	double angle_regulator_output_;
 	double distance_regulator_output_;
+	
+	int publish;
 
 public:
 	ros::Subscriber maize_row_sub_;

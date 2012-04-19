@@ -28,6 +28,10 @@
  # Created: 20 march, 2012, Source written
  ****************************************************************************/
 
+#define X_RANGE 2
+#define Y_RANGE 1.05
+#define MIN_VALID_MEASUREMENTS 25
+
 #include "particle_filter.h"
 
 ParticleFilter::ParticleFilter()
@@ -201,21 +205,39 @@ void ParticleFilter::motionUpdate(const double& dx, const double& dy, const doub
 
 void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud)
 {
-	double error;
+	double prob;
 	double error_temp = 0;
+	int valid_measurements = 0;
+
 	for (int i = 0; i < noParticles; i++)
 	{
-		error = 1;
+		prob = 1;
 		for (int j = 0; j < pointCloud.points.size(); j++)
 		{
-			error_temp = pointCloud.points[j].x * sin(particles[i]->theta) + pointCloud.points[j].y * cos(particles[i]->theta) + particles[i]->y;
+			// transponer laser målingerne ind omkring (0,0) for at muliggøre sortering
+			geometry_msgs::Point32 t;
+			t.x = pointCloud.points[j].x * cos(particles[i]->theta) - pointCloud.points[j].y * sin(particles[i]->theta) + particles[i]->x;
+			t.y = pointCloud.points[j].x * sin(particles[i]->theta) + pointCloud.points[j].y * cos(particles[i]->theta) + particles[i]->y;
 
-			if (error_temp < 0.75/2)
-				error *= gaussian(0,noise_y,error_temp);
-			else
-				error *= gaussian(0,noise_y,error_temp-0.75);
+			// Beregn fejl hvis målingen er gyldig
+			if ((t.x < X_RANGE/2 && t.x > -X_RANGE/2) && (t.y < Y_RANGE/2 && t.y > -Y_RANGE/2))
+			{
+				valid_measurements++;
+				// Beregner fejlen i y-retningen
+				error_temp = pointCloud.points[j].x * sin(particles[i]->theta) + pointCloud.points[j].y * cos(particles[i]->theta) + particles[i]->y;
+
+				// bestemmer fejlen afhængig af om målingen ligger på den ene eller den anden række
+				if (error_temp < 0.75/2)
+					prob *= gaussian(0,noise_y,error_temp);
+				else
+					prob *= gaussian(0,noise_y,error_temp-0.75);
+			}
 		}
-		particles[i]->w = error;
+		// Kontroller at der har været nok målinger
+		if (valid_measurements > MIN_VALID_MEASUREMENTS)
+			particles[i]->w = prob;
+		else
+			particles[i]->w = 0;
 	}
 }
 
@@ -279,7 +301,7 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 	r.probability = max_prob;
 	r.header.stamp = ros::Time::now();
 
-	std::cout << "Row: x: " << last_x << " y: " << last_y << " theta: " << last_theta << std::endl;
+	ROS_INFO("Row: x: %.3f y: %.3f th: %.3f",last_x,last_y,last_theta);
 
 	return r;
 
