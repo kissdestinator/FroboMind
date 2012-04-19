@@ -83,8 +83,8 @@ int main(int argc, char** argv)
 	    y += delta_y;
 	    th = kalman_th;
 	    
-	    pub_msg.x = y;
-	    pub_msg.y = x;
+	    pub_msg.x = vx;
+	    pub_msg.y = vy;
 	    pub_msg.th = vth;
 	    pub_msg.header.stamp = ros::Time::now();
 

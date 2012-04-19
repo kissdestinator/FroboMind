@@ -66,5 +66,4 @@ void IN_ROW_NAV::maizehandler(const fmMsgs::vehicle_position maize_msg){
 
 void IN_ROW_NAV::allow_handler(const fmMsgs::row_nav_allow allow_msg){
 	nav_allow = allow_msg.allow;
-	ROS_INFO("%b", nav_allow);
 }
