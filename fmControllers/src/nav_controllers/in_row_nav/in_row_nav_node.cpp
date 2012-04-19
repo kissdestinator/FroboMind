@@ -54,12 +54,15 @@ int main(int argc, char **argv) {
 
 	IN_ROW_NAV irn(angle_regulator_p,angle_regulator_i,angle_regulator_d,linear_regulator_p,linear_regulator_i,linear_regulator_d);
 
-	n.param<std::string> ("maize_sub", irn.maize_sub_top_, "/husmand/kalman_row_estimate");
-	n.param<std::string> ("twist_top", irn.twist_pub_top_, "/auto_cmd_vel");
-
+	n.param<std::string> ("maize_sub", irn.maize_sub_top_, "/fmExtractors/vehicle_position");
+	n.param<std::string> ("twist_top", irn.twist_pub_top_, "/speed_from_joystick");
+	n.param<std::string> ("allow_sub", irn.allow_sub_top_, "/allow");
+	
+	irn.nav_allow = false;
 
 	irn.twist_pub_ = nh.advertise<geometry_msgs::TwistStamped>(irn.twist_pub_top_.c_str(),1);
 	irn.maize_row_sub_ = nh.subscribe<fmMsgs::vehicle_position>(irn.maize_sub_top_.c_str(),100,&IN_ROW_NAV::maizehandler, &irn);
+	irn.allow_sub_ = nh.subscribe<fmMsgs::row_nav_allow>(irn.allow_sub_top_.c_str(),1,&IN_ROW_NAV::allow_handler,&irn);
 
 	//Handle callbacks
 	ros::spin();

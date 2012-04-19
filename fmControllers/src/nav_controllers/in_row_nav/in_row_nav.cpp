@@ -40,19 +40,31 @@ IN_ROW_NAV::~IN_ROW_NAV(){
 }
 
 void IN_ROW_NAV::maizehandler(const fmMsgs::vehicle_position maize_msg){
-	
 	float error_angle = maize_msg.position.th;
 	if(error_angle < M_PI)
 		error_angle = -2*M_PI + error_angle; 
 
-	distance_regulator_output_ = distance_regulator.update(maize_msg.position.x,0);
+	distance_regulator_output_ = distance_regulator.update(maize_msg.position.y-0.375,0);
 	angle_regulator_output_ = angle_regulator.update(error_angle,0);
 
-	twist_msg.header.stamp = ros::Time::now();
-	twist_msg.twist.linear.x=0.5;
-	twist_msg.twist.angular.z=angle_regulator_output_;
+	ROS_INFO("Dist Error: %f Ang Error: %f",distance_regulator_output_,angle_regulator_output_);
 
+	if(nav_allow == true){
+		twist_msg.header.stamp = ros::Time::now();
+		twist_msg.twist.linear.x=1.0;
+		twist_msg.twist.angular.z=angle_regulator_output_ - distance_regulator_output_;
+	}
+
+	if(nav_allow == false){
+		twist_msg.twist.linear.x=0;
+		twist_msg.twist.angular.z=0;
+	}
 
 	twist_pub_.publish(twist_msg);
 
+}
+
+void IN_ROW_NAV::allow_handler(const fmMsgs::row_nav_allow allow_msg){
+	nav_allow = allow_msg.allow;
+	ROS_INFO("%b", nav_allow);
 }

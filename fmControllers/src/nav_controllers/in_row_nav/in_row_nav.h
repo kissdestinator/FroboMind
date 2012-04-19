@@ -36,6 +36,7 @@
 #include "fmMsgs/row.h"
 #include "pid_regulator.h"
 #include "fmMsgs/vehicle_position.h"
+#include "fmMsgs/row_nav_allow.h"
 
 class IN_ROW_NAV {
 
@@ -52,11 +53,16 @@ private:
 public:
 	ros::Subscriber maize_row_sub_;
 	ros::Publisher twist_pub_;
+	ros::Subscriber allow_sub_;
 
 	std::string maize_sub_top_;
 	std::string twist_pub_top_;
+	std::string allow_sub_top_;
 
 	void maizehandler(const fmMsgs::vehicle_position maize_msg);
+	void allow_handler(const fmMsgs::row_nav_allow allow_msg);
+
+	bool nav_allow;
 
 	IN_ROW_NAV(double ap,double ai,double ad,double lp,double li,double ld);
 	virtual ~IN_ROW_NAV();

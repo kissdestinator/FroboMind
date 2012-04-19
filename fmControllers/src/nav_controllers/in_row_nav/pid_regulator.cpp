@@ -67,16 +67,10 @@ PIDRegulator::PIDRegulator(double p, double i, double d)
 
 double PIDRegulator::update(double feedback, double setpoint)
 {
-
-	ROS_INFO("update called");
-
 	//	Put error and time in ring buffer
 	time_now.push_back(ros::Time::now().toSec());
-	ROS_INFO("time pushed back %f" ,time_now[0] );
 	errors.push_back(setpoint - feedback);
-	ROS_INFO("error %f" ,errors[0] );
 	dt = (time_now[1]-time_now[0]);
-	ROS_INFO("dt calculated %f", dt);
 
 	//	Calculate P-term
 	p_term = p_coef * errors[0];

@@ -80,7 +80,7 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	last_target_speed_left = maxAcceleration(target_speed_left,last_target_speed_left,last_time_left);
 
 	// Calculate the motor power: PID update and directly forwarding the target speed and in the end normalizing by the max_speed
-	motor_power_left = (pid_regulator_left.update(msg->speed,last_target_speed_left) + last_target_speed_left) / max_speed;
+	motor_power_left = (pid_regulator_left.update(msg->speed,last_target_speed_left) + last_target_speed_left);
 
 	// making sure the motor power does not exceed 1 or -1
 	if (motor_power_left > 1)
@@ -99,7 +99,7 @@ void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	last_target_speed_right = maxAcceleration(target_speed_right,last_target_speed_right,last_time_right);
 
 	// Calculate the motor power: PID update and directly forwarding the target speed and in the end normalizing by the max_speed
-	motor_power_right = (pid_regulator_right.update(msg->speed,last_target_speed_right) + last_target_speed_right) / max_speed;
+	motor_power_right = (pid_regulator_right.update(msg->speed,last_target_speed_right) + last_target_speed_right);
 
 	// making sure the motor power does not exceed 1 or -1
 	if (motor_power_right > 1)
