@@ -23,7 +23,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_boost_directories()
 
-rosbuild_add_executable(roboteq src/Motor_Controllers/RoboteQ/rtq_node.cpp)
+#rosbuild_add_executable(roboteq src/Motor_Controllers/RoboteQ/rtq_node.cpp)
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
