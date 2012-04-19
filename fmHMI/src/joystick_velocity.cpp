@@ -10,8 +10,8 @@ void callback(fmMsgs::Joy joy)
 {
 	geometry_msgs::TwistStamped pub_msg;
 
-	pub_msg.twist.linear.x = joy.axes[3] ;
-	pub_msg.twist.angular.z = joy.axes[4]/0.12;
+	pub_msg.twist.linear.x = joy.axes[4] ;
+	pub_msg.twist.angular.z = -joy.axes[3]/0.12;
 	
 	
 	vel_pub.publish(pub_msg);
