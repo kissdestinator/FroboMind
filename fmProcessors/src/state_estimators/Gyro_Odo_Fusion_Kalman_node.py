@@ -11,7 +11,7 @@ gyroAngVel = 0.
 initial_xy = [0., 0.,0.]
 lastInterruptTime = 0
 dt = 0.02
-gyroOffset = -0.027
+gyroOffset = -0.01492
 
 
 
@@ -259,103 +259,8 @@ class matrix:
     def __repr__(self):
         return repr(self.value)
 
-# ######################################################################
+###############################################
 
-# ------------------------------------------------
-# 
-# this is the robot class
-# 
-# our robot lives in x-y space, and its motion is
-# pointed in a random direction. It moves on a straight line
-# until is comes close to a wall at which point it turns
-# away from the wall and continues to move.
-#
-# For measurements, it simply senses the x- and y-distance
-# to landmarks. This is different from range and bearing as 
-# commonly studies in the literature, but this makes it much
-# easier to implement the essentials of SLAM without
-# cluttered math
-#
-
-class robot:
-
-    # --------
-    # init: 
-    #   creates robot and initializes location to 0, 0
-    #
-
-    def __init__(self, world_size = 100.0, measurement_range = 30.0,
-                 motion_noise = 1.0, measurement_noise = 1.0):
-        self.measurement_noise = 0.0
-        self.world_size = world_size
-        self.measurement_range = measurement_range
-        self.x = world_size / 2.0
-        self.y = world_size / 2.0
-        self.motion_noise = motion_noise
-        self.measurement_noise = measurement_noise
-        self.landmarks = []
-        self.num_landmarks = 0
-
-
-    def rand(self):
-        return random.random() * 2.0 - 1.0
-
-    # --------
-    #
-    # make random landmarks located in the world
-    #
-
-    def make_landmarks(self, num_landmarks):
-        self.landmarks = []
-        for i in range(num_landmarks):
-            self.landmarks.append([round(random.random() * self.world_size),
-                                   round(random.random() * self.world_size)])
-        self.num_landmarks = num_landmarks
-
-    # --------
-    #
-    # move: attempts to move robot by dx, dy. If outside world
-    #       boundary, then the move does nothing and instead returns failure
-    #
-
-    def move(self, dx, dy):
-
-        x = self.x + dx + self.rand() * self.motion_noise
-        y = self.y + dy + self.rand() * self.motion_noise
-
-        if x < 0.0 or x > self.world_size or y < 0.0 or y > self.world_size:
-            return False
-        else:
-            self.x = x
-            self.y = y
-            return True
-    
-    # --------
-    #
-    # sense: returns x- and y- distances to landmarks within visibility range
-    #        because not all landmarks may be in this range, the list of measurements
-    #        is of variable length. Set measurement_range to -1 if you want all
-    #        landmarks to be visible at all times
-    #
-
-    def sense(self):
-        Z = []
-        for i in range(self.num_landmarks):
-            dx = self.landmarks[i][0] - self.x + self.rand() * self.measurement_noise
-            dy = self.landmarks[i][1] - self.y + self.rand() * self.measurement_noise    
-            if self.measurement_range < 0.0 or abs(dx) + abs(dy) <= self.measurement_range:
-                Z.append([i, dx, dy])
-        return Z
-
-    # --------
-    #
-    # print robot location
-    #
-
-    def __repr__(self):
-        return 'Robot: [x=%.5f y=%.5f]'  % (self.x, self.y)
-
-gyroOffset = -0.027
 gyroBelieve = 0.5
 odoBelieve = 0.5
     
@@ -368,7 +273,7 @@ Q = matrix([[0.00005,0.,0.],[0.,0.00005,0.],[0.,0.,0.00005]])
 
 x = matrix([[initial_xy[0]], [initial_xy[1]], [initial_xy[2]]]) # initial state (location and velocity)
 u = matrix([[0.],[0.],[0.]]) # external motion
-###############################################
+
 ###############################################
 
 
@@ -392,6 +297,7 @@ def filter(x, P, measurements):
 
 def kalman_calc(event):
     global gyroAngVel, odoAngVel, x, P, dt, lastInterruptTime, gyroBelieve, odoBelieve
+    gyroAngVel = drift_correction(gyroAngVel)
     temp_mes = [[gyroAngVel,odoAngVel]]
     update_Believes()
     dt = (event.current_real.to_sec()- lastInterruptTime)
@@ -400,7 +306,7 @@ def kalman_calc(event):
      #Publish Message
     pub_msg = kalman_output()
     pub_msg.header.stamp = rospy.get_rostime()
-    pub_msg.yaw = x.value[0][0]
+    pub_msg.yaw = x.value[0][0] % 2*pi
     pub_msg.ang_vel = x.value[1][0]
     pub_msg.ang_vel2 = x.value[2][0]	
     global pub
@@ -413,8 +319,14 @@ def update_Believes():
 	gyroBelieve = 0.8
 	odoBelieve = 0.2
     else:
-	gyroBelieve = 0.2
-        odoBelieve = 0.8
+	gyroBelieve = 0
+        odoBelieve = 1
+
+def drift_correction(gyroAng):
+	if (gyroAng < 0.004) and (gyroAng > -0.004):
+		return 0
+        return gyroAng
+
 def gyro_callback(data):
     global gyroAngVel, gyroOffset
     gyroAngVel = data.z - gyroOffset

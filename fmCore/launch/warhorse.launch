@@ -86,7 +86,7 @@
 			<param name="d_right" value="0" /> 
 		</node>
 
-		<node pkg="fmControllers" name="in_row_naw_controller" type="IN_ROW_NAV" output="screen">
+		<node pkg="fmControllers" name="in_row_naw_controller" type="IN_ROW_NAV">
 			<param name="lidar_sub" value="/fmExtractors/vehicle_position" />
 			<param name="twist_top" value="/speed_from_joystick" />
 			<param name="angular_p" value="0.25" />

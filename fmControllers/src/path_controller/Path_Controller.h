@@ -1,6 +1,6 @@
 /****************************************************************************
  # In row navigation
- # Copyright (c) 2011 Søren Hundevadt Nielsen <shn@kbm.sdu.dk>
+ # Copyright (c) 2011 Thomas Iversen
  #
  # Permission is hereby granted, free of charge, to any person obtaining a copy
  # of this software and associated documentation files (the "Software"), to deal
@@ -21,53 +21,67 @@
  # THE SOFTWARE.
  #
  *****************************************************************************
- # File: in_row_nav.h
- # Purpose: In-row navigation class
- # Project: Field Robot - Vehicle Interface Computer
- # Author: Søren Hundevadt Nielsen <shn@kbm.sdu.dk>
- # Created: Jun 28, 2011 Søren Hundevadt Nielsen, Source written
+ # File: Path_Controller.h
+ # Purpose: Path controller class
+ # Project: Field Robot - Warhorse
+ # Author: Thomas Iversen <thive09@student.sdu.dj>
+ # Created: Apr 18, 2012
  ****************************************************************************/
 
-#ifndef IN_ROW_NAV_H_
-#define IN_ROW_NAV_H_
+#ifndef PATH_CONTROLLER_H_
+#define PATH_CONTROLLER_H_
 
 #include <ros/ros.h>
-#include <geometry_msgs/TwistStamped.h>
-#include "fmMsgs/row.h"
+#include "geometry_msgs/TwistStamped.h"
 #include "pid_regulator.h"
+#include "fmMsgs/path.h"
+#include "fmMsgs/kalman_output.h"
+#include "fmMsgs/Vector3.h"
 #include "fmMsgs/vehicle_position.h"
-#include "fmMsgs/row_nav_allow.h"
+#include "math.h"
 
-class IN_ROW_NAV {
+class PATH_CONTROLLER {
 
 private:
-
 	PIDRegulator angle_regulator;
-    	PIDRegulator distance_regulator;
-
-   	geometry_msgs::TwistStamped twist_msg;
+    PIDRegulator distance_regulator;
+    
+    geometry_msgs::TwistStamped twist_msg;
 
 	double angle_regulator_output_;
-	double distance_regulator_output_;
+	double distance_regulator_;
+
+	std::vector<double> point_x;
+	std::vector<double> point_y;
+
+	double x,y,th_kal, th_row, th_points, error_angle;
+	ros::Time last_time;
 	
-	int publish;
 
 public:
-	ros::Subscriber maize_row_sub_;
-	ros::Publisher twist_pub_;
-	ros::Subscriber allow_sub_;
-
-	std::string maize_sub_top_;
+	double update_frequency;
+	ros::Publisher twist_pub;
+	ros::Subscriber kalman_sub;
+	ros::Subscriber path_sub;
+	ros::Subscriber xy_sub;
+	ros::Subscriber row_sub;
+	
+	std::string kalman_sub_top_;
 	std::string twist_pub_top_;
-	std::string allow_sub_top_;
+	std::string path_sub_top_;
+	std::string xy_sub_top_;
+	std::string row_sub_top_;
 
-	void maizehandler(const fmMsgs::vehicle_position maize_msg);
-	void allow_handler(const fmMsgs::row_nav_allow allow_msg);
+	
+	PATH_CONTROLLER(double ap,double ai,double ad,double lp,double li,double ld);
+	virtual ~PATH_CONTROLLER();
 
-	bool nav_allow;
-
-	IN_ROW_NAV(double ap,double ai,double ad,double lp,double li,double ld);
-	virtual ~IN_ROW_NAV();
+	void orientation_handler(const fmMsgs::kalman_output kal_msg);
+	void path_handler(const fmMsgs::path path_msg);
+	void xy_handler(const fmMsgs::Vector3 xy_msg);
+	void row_handler(const fmMsgs::vehicle_position row_msg);
+	void main_loop();
+	
 };
 
-#endif /* IN_ROW_NAV_H_ */
+#endif /* PATH_CONTROLLER_H_ */

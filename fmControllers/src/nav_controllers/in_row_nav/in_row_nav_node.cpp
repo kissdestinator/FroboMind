@@ -57,8 +57,6 @@ int main(int argc, char **argv) {
 	n.param<std::string> ("maize_sub", irn.maize_sub_top_, "/fmExtractors/vehicle_position");
 	n.param<std::string> ("twist_top", irn.twist_pub_top_, "/speed_from_joystick");
 	n.param<std::string> ("allow_sub", irn.allow_sub_top_, "/allow");
-	
-	irn.nav_allow = false;
 
 	irn.twist_pub_ = nh.advertise<geometry_msgs::TwistStamped>(irn.twist_pub_top_.c_str(),1);
 	irn.maize_row_sub_ = nh.subscribe<fmMsgs::vehicle_position>(irn.maize_sub_top_.c_str(),100,&IN_ROW_NAV::maizehandler, &irn);
