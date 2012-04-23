@@ -11,7 +11,7 @@
 using namespace std;
 
 bool start;
-double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset, kalman_th;
+double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset, kalman_th, odo_th;
 ros::Time current_time, last_time;
 double lengthBetweenTwoWheels = 0.39;
 ros::Time right_time, right_last_time, left_time, left_last_time;
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 	
 	ros::NodeHandle h;
 	
-	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = kalman_th = 0;
+	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = kalman_th = odo_th = 0;
 	left_last_time = right_last_time = ros::Time::now();
 	start = true;
 
@@ -87,8 +87,7 @@ int main(int argc, char** argv)
 	    x += delta_x;
 	    y += delta_y;
 	    th = kalman_th;
-		
-	    ROS_INFO("vx: %f, vy: %f", vx, vy);
+	    odo_th += delta_th;
 	    
 	    pub_msg.x = vx;
 	    pub_msg.y = vy;
@@ -97,7 +96,7 @@ int main(int argc, char** argv)
 
 	    coord_pub_msg.x = x;
 	    coord_pub_msg.y = y;
-	    coord_pub_msg.th = th;
+	    coord_pub_msg.th = odo_th;
 
 	    coordi_pub.publish(coord_pub_msg);
 
