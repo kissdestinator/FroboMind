@@ -85,8 +85,8 @@
 			<param name="i_right" value="0" /> 
 			<param name="d_right" value="0" /> 
 		</node>
-
-		<node pkg="fmControllers" name="in_row_naw_controller" type="IN_ROW_NAV">
+		
+		/*<node pkg="fmControllers" name="in_row_naw_controller" type="IN_ROW_NAV">
 			<param name="lidar_sub" value="/fmExtractors/vehicle_position" />
 			<param name="twist_top" value="/speed_from_joystick" />
 			<param name="angular_p" value="0.25" />
@@ -95,7 +95,7 @@
 			<param name="linear_p" value="4" />
 			<param name="linear_i" value="0" />
 			<param name="linear_d" value="0" />
-		</node>
+		</node>*/
 	</group>
 
  	<group ns="fmActuators">

@@ -38,7 +38,7 @@ void PATH_CONTROLLER::main_loop(){
 
 		twist_pub.publish(twist_msg);
 
-		ROS_DEBUG("Point 1: %f, %f - Point 2: %f, %f - X: %f - Error_angle: %f - Th_points: %f", point_x[0], point_y[0], point_x[1], point_y[1], x_koeff, error_angle, th_points);
+		ROS_INFO("Point 1: %f, %f - Point 2: %f, %f - X: %f - Error_angle: %f - Th_points: %f", point_x[0], point_y[0], point_x[1], point_y[1], x_koeff, error_angle, th_points);
 
 		loop_rate.sleep();
 		ros::spinOnce();
@@ -69,6 +69,8 @@ void PATH_CONTROLLER::xy_handler(const fmMsgs::Vector3 xy_msg){
     y += delta_y;
     point_x[0] = x;
     point_y[0] = y;
+    delta_x = 0;
+    delta_y = 0;
 }
 
 void PATH_CONTROLLER::row_handler(const fmMsgs::vehicle_position row_msg){

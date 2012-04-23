@@ -64,6 +64,8 @@ int main(int argc, char** argv)
 	while(h.ok()){
 
 	    ros::spinOnce();
+		
+		
 
 		vl = (xl - lxl)/(left_time - left_last_time).toSec(); 
 		vr = (xr - lxr)/(right_time - right_last_time).toSec(); 
@@ -77,11 +79,16 @@ int main(int argc, char** argv)
 	    double dt = (current_time - last_time).toSec();
 	    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
 	    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
+
+	    ROS_DEBUG("VL: %f, VR: %f. XL: %f, LXL: %f, left_time: %f, left_lefttime: %f, vx: %f", vl, vr, xl, lxl, (double)left_time.toSec(), (double)left_last_time.toSec(), vx);
+	    
 	    double delta_th = (vth * dt); 
 
 	    x += delta_x;
 	    y += delta_y;
 	    th = kalman_th;
+		
+	    ROS_INFO("vx: %f, vy: %f", vx, vy);
 	    
 	    pub_msg.x = vx;
 	    pub_msg.y = vy;
