@@ -11,7 +11,7 @@
 using namespace std;
 
 bool start;
-double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset, kalman_th;
+double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset, kalman_th, odo_th;
 ros::Time current_time, last_time;
 double lengthBetweenTwoWheels = 0.39;
 ros::Time right_time, right_last_time, left_time, left_last_time;
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 	
 	ros::NodeHandle h;
 	
-	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = kalman_th = 0;
+	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = kalman_th = odo_th = 0;
 	left_last_time = right_last_time = ros::Time::now();
 	start = true;
 
@@ -64,6 +64,8 @@ int main(int argc, char** argv)
 	while(h.ok()){
 
 	    ros::spinOnce();
+		
+		
 
 		vl = (xl - lxl)/(left_time - left_last_time).toSec(); 
 		vr = (xr - lxr)/(right_time - right_last_time).toSec(); 
@@ -77,11 +79,15 @@ int main(int argc, char** argv)
 	    double dt = (current_time - last_time).toSec();
 	    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
 	    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
+
+	    ROS_DEBUG("VL: %f, VR: %f. XL: %f, LXL: %f, left_time: %f, left_lefttime: %f, vx: %f", vl, vr, xl, lxl, (double)left_time.toSec(), (double)left_last_time.toSec(), vx);
+	    
 	    double delta_th = (vth * dt); 
 
 	    x += delta_x;
 	    y += delta_y;
 	    th = kalman_th;
+	    odo_th += delta_th;
 	    
 	    pub_msg.x = vx;
 	    pub_msg.y = vy;
@@ -90,7 +96,7 @@ int main(int argc, char** argv)
 
 	    coord_pub_msg.x = x;
 	    coord_pub_msg.y = y;
-	    coord_pub_msg.th = th;
+	    coord_pub_msg.th = odo_th;
 
 	    coordi_pub.publish(coord_pub_msg);
 

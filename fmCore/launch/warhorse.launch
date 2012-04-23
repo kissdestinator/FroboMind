@@ -57,6 +57,8 @@
 
 	<group ns="fmHMI">
 		<node pkg="fmHMI" name="joystick_speed" type="joystick_speed" output="screen" >	 
+		<param name="linear_velocity" value="1" />
+		<param name="angular_velocity" value="1" />
 		</node>
 
 		<node pkg="fmHMI" name="joy_node" type="joy_node" output="screen" >
@@ -75,18 +77,18 @@
 			<param name="right_odo_subscriber_topic" value="/fmSensors/right_odometry" /> 
 			<param name="desired_speed_subscriber_topic" value="/speed_from_joystick" /> 
 			<param name="motor_power_topic" value="/fmControllers/motor_power" /> 
-			<param name="maximum_speed" value="1" /> 
+			<param name="maximum_speed" value="0.7" /> 
 			<param name="maximum_acceleration" value="0" /> 
 			<param name="maximum_deacceleration" value="0" /> 
-			<param name="p_left" value="0" /> 
-			<param name="i_left" value="0" />
-			<param name="d_left" value="0" /> 
-			<param name="p_right" value="0" /> 
-			<param name="i_right" value="0" /> 
-			<param name="d_right" value="0" /> 
+			<param name="p_left" value="1" /> 
+			<param name="i_left" value="0.3" />
+			<param name="d_left" value="0.5" /> 
+			<param name="p_right" value="1" /> 
+			<param name="i_right" value="0.3" /> 
+			<param name="d_right" value="0.5" /> 
 		</node>
-
-		<node pkg="fmControllers" name="in_row_naw_controller" type="IN_ROW_NAV">
+		
+		/*<node pkg="fmControllers" name="in_row_naw_controller" type="IN_ROW_NAV">
 			<param name="lidar_sub" value="/fmExtractors/vehicle_position" />
 			<param name="twist_top" value="/speed_from_joystick" />
 			<param name="angular_p" value="0.25" />
@@ -95,7 +97,7 @@
 			<param name="linear_p" value="4" />
 			<param name="linear_i" value="0" />
 			<param name="linear_d" value="0" />
-		</node>
+		</node>*/
 	</group>
 
  	<group ns="fmActuators">
