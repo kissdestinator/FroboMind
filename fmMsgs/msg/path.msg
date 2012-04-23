@@ -1,4 +1,3 @@
- Header header
-float64[] pointx
-float64[] pointy
+Header header
+nav_points[] route
 
