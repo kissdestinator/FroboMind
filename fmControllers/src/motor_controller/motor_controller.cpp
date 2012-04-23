@@ -18,7 +18,7 @@ MotorController::MotorController(double p_left, double i_left, double d_left, do
 void MotorController::desiredSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg)
 {
 
-	double W = 0.12; //length from center to meter
+	double W = 0.24; //length from center to meter
 	double vel_right = msg->twist.linear.x - ( W * msg->twist.angular.z );
 	double vel_left =  msg->twist.linear.x + ( W * msg->twist.angular.z );
 
@@ -46,6 +46,7 @@ void MotorController::desiredSpeedHandler(const geometry_msgs::TwistStampedConst
 
 	target_speed_left = vel_left * max_speed;
 	target_speed_right = vel_right * max_speed;
+	ROS_INFO("Target_speed_left: %f , target_speed_right: %f", target_speed_left, target_speed_right);
 }
 
 double MotorController::maxAcceleration(const double& target_speed, const double& last_target_speed, ros::Time& last_time)
