@@ -57,8 +57,8 @@
 
 	<group ns="fmHMI">
 		<node pkg="fmHMI" name="joystick_speed" type="joystick_speed" output="screen" >	 
-		<param name="linear_velocity" value="1" />
-		<param name="angular_velocity" value="1" />
+		<param name="linear_velocity" value="0.5" />
+		<param name="angular_velocity" value="0.5" />
 		</node>
 
 		<node pkg="fmHMI" name="joy_node" type="joy_node" output="screen" >

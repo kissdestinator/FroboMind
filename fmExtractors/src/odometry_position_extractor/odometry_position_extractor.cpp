@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
 	    coord_pub_msg.x = x;
 	    coord_pub_msg.y = y;
-	    coord_pub_msg.th = odo_th;
+	    coord_pub_msg.th = th;
 
 	    coordi_pub.publish(coord_pub_msg);
 

@@ -32,9 +32,9 @@ rosbuild_add_executable(IN_ROW_NAV src/nav_controllers/in_row_nav/in_row_nav_nod
 rosbuild_add_executable(IN_ROW_NAV src/nav_controllers/in_row_nav/in_row_nav.cpp)
 rosbuild_add_executable(IN_ROW_NAV src/nav_controllers/in_row_nav/pid_regulator.cpp)
 
-rosbuild_add_executable(PATH_CONTROLLER src/path_controller/Path_Controller_Node.cpp)
-rosbuild_add_executable(PATH_CONTROLLER src/path_controller/Path_Controller.cpp)
-rosbuild_add_executable(PATH_CONTROLLER src/path_controller/pid_regulator.cpp)
+#rosbuild_add_executable(PATH_CONTROLLER src/path_controller/Path_Controller_Node.cpp)
+#rosbuild_add_executable(PATH_CONTROLLER src/path_controller/Path_Controller.cpp)
+#rosbuild_add_executable(PATH_CONTROLLER src/path_controller/pid_regulator.cpp)
 
 
 

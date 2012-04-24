@@ -30,7 +30,7 @@
 
 #include "lidar_navigator.h"
 
-#define SAFETY_RANGE 0.2
+#define SAFETY_RANGE 0.20
 #define NAV_RANGE 0.6
 #define MIN_RANGE 0.06
 #define MIN_WIDTH 0.35
@@ -50,21 +50,32 @@ void LidarNavigator::positionCallback(const fmMsgs::vehicle_coordinateConstPtr& 
 
 void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& laser_scan )
 {
+	ROS_INFO("CALLBACK - LIDAR NAV");
 
 	std::vector<hole> holes;
 
 	for (int i = 0; i < laser_scan->get_ranges_size(); i++)
 	{
-		if (laser_scan->ranges[i] > NAV_RANGE || laser_scan->ranges[i] < MIN_RANGE)
+		
+		if ((laser_scan->ranges[i] < SAFETY_RANGE && laser_scan->ranges[i] > MIN_RANGE) && (i > 315 || i < 45))
+		{
+			geometry_msgs::TwistStamped twist;
+			twist.twist.linear.x = 0;
+			twist.twist.angular.z = 0;
+			ROS_INFO("Objekt i vejen..!");
+			velocity_pub.publish(twist);
+			return;
+		}		
+		else if (laser_scan->ranges[i] > NAV_RANGE || laser_scan->ranges[i] < MIN_RANGE)
 		{
 			int done = 0;
 			int j = i;
 			hole h;
-			while(laser_scan->ranges[j] > NAV_RANGE || laser_scan->ranges[j] < MIN_RANGE)
+			while(laser_scan->ranges[j] > NAV_RANGE || laser_scan->ranges[j] < MIN_RANGE || done > 2)
 			{
 				j = (j+1);
 				if (j >=360 )
-					done = 1;
+					done++;
 				j %= 360;
 			}
 			h.right_angle = j;
@@ -129,7 +140,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 
 		geometry_msgs::TwistStamped twist;
 		twist.twist.linear.x = 0.5;
-		twist.twist.angular.z = turn_angle * K_TURN;
+		twist.twist.angular.z = -turn_angle * K_TURN;
 		ROS_INFO("ARA: %f, ALA: %f, CA: %f, TA: %f",h.allowed_right_angle, h.allowed_left_angle, h.center_angle, twist.twist.angular.z);
 		velocity_pub.publish(twist);
 	}
