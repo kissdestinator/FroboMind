@@ -316,11 +316,11 @@ def kalman_calc(event):
 def update_Believes():
     global gyroAngVel,odoAngVel,gyroBelieve,odoBelieve
     if (gyroAngVel + odoAngVel < -0.02) or (gyroAngVel + odoAngVel > 0.02) :
-	gyroBelieve = 1
-	odoBelieve = 0
+	gyroBelieve = 0.9
+	odoBelieve = 0.1
     else:
-	gyroBelieve = 1
-        odoBelieve = 0
+	gyroBelieve = 0
+        odoBelieve = 1
 
 def drift_correction(gyroAng):
 	if (gyroAng < 0.004) and (gyroAng > -0.004):
