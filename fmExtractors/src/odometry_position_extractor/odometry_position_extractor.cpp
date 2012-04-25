@@ -69,18 +69,21 @@ int main(int argc, char** argv)
 
 		vl = (xl - lxl)/(left_time - left_last_time).toSec(); 
 		vr = (xr - lxr)/(right_time - right_last_time).toSec(); 
+		current_time = ros::Time::now();  
 		
-		current_time = ros::Time::now();    
+	    double dt = (current_time - last_time).toSec();
+
+  
 		vx = (vl+vr)/2;
 		vy = 0;
-		vth = (vr-vl)/lengthBetweenTwoWheels; //angular velocity in radian per second. 
+		vth = ((xr - lxr)-(xl - lxl))/lengthBetweenTwoWheels / dt; //angular velocity in radian per second. 
 		
 			//compute odometry in a typical way given the velocities of the robot
-	    double dt = (current_time - last_time).toSec();
+
 	    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
 	    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
 
-	    ROS_DEBUG("VL: %f, VR: %f. XL: %f, LXL: %f, left_time: %f, left_lefttime: %f, vx: %f", vl, vr, xl, lxl, (double)left_time.toSec(), (double)left_last_time.toSec(), vx);
+	    ROS_INFO("VL: %f, VR: %f. XL: %f, LXL: %f, left_time: %f, left_lefttime: %f, vx: %f, vth: %f, dt: %f. xr: %f, lxr: %f", vl, vr, xl, lxl, (double)left_time.toSec(), (double)left_last_time.toSec(), vx, vth, dt, xr, lxr);
 	    
 	    double delta_th = (vth * dt); 
 
