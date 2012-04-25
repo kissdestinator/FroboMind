@@ -16,27 +16,6 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
-struct hole
-{
-	hole()
-	{
-		left_angle = 0; right_angle = 0; width = 0; center_angle = 0; angle = 0; allowed_left_angle = 0; allowed_right_angle = 0;
-	}
-	hole(double left_ang, double right_ang, double wid)
-	{
-		left_angle = left_ang; right_angle = right_ang; width = wid; center_angle = 0; angle = 0; allowed_left_angle = 0; allowed_right_angle = 0;
-	}
-
-	int left_angle;
-	int right_angle;
-	double center_angle;
-	double width;
-	double angle;
-
-	double allowed_left_angle;
-	double allowed_right_angle;
-};
-
 class LidarNavigator
 {
 private:
@@ -62,9 +41,10 @@ private:
 
 	visualization_msgs::MarkerArray vizMarker;
 
-	double calcTurnAngle(const hole& h, double goal, int LRS_size);
-	void publishVisualization(const hole& h, double turn_angle);
-	void calcAndPublishSpeed(const hole& h, double goal, double turn_angle, double velocity);
+	double calcTurnAngle(double goal, int LRS_size);
+	void publishVisualization(double turn_angle);
+	void calcAndPublishSpeed(double turn_angle, double velocity);
+	double safetyCheck(const std::vector<double>& ranges);
 
 public:
 
