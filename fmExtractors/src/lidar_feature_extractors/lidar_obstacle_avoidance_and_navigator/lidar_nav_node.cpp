@@ -94,5 +94,10 @@ int main(int argc, char **argv)
 
 	ros::spin();
 
+	geometry_msgs::TwistStamped twist;
+	twist.twist.linear.x = 0;
+	twist.twist.angular.z = 0;
+	ln.velocity_pub.publish(twist);
+
 	return 0;
 }

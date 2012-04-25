@@ -59,10 +59,10 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 	std::vector<hole> holes;
 
 	// run through the laser scan to search for "holes"
-	for (int i = 0; i < 2*LRS_size; i++)
+	for (int i = 0; i < 2*LRS_size;i++)
 	{
 		// find the first point with no obstacles in the way
-		if (ranges[i] > nav_range || ranges[i] < min_range)
+		if (ranges[i%LRS_size] > nav_range || ranges[i%LRS_size] < min_range)
 		{
 			hole h;
 			// set left angle to the last point with an obstacle
@@ -76,6 +76,8 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 			// setting the right angle to the next obstacle found
 			h.right_angle = j%LRS_size;
 
+			i = j-1;
+
 			// calculating the angle between the two points taking in to account that the scan is cyclic
 			if (h.left_angle > h.right_angle)
 				h.angle = LRS_size-h.left_angle + h.right_angle;
@@ -83,10 +85,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 				h.angle = h.right_angle - h.left_angle;
 
 			// calculating the width between the two points - to check if the car fits between
-			if (h.angle < LRS_size/2)
-				h.width = MIN(ranges[h.right_angle],ranges[h.left_angle]) * sin((h.angle/2)*2*M_PI/LRS_size) * 2.0;
-			else
-				h.width = 1;
+				h.width = abs(MIN(ranges[h.right_angle],ranges[h.left_angle]) * sin((h.angle/2)*2*M_PI/LRS_size) * 2.0);
 
 			// calculating the center angle of the hole
 			h.center_angle = (h.left_angle + h.angle/2.0);
@@ -96,6 +95,15 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 			// if the width is large enough the "hole" is accepted and pushed back in our vector
 			if (h.width > min_clearance_width)
 			{
+
+				// the angles at which the car can pass the hole is calculated
+				h.allowed_left_angle = h.left_angle + ( min_clearance_width/2 * h.angle/h.width );
+				if (h.allowed_left_angle > LRS_size)
+					h.allowed_left_angle -= LRS_size;
+				h.allowed_right_angle = h.right_angle - ( min_clearance_width/2 * h.angle/h.width );
+				if (h.allowed_right_angle < 0)
+					h.allowed_right_angle += LRS_size;
+
 				if (DEBUG)
 					ROS_INFO("Hole: Left: %d, Right: %d, Center: %.2f, width: %.3f, angle: %.3f, LeftRange: %.3f, RightRange: %.3f",h.left_angle, h.right_angle, h.center_angle, h.width, h.angle,ranges[h.left_angle],ranges[h.right_angle]);
 				holes.push_back(h);
@@ -109,18 +117,13 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 		int index = 0;
 		for (int i = 0; i < holes.size(); i++)
 		{
-			if (MIN(MIN(abs(holes[i].center_angle - desired_heading),abs(holes[i].center_angle - LRS_size - desired_heading)),MIN(abs(holes[i].center_angle - desired_heading),abs(holes[i].center_angle + LRS_size - desired_heading))) < MIN(MIN(abs(holes[index].center_angle - desired_heading),abs(holes[index].center_angle - LRS_size - desired_heading)),MIN(abs(holes[index].center_angle - desired_heading),abs(holes[index].center_angle + LRS_size - desired_heading))))
-				index = i;
+			//if (MIN(MIN(abs(holes[i].center_angle - desired_heading),abs(holes[i].center_angle - LRS_size - desired_heading)),MIN(abs(holes[i].center_angle - desired_heading),abs(holes[i].center_angle + LRS_size - desired_heading))) < MIN(MIN(abs(holes[index].center_angle - desired_heading),abs(holes[index].center_angle - LRS_size - desired_heading)),MIN(abs(holes[index].center_angle - desired_heading),abs(holes[index].center_angle + LRS_size - desired_heading))))
+			if ((desired_heading > holes[i].allowed_left_angle && desired_heading < holes[i].allowed_right_angle && holes[i].allowed_right_angle > holes[i].allowed_left_angle && holes[i].width > holes[index].width) ||
+				(&& holes[i].allowed_right_angle > holes[i].allowed_left_angle && holes[i].width > holes[index].width))
+				)
+			index = i;
 		}
 		hole h = holes[index];
-
-		// the angles at which the car can pass the hole is calculated
-		h.allowed_left_angle = h.left_angle + ( min_clearance_width/2 * h.angle/h.width );
-		if (h.allowed_left_angle > LRS_size)
-			h.allowed_left_angle -= LRS_size;
-		h.allowed_right_angle = h.right_angle - ( min_clearance_width/2 * h.angle/h.width );
-		if (h.allowed_right_angle < 0)
-			h.allowed_right_angle += LRS_size;
 
 		// the optimum angle is calculated and converted to radians
 		turn_angle = calcTurnAngle(h,desired_heading,LRS_size);
