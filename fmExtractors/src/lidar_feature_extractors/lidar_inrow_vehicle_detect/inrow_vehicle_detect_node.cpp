@@ -43,8 +43,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   std::string lidar_sub_topic;
-  std::string viz_marker_left_pub_topic;
-  std::string viz_marker_right_pub_topic;
+  std::string viz_marker_pub_topic;
   std::string row_pub_topic;
   std::string point_cloud_pub_topic;
   std::string point_cloud_rotated_pub_topic;
@@ -52,8 +51,7 @@ int main(int argc, char **argv)
   std::string vehicle_position_pub_topic;
 
   n.param<std::string>("lidar_sub_topic", lidar_sub_topic, "/fmSensors/lidar_scan_data");
-  n.param<std::string>("visualization_marker_left_pub_topic", viz_marker_left_pub_topic, "/fmExtractors/viz_marker_left");
-  n.param<std::string>("visualization_marker_right_pub_topic", viz_marker_right_pub_topic, "/fmExtractors/viz_marker_right");
+  n.param<std::string>("visualization_marker_pub_topic", viz_marker_pub_topic, "/fmExtractors/viz_marker_left");
   n.param<std::string>("point_cloud_pub_topic", point_cloud_pub_topic, "/fmExtractors/point_cloud");
   n.param<std::string>("point_cloud_rotated_pub_topic", point_cloud_rotated_pub_topic, "/fmExtractors/point_cloud_rotated");
   n.param<std::string>("position_sub_topic", position_sub_topic, "/fmExtractors/xyz_position");
@@ -62,7 +60,7 @@ int main(int argc, char **argv)
   rd.laser_scan_sub = nh.subscribe<sensor_msgs::LaserScan> (lidar_sub_topic.c_str(), 2, &InRowVehicleDetector::processLaserScan, &rd);
   rd.position_sub = nh.subscribe<fmMsgs::Vector3> (position_sub_topic.c_str(), 2, &InRowVehicleDetector::positionCallback, &rd);
 
-  rd.marker_pub = nh.advertise<visualization_msgs::MarkerArray>(viz_marker_left_pub_topic.c_str(), 1);
+  rd.marker_pub = nh.advertise<visualization_msgs::MarkerArray>(viz_marker_pub_topic.c_str(), 1);
   rd.point_cloud_pub = n.advertise<sensor_msgs::PointCloud>(point_cloud_pub_topic, 1);
   rd.point_cloud_rotated_pub = n.advertise<sensor_msgs::PointCloud>(point_cloud_rotated_pub_topic, 1);
   rd.vehicle_position_pub = n.advertise<fmMsgs::vehicle_position>(vehicle_position_pub_topic, 1);

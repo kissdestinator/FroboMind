@@ -30,13 +30,9 @@
 
 #include "lidar_navigator.h"
 
-#define SAFETY_RANGE 0.20
-#define NAV_RANGE 0.6
-#define MIN_RANGE 0.06
-#define MIN_WIDTH 0.35
-#define GOAL 0.0
-
-#define K_TURN 4.0
+#define DEBUG 1
+#define DEG2RAD M_PI/180
+#define RAD2DEG 180/M_PI
 
 LidarNavigator::LidarNavigator()
 {
@@ -50,100 +46,222 @@ void LidarNavigator::positionCallback(const fmMsgs::vehicle_coordinateConstPtr& 
 
 void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& laser_scan )
 {
-	ROS_INFO("CALLBACK - LIDAR NAV");
+	std::vector<double> ranges;
+	int LRS_size = laser_scan->get_ranges_size();
+
+	if (laser_inverted)
+		for (int i = LRS_size-1; i >= 0; i--)
+			ranges.push_back(laser_scan->ranges[i]);
+	else
+		for (int i = 0; i > LRS_size; i++)
+			ranges.push_back(laser_scan->ranges[i]);
 
 	std::vector<hole> holes;
 
-	for (int i = 0; i < laser_scan->get_ranges_size(); i++)
+	// run through the laser scan to search for "holes"
+	for (int i = 0; i < 2*LRS_size; i++)
 	{
-		
-		if ((laser_scan->ranges[i] < SAFETY_RANGE && laser_scan->ranges[i] > MIN_RANGE) && (i > 315 || i < 45))
+		// find the first point with no obstacles in the way
+		if (ranges[i] > nav_range || ranges[i] < min_range)
 		{
-			geometry_msgs::TwistStamped twist;
-			twist.twist.linear.x = 0;
-			twist.twist.angular.z = 0;
-			ROS_INFO("Objekt i vejen..!");
-			velocity_pub.publish(twist);
-			return;
-		}		
-		else if (laser_scan->ranges[i] > NAV_RANGE || laser_scan->ranges[i] < MIN_RANGE)
-		{
-			int done = 0;
-			int j = i;
 			hole h;
-			while(laser_scan->ranges[j] > NAV_RANGE || laser_scan->ranges[j] < MIN_RANGE || done > 2)
-			{
-				j = (j+1);
-				if (j >=360 )
-					done++;
-				j %= 360;
-			}
-			h.right_angle = j;
-			j = i;
-			while(laser_scan->ranges[j] > NAV_RANGE || laser_scan->ranges[j] < MIN_RANGE)
-				j = (j-1) % laser_scan->get_ranges_size();
-			h.left_angle = j;
+			// set left angle to the last point with an obstacle
+			h.left_angle = (i-1) % LRS_size;
 
-			if (!done)
-				i = h.right_angle;
-			else
-				i = laser_scan->get_ranges_size();
+			// find the next obstacle
+			int j = i;
+			while((ranges[j%LRS_size] > nav_range || ranges[j%LRS_size] < min_range) && j < 2*LRS_size)
+				j++;
 
+			// setting the right angle to the next obstacle found
+			h.right_angle = j%LRS_size;
+
+			// calculating the angle between the two points taking in to account that the scan is cyclic
 			if (h.left_angle > h.right_angle)
-				h.angle = 360-h.left_angle + h.right_angle;
+				h.angle = LRS_size-h.left_angle + h.right_angle;
 			else
 				h.angle = h.right_angle - h.left_angle;
 
-			h.width = MIN(laser_scan->ranges[h.right_angle],laser_scan->ranges[h.left_angle]) * sin((h.angle/2)*M_PI/180) * 2.0;
+			// calculating the width between the two points - to check if the car fits between
+			if (h.angle < LRS_size/2)
+				h.width = MIN(ranges[h.right_angle],ranges[h.left_angle]) * sin((h.angle/2)*2*M_PI/LRS_size) * 2.0;
+			else
+				h.width = 1;
+
+			// calculating the center angle of the hole
 			h.center_angle = (h.left_angle + h.angle/2.0);
-			if (h.center_angle >= 360)
-				h.center_angle -= 360;
-			if (h.width > MIN_WIDTH)
+			if (h.center_angle >= LRS_size)
+				h.center_angle -= LRS_size;
+
+			// if the width is large enough the "hole" is accepted and pushed back in our vector
+			if (h.width > min_clearance_width)
 			{
+				if (DEBUG)
+					ROS_INFO("Hole: Left: %d, Right: %d, Center: %.2f, width: %.3f, angle: %.3f, LeftRange: %.3f, RightRange: %.3f",h.left_angle, h.right_angle, h.center_angle, h.width, h.angle,ranges[h.left_angle],ranges[h.right_angle]);
 				holes.push_back(h);
-				ROS_INFO("Right: %d, Left: %d, Center: %f, width: %f, angle: %f",h.right_angle, h.left_angle, h.center_angle, h.width, h.angle);
 			}
 		}
 	}
+	// if any holes was found we start searching for the most desirable to go through
 	if (holes.size() > 0)
 	{
-		hole h = holes[0];
+		// we find the hole closest to our goal
+		int index = 0;
 		for (int i = 0; i < holes.size(); i++)
 		{
-			if (MIN(abs(holes[i].center_angle - GOAL),abs(holes[i].center_angle - 360 - GOAL)) < abs(h.center_angle - GOAL))
-				h = holes[i];
-			if (MIN(abs(holes[i].center_angle - GOAL),abs(holes[i].center_angle + 360 - GOAL)) < abs(h.center_angle - GOAL))
-				h = holes[i];
+			if (MIN(MIN(abs(holes[i].center_angle - desired_heading),abs(holes[i].center_angle - LRS_size - desired_heading)),MIN(abs(holes[i].center_angle - desired_heading),abs(holes[i].center_angle + LRS_size - desired_heading))) < MIN(MIN(abs(holes[index].center_angle - desired_heading),abs(holes[index].center_angle - LRS_size - desired_heading)),MIN(abs(holes[index].center_angle - desired_heading),abs(holes[index].center_angle + LRS_size - desired_heading))))
+				index = i;
 		}
+		hole h = holes[index];
 
-		h.allowed_left_angle = h.left_angle + ( MIN_WIDTH/2 * h.angle/h.width );
-		h.allowed_right_angle = h.right_angle - ( MIN_WIDTH/2 * h.angle/h.width );
+		// the angles at which the car can pass the hole is calculated
+		h.allowed_left_angle = h.left_angle + ( min_clearance_width/2 * h.angle/h.width );
+		if (h.allowed_left_angle > LRS_size)
+			h.allowed_left_angle -= LRS_size;
+		h.allowed_right_angle = h.right_angle - ( min_clearance_width/2 * h.angle/h.width );
+		if (h.allowed_right_angle < 0)
+			h.allowed_right_angle += LRS_size;
 
-		if ((GOAL < h.allowed_right_angle && GOAL > h.allowed_left_angle && h.left_angle < h.right_angle) ||
-			(GOAL < h.allowed_right_angle && h.left_angle > h.right_angle) ||
-			(GOAL > h.allowed_left_angle && h.left_angle > h.right_angle))
-			turn_angle = GOAL;
-		else if (abs(h.allowed_left_angle - GOAL) < abs(h.allowed_right_angle - GOAL) && h.left_angle > h.right_angle)
-			turn_angle = h.allowed_left_angle;
-		else if (abs(h.allowed_right_angle - GOAL) < abs(h.allowed_left_angle - GOAL) && h.left_angle > h.right_angle)
-			turn_angle = h.allowed_right_angle;
-		else if (abs(GOAL-360-h.allowed_left_angle) < abs(GOAL-h.allowed_right_angle) && h.left_angle < h.right_angle)
-			turn_angle = h.allowed_left_angle;
-		else if (abs(GOAL+360-h.allowed_right_angle) < abs(GOAL-h.allowed_left_angle) && h.left_angle < h.right_angle)
-			turn_angle = h.allowed_right_angle;
-		else if (abs(GOAL-h.allowed_left_angle) < abs(GOAL-h.allowed_right_angle) && h.left_angle < h.right_angle)
-			turn_angle = h.allowed_left_angle;
-		else if (abs(GOAL-h.allowed_right_angle) < abs(GOAL-h.allowed_left_angle) && h.left_angle < h.right_angle)
-			turn_angle = h.allowed_right_angle;
+		// the optimum angle is calculated and converted to radians
+		turn_angle = calcTurnAngle(h,desired_heading,LRS_size);
 
-		turn_angle *= M_PI / 180;
-
-		geometry_msgs::TwistStamped twist;
-		twist.twist.linear.x = 0.5;
-		twist.twist.angular.z = -turn_angle * K_TURN;
-		ROS_INFO("ARA: %f, ALA: %f, CA: %f, TA: %f",h.allowed_right_angle, h.allowed_left_angle, h.center_angle, twist.twist.angular.z);
-		velocity_pub.publish(twist);
+		// Calculate and publish the vehicle speed
+		calcAndPublishSpeed(h,desired_heading,turn_angle,max_velocity);
+	}
+	else
+	{
+		ROS_INFO("No holes wide enough found..! - setting speed to zero");
+		hole h;
+		calcAndPublishSpeed(h,desired_heading,0,0);
 	}
 
 }
 
+void LidarNavigator::calcAndPublishSpeed(const hole& h, double goal, double turn_angle, double velocity)
+{
+	double vel = 0;
+	double ang_vel = 0;
+
+	// Calculate velocity
+	if (abs(turn_angle) < 15 * DEG2RAD)
+		vel = velocity;
+	else if (abs(turn_angle) < 90 * DEG2RAD)
+		vel = velocity - ((abs(turn_angle)*RAD2DEG - 15) / 75);
+
+	// Calculate Angular velocity
+	ang_vel = turn_angle * K_ang_vel;
+
+	publishVisualization(h,turn_angle);
+
+	geometry_msgs::TwistStamped twist;
+	twist.twist.linear.x = vel;
+	twist.twist.angular.z = ang_vel;
+	velocity_pub.publish(twist);
+
+	ROS_INFO("LeftAngle: %d, RightAngle: %d, LeftAllowedAngle: %.2f, RightAllowedAngle: %.2f, Width: %.2f, TurnAngle: %.2f - Vel: %.2f, AngVel: %.2f",h.left_angle, h.right_angle, h.allowed_left_angle, h.allowed_right_angle, h.width, turn_angle, vel, ang_vel);
+}
+
+// finds the optimum turn angle
+double LidarNavigator::calcTurnAngle(const hole& h, double goal, int LRS_size)
+{
+	double r = 0;
+	std::string output;
+
+	// finds the best posible turn angle based on the hole and goal
+	if (goal < h.allowed_right_angle && goal > h.allowed_left_angle && h.allowed_left_angle < h.allowed_right_angle)
+	{
+		r = goal;
+		if(DEBUG)
+			ROS_INFO("1: Goal allowed");
+	}
+	else if (goal < h.allowed_right_angle && h.allowed_left_angle > h.allowed_right_angle)
+	{
+		r = goal;
+		if(DEBUG)
+			ROS_INFO("2: Goal allowed");
+	}
+	else if (goal > h.allowed_left_angle && h.allowed_left_angle > h.allowed_right_angle)
+	{
+		r = goal;
+		if(DEBUG)
+			ROS_INFO("3: Goal allowed");
+	}
+	else if (abs(h.allowed_left_angle - goal) < abs(h.allowed_right_angle - goal) && h.allowed_left_angle > h.allowed_right_angle)
+	{
+		r = h.allowed_left_angle;
+		if(DEBUG)
+			ROS_INFO("4: Allowed left angle chosen");
+	}
+	else if (abs(h.allowed_right_angle - goal) < abs(h.allowed_left_angle - goal) && h.allowed_left_angle > h.allowed_right_angle)
+	{
+		r = h.allowed_right_angle;
+		if(DEBUG)
+			ROS_INFO("5: Allowed right angle chosen");
+	}
+	else if (abs(goal-LRS_size-h.allowed_left_angle) < abs(goal-h.allowed_right_angle) && h.allowed_left_angle < h.allowed_right_angle)
+	{
+		r = h.allowed_left_angle;
+		if(DEBUG)
+			ROS_INFO("6: Allowed left angle chosen");
+	}
+	else if (abs(goal+LRS_size-h.allowed_right_angle) < abs(goal-h.allowed_left_angle) && h.allowed_left_angle < h.allowed_right_angle)
+	{
+		r = h.allowed_right_angle;
+		if(DEBUG)
+			ROS_INFO("7: Allowed right angle chosen");
+	}
+	else if (abs(goal-h.allowed_left_angle) < abs(goal-h.allowed_right_angle) && h.allowed_left_angle < h.allowed_right_angle)
+	{
+		r = h.allowed_left_angle;
+		if(DEBUG)
+			ROS_INFO("8: Allowed left angle chosen");
+	}
+	else if (abs(goal-h.allowed_right_angle) < abs(goal-h.allowed_left_angle) && h.allowed_left_angle < h.allowed_right_angle)
+	{
+		r = h.allowed_right_angle;
+		if(DEBUG)
+			ROS_INFO("9: Allowed right angle chosen");
+	}
+
+	// converts the turn angle to radians
+	r *= 2*M_PI / LRS_size;
+	if (r > M_PI)
+		r -= 2*M_PI;
+
+	return r;
+}
+
+void LidarNavigator::publishVisualization(const hole& h, double turn_angle)
+{
+	vizMarker.markers.clear();
+
+	if (h.left_angle != 0 && h.right_angle != 0)
+	{
+		visualization_msgs::Marker marker;
+
+		marker.header.frame_id = "neato_lidar";
+		marker.header.stamp = ros::Time();
+		marker.ns = "my_namespace";
+		marker.id = 0;
+		marker.type = visualization_msgs::Marker::ARROW;
+		marker.action = visualization_msgs::Marker::ADD;
+		marker.pose.position.x = 0;
+		marker.pose.position.y = 0;
+		marker.pose.position.z = 0;
+		marker.pose.orientation.x = cos(-turn_angle/2);
+		marker.pose.orientation.y = sin(-turn_angle/2);
+		marker.pose.orientation.z = 0.0;
+		marker.pose.orientation.w = 0.0;
+		marker.scale.x = 0.4;
+		marker.scale.y = 0.6;
+		marker.scale.z = 0.5;
+		marker.color.a = 1.0;
+		marker.color.r = 0.0;
+		marker.color.g = 1.0;
+		marker.color.b = 0.0;
+
+		vizMarker.markers.push_back(marker);
+	}
+
+	marker_pub.publish(vizMarker);
+}
