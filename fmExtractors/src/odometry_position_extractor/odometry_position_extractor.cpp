@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   
 		vx = (vl+vr)/2;
 		vy = 0;
-		vth = ((xr - lxr)-(xl - lxl))/lengthBetweenTwoWheels / dt; //angular velocity in radian per second. 
+		vth = (vr-vl)/lengthBetweenTwoWheels; //angular velocity in radian per second. 
 		
 			//compute odometry in a typical way given the velocities of the robot
 
