@@ -265,7 +265,7 @@ gyroBelieve = 0.5
 odoBelieve = 0.5
     
 P =  matrix([[0.1,0.,0.],[0.,0.1,0.],[0.,0.,0.1]])
-F =  matrix([[1., dt * gyroBelieve, dt * odoBelieve], [0.,1.,0.], [0.,0.,1.]])
+F =  matrix([[1., dt * 0.5, dt * 0.5], [0.,1.,0.], [0.,0.,1.]])
 H =  matrix([[0.,1.,0.],[0.,0.,1.]])
 R =  matrix([[0.0001,0.],[0.,0.0001]])
 I =  matrix([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]] )
@@ -306,7 +306,7 @@ def kalman_calc(event):
      #Publish Message
     pub_msg = kalman_output()
     pub_msg.header.stamp = rospy.get_rostime()
-    pub_msg.yaw = x.value[0][0] % 2*pi
+    pub_msg.yaw = x.value[0][0] % (pi * 2)
     pub_msg.ang_vel = x.value[1][0]
     pub_msg.ang_vel2 = x.value[2][0]	
     global pub

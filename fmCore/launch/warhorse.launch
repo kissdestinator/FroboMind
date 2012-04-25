@@ -31,7 +31,7 @@
 	</group>
 
 	<group ns="fmExtractors">
-		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node" >
+		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node" output="screen">
 		</node>
 
 		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector" output="screen">
