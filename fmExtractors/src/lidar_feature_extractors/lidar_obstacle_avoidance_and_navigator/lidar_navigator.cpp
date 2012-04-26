@@ -45,12 +45,21 @@ int mMod(int number, int modulus)
 
 LidarNavigator::LidarNavigator()
 {
+	pid_ang_vel = PIDRegulator(P_ang_vel,I_ang_vel,D_ang_vel);
 }
 
 void LidarNavigator::positionCallback(const fmMsgs::vehicle_coordinateConstPtr& position)
 {
 	turn_angle -= position->th - old_th;
 	old_th = position->th;
+
+	double ang_vel = pid_ang_vel.update(turn_angle,0);
+
+	geometry_msgs::TwistStamped twist;
+	twist.twist.linear.x = current_velocity;
+	twist.twist.angular.z = ang_vel;
+	velocity_pub.publish(twist);
+
 }
 
 void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& laser_scan )
@@ -65,10 +74,10 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 		for (int i = 0; i > LRS_size; i++)
 			ranges.push_back(laser_scan->ranges[i]);
 
-	double temp_heading = desired_heading;
+	double temp = desired_heading;
 	if (desired_heading > M_PI)
-		temp_heading -= 2 * M_PI;
-	temp_heading = (int)(temp_heading * LRS_size / 2 * M_PI);
+		temp -= 2 * M_PI;
+	int temp_heading = (int)(temp * LRS_size / 2 * M_PI);
 
 	int hole_found = 0;
 
@@ -76,17 +85,13 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 	{
 		int index = temp_heading;
 
-		double mca = (asin((min_clearance_width/2.0)/test_range) * 2.0 * LRS_size / (2 * M_PI));
-		int minimum_clearance_angle = (int)mca;
-		int step_size = 15;//(int)((double)minimum_clearance_angle/2.0);
-		int half_min_clerance_angle = minimum_clearance_angle/2;
+		int step_size = 15;
 		int step = step_size;
-
-		ROS_INFO("MCA: %f, intMCA %d, halvIntMCA %d",mca,minimum_clearance_angle,half_min_clerance_angle);
 
 		for (int i = 0; i < (LRS_size/step_size); i++)
 			{
-				int center(0), left_line(0), right_line(0);
+				int left_line(0), right_line(0);
+				double center(0.0);
 
 				while((ranges[mMod(left_line+index,LRS_size)] > test_range || ranges[mMod(left_line+index,LRS_size)] < min_range) && abs(left_line) < (int)LRS_size/4)
 					left_line--;
@@ -94,21 +99,25 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 				while((ranges[mMod(right_line+index,LRS_size)] > test_range || ranges[mMod(right_line+index,LRS_size)] < min_range) && abs(right_line) < (int)LRS_size/4)
 					right_line++;
 
-				if (right_line-left_line > minimum_clearance_angle)
+				double left_clearing_angle = (double)left_line + (asin((min_clearance_width/2.0)/ranges[mMod(left_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
+				double right_clearing_angle = (double)right_line - (asin((min_clearance_width/2.0)/ranges[mMod(right_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
+
+				if (left_clearing_angle < right_clearing_angle)
 				{
-					if (temp_heading > index+left_line+half_min_clerance_angle && temp_heading < index+right_line-half_min_clerance_angle)
+
+					if (temp_heading > index+(double)(left_clearing_angle) && temp_heading < index+(double)(right_clearing_angle))
 						center = temp_heading;
-					else if (temp_heading-index < left_line+half_min_clerance_angle)
-						center = index+left_line+half_min_clerance_angle;
-					else if (temp_heading-index > right_line-half_min_clerance_angle)
-						center = index+right_line-half_min_clerance_angle;
+					else if (temp_heading-index < left_clearing_angle)
+						center = (int)index+left_clearing_angle;
+					else if (temp_heading-index > right_clearing_angle)
+						center = (int)index+right_clearing_angle;
 
 					turn_angle = center * 2*M_PI/LRS_size;
 
 					// Calculate and publish the vehicle speed
-					double max_vel = max_velocity * safetyCheck(ranges) * test_range;
-					ROS_INFO("index: %d, left: %d, center: %d, right: %d, turn angle: %.3f, test range: %.3f", index, left_line, center, right_line,turn_angle,test_range);
-					calcAndPublishSpeed(turn_angle,max_vel);
+					current_velocity = max_velocity * safetyCheck(ranges) * test_range;
+					ROS_INFO("index: %d, left: %d, center: %d, right: %d, turn angle: %.3f, test range: %.3f, LeftClear: %.3f, RightClear: %.3f, rangeLeft: %3.f, rangeRight: %3.f", index, left_line, center, right_line,turn_angle,test_range,left_clearing_angle,right_clearing_angle, ranges[mMod(left_line+index,LRS_size)], ranges[mMod(right_line+index,LRS_size)]);
+					calcAndPublishSpeed(turn_angle,current_velocity);
 
 					i = (LRS_size/step_size);
 					hole_found = 1;
@@ -120,6 +129,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 					else
 						index -= step;
 					step += step_size;
+					ROS_INFO("i: %d, index: %d",i,index);
 				}
 			}
 	}
@@ -138,7 +148,7 @@ double LidarNavigator::safetyCheck(const std::vector<double>& ranges)
 	for (int i = -half_min_clearance_angle; i <half_min_clearance_angle; i++)
 		if (ranges[mMod(i,ranges.size())] < safety_range && ranges[mMod(i,ranges.size())] > min_range)
 			{
-				ROS_INFO("Obstacle in the way.! angular velocity set to zero.!");
+				ROS_INFO("Obstacle in the way.! velocity set to zero.!");
 				return 0;
 			}
 	return 1;
@@ -156,7 +166,7 @@ void LidarNavigator::calcAndPublishSpeed(double turn_angle, double velocity)
 		vel = velocity * (90 - (abs(turn_angle)*RAD2DEG)) / 75;
 
 	// Calculate Angular velocity
-	ang_vel = turn_angle * K_ang_vel;
+	ang_vel = pid_ang_vel.update(turn_angle,0);
 
 	publishVisualization(turn_angle);
 

@@ -13,6 +13,8 @@
 #include "fmMsgs/vehicle_coordinate.h"
 #include "nr3.h"
 
+#include "pid_regulator.h"
+
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
@@ -28,6 +30,8 @@ private:
 	double max_angular_velocity;
 	double max_velocity;
 
+	double current_velocity;
+
 	double nav_range;
 	double safety_range;
 	double min_range;
@@ -35,7 +39,11 @@ private:
 	double min_clearance_angle;
 	double desired_heading;
 
-	double K_ang_vel;
+	double P_ang_vel;
+	double I_ang_vel;
+	double D_ang_vel;
+
+	PIDRegulator pid_ang_vel;
 
 	int laser_inverted;
 
@@ -67,7 +75,9 @@ public:
   void setDesiredHeading(double heading)		{ desired_heading = heading; }
   void setMinClearanceAngle(double angle)		{ min_clearance_angle = angle; }
   void setMinClearance(double clearance)		{ min_clearance_width = clearance; }
-  void setKAngularVelocity(double ang_vel)		{ K_ang_vel = ang_vel; }
+  void setPAngularVelocity(double ang_vel)		{ P_ang_vel = ang_vel; }
+  void setIAngularVelocity(double ang_vel)		{ I_ang_vel = ang_vel; }
+  void setDAngularVelocity(double ang_vel)		{ D_ang_vel = ang_vel; }
 
 };
 

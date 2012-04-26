@@ -35,6 +35,7 @@ rosbuild_add_executable(imu_ypr src/imu_data_extractors/imu_ypr_extractor.cpp)
 #Lidar obstacle avoidance and navigator node
 rosbuild_add_executable(lidar_navigator src/lidar_feature_extractors/lidar_obstacle_avoidance_and_navigator/lidar_nav_node.cpp)
 rosbuild_add_executable(lidar_navigator src/lidar_feature_extractors/lidar_obstacle_avoidance_and_navigator/lidar_navigator.cpp)
+rosbuild_add_executable(lidar_navigator src/lidar_feature_extractors/lidar_obstacle_avoidance_and_navigator/pid_regulator.cpp)
 
 rosbuild_add_executable(odometry_position_node src/odometry_position_extractor/odometry_position_extractor.cpp)
 

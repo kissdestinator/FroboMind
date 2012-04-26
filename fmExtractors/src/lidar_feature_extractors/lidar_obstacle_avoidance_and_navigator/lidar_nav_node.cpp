@@ -56,7 +56,9 @@ int main(int argc, char **argv)
 	double max_angular_velocity;
 	double max_velocity;
 
-	double K_ang_vel;
+	double P_ang_vel;
+	double I_ang_vel;
+	double D_ang_vel;
 
 	int laser_inverted;
 
@@ -72,7 +74,9 @@ int main(int argc, char **argv)
 	nh.param<double>("minimum_clearance_angle", min_clearance_angle, M_PI/2);
 	nh.param<double>("maximum_angular_velocity", max_angular_velocity, 5.0);
 	nh.param<double>("maximum_velocity", max_velocity, 1.0);
-	nh.param<double>("k_angular_velocity", K_ang_vel, 4.0);
+	nh.param<double>("p_angular_velocity", P_ang_vel, 2.0);
+	nh.param<double>("i_angular_velocity", I_ang_vel, 0.0);
+	nh.param<double>("d_angular_velocity", D_ang_vel, 0.0);
 	nh.param<int>("laser_inverted", laser_inverted, 1);
 
 	ln.setNavRange(nav_range);
@@ -84,7 +88,9 @@ int main(int argc, char **argv)
 	ln.setLaserInverted(laser_inverted);
 	ln.setMinClearance(min_clearance_width);
 	ln.setMinClearanceAngle(min_clearance_angle);
-	ln.setKAngularVelocity(K_ang_vel);
+	ln.setPAngularVelocity(P_ang_vel);
+	ln.setIAngularVelocity(I_ang_vel);
+	ln.setDAngularVelocity(D_ang_vel);
 
 	ln.laser_scan_sub = nh.subscribe<sensor_msgs::LaserScan> (lidar_sub_topic.c_str(), 2, &LidarNavigator::processLaserScan, &ln);
 	ln.position_sub = nh.subscribe<fmMsgs::vehicle_coordinate> (position_sub_topic.c_str(), 2, &LidarNavigator::positionCallback, &ln);
