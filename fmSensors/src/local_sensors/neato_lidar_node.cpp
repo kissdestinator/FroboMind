@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
   nh.param("port", port, std::string("/dev/ttyUSB0"));
   nh.param("baud_rate", baud_rate, 115200);
-  nh.param("frame_id", frame_id, std::string("neato_lidar"));
+  nh.param("frame_id", frame_id, std::string("lidar_scan"));
   nh.param("firmware_version", firmware_number, 2);
   nh.param("lidar_publisher_topic", lidar_publisher_topic, std::string("lidar_scan_data"));
 

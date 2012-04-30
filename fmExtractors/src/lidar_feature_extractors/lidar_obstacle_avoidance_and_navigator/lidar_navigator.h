@@ -75,9 +75,9 @@ public:
   void setDesiredHeading(double heading)		{ desired_heading = heading; }
   void setMinClearanceAngle(double angle)		{ min_clearance_angle = angle; }
   void setMinClearance(double clearance)		{ min_clearance_width = clearance; }
-  void setPAngularVelocity(double ang_vel)		{ P_ang_vel = ang_vel; }
-  void setIAngularVelocity(double ang_vel)		{ I_ang_vel = ang_vel; }
-  void setDAngularVelocity(double ang_vel)		{ D_ang_vel = ang_vel; }
+  void setPAngularVelocity(double ang_vel)		{ P_ang_vel = ang_vel; pid_ang_vel.setP(ang_vel);}
+  void setIAngularVelocity(double ang_vel)		{ I_ang_vel = ang_vel; pid_ang_vel.setI(ang_vel);}
+  void setDAngularVelocity(double ang_vel)		{ D_ang_vel = ang_vel; pid_ang_vel.setD(ang_vel);}
 
 };
 

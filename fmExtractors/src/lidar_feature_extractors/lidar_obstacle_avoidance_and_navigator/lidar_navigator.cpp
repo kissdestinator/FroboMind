@@ -53,12 +53,12 @@ void LidarNavigator::positionCallback(const fmMsgs::vehicle_coordinateConstPtr& 
 	turn_angle -= position->th - old_th;
 	old_th = position->th;
 
-	double ang_vel = pid_ang_vel.update(turn_angle,0);
+	double ang_vel = pid_ang_vel.update(-turn_angle,0);
 
 	geometry_msgs::TwistStamped twist;
 	twist.twist.linear.x = current_velocity;
 	twist.twist.angular.z = ang_vel;
-	velocity_pub.publish(twist);
+	//velocity_pub.publish(twist);
 
 }
 
@@ -85,7 +85,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 	{
 		int index = temp_heading;
 
-		int step_size = 15;
+		int step_size = 2;
 		int step = step_size;
 
 		for (int i = 0; i < (LRS_size/step_size); i++)
@@ -115,7 +115,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 					turn_angle = center * 2*M_PI/LRS_size;
 
 					// Calculate and publish the vehicle speed
-					current_velocity = max_velocity * safetyCheck(ranges) * test_range;
+					current_velocity = max_velocity * safetyCheck(ranges);
 					ROS_INFO("index: %d, left: %d, center: %d, right: %d, turn angle: %.3f, test range: %.3f, LeftClear: %.3f, RightClear: %.3f, rangeLeft: %3.f, rangeRight: %3.f", index, left_line, center, right_line,turn_angle,test_range,left_clearing_angle,right_clearing_angle, ranges[mMod(left_line+index,LRS_size)], ranges[mMod(right_line+index,LRS_size)]);
 					calcAndPublishSpeed(turn_angle,current_velocity);
 
@@ -129,7 +129,6 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 					else
 						index -= step;
 					step += step_size;
-					ROS_INFO("i: %d, index: %d",i,index);
 				}
 			}
 	}
@@ -166,7 +165,16 @@ void LidarNavigator::calcAndPublishSpeed(double turn_angle, double velocity)
 		vel = velocity * (90 - (abs(turn_angle)*RAD2DEG)) / 75;
 
 	// Calculate Angular velocity
-	ang_vel = pid_ang_vel.update(turn_angle,0);
+	//ang_vel = pid_ang_vel.update(-turn_angle,0);
+
+	ang_vel = turn_angle * P_ang_vel;
+	if (abs(ang_vel) > max_angular_velocity)
+		{
+			if(ang_vel < 0)
+				ang_vel = -max_angular_velocity;
+			else
+				ang_vel = max_angular_velocity;
+		}
 
 	publishVisualization(turn_angle);
 

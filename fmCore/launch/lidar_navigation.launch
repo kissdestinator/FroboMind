@@ -6,15 +6,15 @@
 			<param name="velocity_pub_topic" value="/speed_from_joystick" />
 			<param name="vehicle_coordinate" value="/fmExtractors/vehicle_coordinate" />
 			
-			<param name="navigation_range" value="1" />
+			<param name="navigation_range" value="0.75" />
 			<param name="safety_range" value="0.25" />
 			<param name="minimum_range" value="0.12" />
 			<param name="desired_heading" value="0.0" />
-			<param name="maximum_angular_velocity" value="5.0" />
+			<param name="maximum_angular_velocity" value="3.0" />
 			<param name="maximum_velocity" value="0.5" />
 			<param name="minimum_clearance" value="0.40" />
 			<param name="minimum_clearance_angle" value="60" /> 
-			<param name="p_angular_velocity" value="2.0" />
+			<param name="p_angular_velocity" value="5" />
 			<param name="i_angular_velocity" value="0.0" />
 			<param name="d_angular_velocity" value="0.0" />
 			<param name="laser_inverted" value="1" />

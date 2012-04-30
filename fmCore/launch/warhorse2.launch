@@ -18,7 +18,7 @@
 		<node pkg="fmSensors" name="Lidar" type="neato_lidar_node" output="screen" >
 			<param name="port" value="/dev/ttyUSB1" /> 
 			<param name="baud_rate" value="115200" /> 
-			<param name="frame_id" value="neato_lidar" /> 
+			<param name="frame_id" value="/lidar_scan" /> 
 			<param name="firmware_version" value="2" /> 
 			<param name="lidar_publisher_topic" value="lidar_scan_data" /> 
 		</node>
@@ -33,17 +33,6 @@
 	<group ns="fmExtractors">
 		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node">
 		</node>
-
-		/*<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector" output="screen">
-			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
-			<param name="visualization_marker_left_pub_topic" value="/fmExtractors/viz_marker_left" />
-			<param name="visualization_marker_right_pub_topic" value="/fmExtractors/viz_marker_right" />
-			<param name="row_pub_topic" value="/fmExtractors/Rows" />
-			<param name="point_cloud_pub_topic" value="/fmExtractors/point_cloud" />
-			<param name="point_cloud_rotated_pub_topic" value="/fmExtractors/point_cloud_rotated" />
-			<param name="position_sub_topic" value="/fmExtractors/xyz_position" />
-			<param name="vehicle_position_pub_topic" value="/fmExtractors/vehicle_position" />
-		</node>*/
 	</group>
 
 	<group ns="fmTools">
@@ -87,17 +76,7 @@
 			<param name="i_right" value="0.3" /> 
 			<param name="d_right" value="0.5" /> 
 		</node>
-		
-		/*<node pkg="fmControllers" name="in_row_naw_controller" type="IN_ROW_NAV">
-			<param name="lidar_sub" value="/fmExtractors/vehicle_position" />
-			<param name="twist_top" value="/speed_from_joystick" />
-			<param name="angular_p" value="0.25" />
-			<param name="angular_i" value= "0" />
-			<param name="angular_d" value= "0" />
-			<param name="linear_p" value="4" />
-			<param name="linear_i" value="0" />
-			<param name="linear_d" value="0" />
-		</node>*/
+	
 	</group>
 
  	<group ns="fmActuators">
@@ -122,5 +101,7 @@
 			<param name="publisher_topic" value="ypr_serial"/>
 		</node>
 	</group>
+	<node pkg="tf" type="static_transform_publisher" name="laser_scan_tf" args="0 0 0 0 0 0 /base_link /lidar_scan 100" />
+
 </launch>
 
