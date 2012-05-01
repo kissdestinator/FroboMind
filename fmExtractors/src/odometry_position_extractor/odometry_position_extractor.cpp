@@ -86,6 +86,7 @@ int main(int argc, char** argv)
 	    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
 	    double delta_th = (vth * dt); 
 
+
 	    x += delta_x;
 	    y += delta_y;
 	    th = kalman_th;
