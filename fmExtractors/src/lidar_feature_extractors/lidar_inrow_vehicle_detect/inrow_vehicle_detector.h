@@ -14,6 +14,9 @@
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
 
+#include "nav_msgs/OccupancyGrid.h"
+#include "nav_msgs/MapMetaData.h"
+
 #include "particle_filter.h"
 
 class InRowVehicleDetector
@@ -44,20 +47,26 @@ private:
 public:
 
   ros::Publisher point_cloud_pub;
-  ros::Publisher point_cloud_rotated_pub;
 
   ros::Publisher marker_pub;
 
   ros::Publisher vehicle_position_pub;
+
+  ros::Publisher map_pub;
 
   ros::Subscriber laser_scan_sub;
   ros::Subscriber position_sub;
 
   laser_geometry::LaserProjection projector;
 
+  nav_msgs::OccupancyGrid map;
+  nav_msgs::MapMetaData map_data;
+
   InRowVehicleDetector();
   void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan);
   void positionCallback(const fmMsgs::Vector3::ConstPtr& position);
+  nav_msgs::OccupancyGrid buildMap();
+  void publishMap();
 
 };
 

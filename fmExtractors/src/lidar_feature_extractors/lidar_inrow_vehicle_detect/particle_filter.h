@@ -10,7 +10,9 @@
 #include "fmMsgs/vehicle_position.h"
 #include "tf/transform_listener.h"
 #include "visualization_msgs/MarkerArray.h"
-#include "geometry_msgs/Point32.h"
+
+#include "nav_msgs/OccupancyGrid.h"
+#include "nav_msgs/MapMetaData.h"
 
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>

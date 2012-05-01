@@ -30,6 +30,17 @@
 
 #include "inrow_vehicle_detector.h"
 
+#define MAP_SIZE_X 100
+#define MAP_SIZE_Y 100
+#define MAP_RESOLUTION 0.05
+
+#define ROW_WIDTH 0.40
+#define ROW_LENGTH 20
+#define ROW_SPACING 0.75
+#define NO_OF_ROWS 20
+#define START_X 10
+#define START_Y 10
+
 InRowVehicleDetector::InRowVehicleDetector()
 {
 	particlefilter = ParticleFilter(1000,0,0,0.75,0.375,M_PI/2,0,0.1,0.1);
@@ -37,6 +48,8 @@ InRowVehicleDetector::InRowVehicleDetector()
 	old_theta = 0;
 	old_x = 0;
 	old_y = 0;
+
+	map = buildMap();
 }
 
 void InRowVehicleDetector::positionCallback(const fmMsgs::Vector3::ConstPtr& position)
@@ -67,27 +80,48 @@ void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstP
 
 	vehicle_position_pub.publish(vp);
 
-	sensor_msgs::PointCloud cloud_rotated;
-
-	for (int i = 0; i<cloud.points.size(); i++)
-	{
-		geometry_msgs::Point32 t;
-
-		t.x = cloud.points[i].x * cos(vp.position.th) - cloud.points[i].y * sin(vp.position.th) + vp.position.x;
-		t.y = cloud.points[i].x * sin(vp.position.th) + cloud.points[i].y * cos(vp.position.th) + vp.position.y;
-		t.z = 0;
-
-		cloud_rotated.points.push_back(t);
-	}
-
-    cloud_rotated.header.frame_id = "base_link";
-
-    point_cloud_rotated_pub.publish(cloud_rotated);
-
     particlefilter.updateParticlesMarker();
 
 	visualization_msgs::MarkerArray markerArray = particlefilter.getParticlesMarker();
 
 	marker_pub.publish(markerArray);
+}
+
+void InRowVehicleDetector::publishMap()
+{
+	map_pub.publish(map);
+}
+
+nav_msgs::OccupancyGrid InRowVehicleDetector::buildMap()
+{
+	nav_msgs::OccupancyGrid r;
+	nav_msgs::MapMetaData temp;
+
+	temp.height = MAP_SIZE_Y / MAP_RESOLUTION;
+	temp.width = MAP_SIZE_X / MAP_RESOLUTION;
+	temp.resolution = MAP_RESOLUTION;
+	temp.map_load_time = ros::Time::now();
+
+	r.info = temp;
+	r.header.frame_id = "/map";
+	r.header.stamp = ros::Time::now();
+
+	int range_x = (int)((float)(r.info.width)/r.info.resolution);
+	int range_y = (int)((float)(r.info.height)/r.info.resolution);
+
+	for (int y = 0; y < range_y; y++)
+	{
+		for (int x = 0; x < range_x; x++)
+		{
+			r.data.push_back(0);
+		}
+	}
+
+	for (int i = 0; i < NO_OF_ROWS; i++)
+	{
+
+	}
+	return r;
+
 }
 
