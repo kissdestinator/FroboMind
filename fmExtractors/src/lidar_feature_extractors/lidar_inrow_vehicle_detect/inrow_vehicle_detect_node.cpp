@@ -68,13 +68,32 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(1); //Encoder loop frequency
 
+  tf::TransformBroadcaster map_broadcaster;
+
   while(ros::ok())
   {
-	  ros::spinOnce();
+		ros::spinOnce();
 
-	  rd.publishMap();
+		//since all odometry is 6DOF we'll need a quaternion created from yaw
+		geometry_msgs::Quaternion map_quat = tf::createQuaternionMsgFromYaw(0.0);
 
-	  loop_rate.sleep();
+		//first, we'll publish the transform over tf
+		geometry_msgs::TransformStamped map_trans;
+		map_trans.header.stamp = ros::Time::now();
+		map_trans.header.frame_id = "map";
+		map_trans.child_frame_id = "odom";
+
+		map_trans.transform.translation.x = 0.0;
+		map_trans.transform.translation.y = 0.0;
+		map_trans.transform.translation.z = 0.0;
+		map_trans.transform.rotation = map_quat;
+
+		//send the transform
+		map_broadcaster.sendTransform(map_trans);
+
+		rd.publishMap();
+
+		loop_rate.sleep();
   }
 
   return 0;

@@ -30,8 +30,8 @@
 
 #include "inrow_vehicle_detector.h"
 
-#define MAP_SIZE_X 100
-#define MAP_SIZE_Y 100
+#define MAP_SIZE_X 40
+#define MAP_SIZE_Y 40
 #define MAP_RESOLUTION 0.05
 
 #define ROW_WIDTH 0.40
@@ -106,8 +106,8 @@ nav_msgs::OccupancyGrid InRowVehicleDetector::buildMap()
 	r.header.frame_id = "/map";
 	r.header.stamp = ros::Time::now();
 
-	int range_x = (int)((float)(r.info.width)/r.info.resolution);
-	int range_y = (int)((float)(r.info.height)/r.info.resolution);
+	int range_x = r.info.width;
+	int range_y = r.info.height;
 
 	for (int y = 0; y < range_y; y++)
 	{
@@ -119,9 +119,18 @@ nav_msgs::OccupancyGrid InRowVehicleDetector::buildMap()
 
 	for (int i = 0; i < NO_OF_ROWS; i++)
 	{
+		int offset_x = (START_X + i*(ROW_SPACING+ROW_WIDTH)) / MAP_RESOLUTION;
+		int offset_y = START_Y / MAP_RESOLUTION;
 
+		for (int y = offset_y; y < offset_y+(ROW_LENGTH/MAP_RESOLUTION); y++)
+		{
+			for (int x = offset_x; x < offset_x+(ROW_WIDTH/MAP_RESOLUTION); x++)
+			{
+				r.data[range_x*y+x] = 100;
+			}
+		}
 	}
-	return r;
 
+	return r;
 }
 

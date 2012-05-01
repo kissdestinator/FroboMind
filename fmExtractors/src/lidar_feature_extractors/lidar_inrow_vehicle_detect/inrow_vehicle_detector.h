@@ -19,6 +19,8 @@
 
 #include "particle_filter.h"
 
+#include <tf/transform_broadcaster.h>
+
 class InRowVehicleDetector
 {
 private:
@@ -60,7 +62,6 @@ public:
   laser_geometry::LaserProjection projector;
 
   nav_msgs::OccupancyGrid map;
-  nav_msgs::MapMetaData map_data;
 
   InRowVehicleDetector();
   void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan);
