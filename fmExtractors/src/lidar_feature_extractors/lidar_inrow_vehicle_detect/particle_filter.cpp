@@ -28,8 +28,8 @@
  # Created: 20 march, 2012, Source written
  ****************************************************************************/
 
-#define X_RANGE 2
-#define Y_RANGE 1.05
+#define X_RANGE 2.00
+#define Y_RANGE 1.50
 #define MIN_VALID_MEASUREMENTS 25
 
 #include "particle_filter.h"
@@ -39,7 +39,7 @@ ParticleFilter::ParticleFilter()
 
 }
 
-ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double x_noise, double y_noise, double theta_noise)
+ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise)
 {
 	noParticles = numberOfParticles;
 	length_x = len_x;
@@ -47,13 +47,10 @@ ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,d
 	length_y = len_y;
 	offset_y = off_y;
 	max_angle = max_ang;
-	noise_x = x_noise;
-	noise_y = y_noise;
-	noise_theta = theta_noise;
 
-	last_x = 0;
-	last_y = 0;
-	last_theta = 0;
+	measurement_noise = measurements_noise;
+	move_noise = movement_noise;
+	turn_noise = turning_noise;
 
 	print = 0;
 
@@ -64,6 +61,8 @@ ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,d
 		particles.push_back(getRandomParticle(i));
 	}
 	std::cout << "ParticleFilter created:" << std::endl;
+
+
 }
 
 Car* ParticleFilter::getRandomParticle(double seed)
@@ -98,7 +97,7 @@ void ParticleFilter::updateParticlesMarker(void)
 		double prob = (particles[i]->w / max_prob);
 
 		visualization_msgs::Marker marker;
-		marker.header.frame_id = "base_link";
+		marker.header.frame_id = "map";
 		marker.header.stamp = ros::Time();
 		marker.ns = "particles";
 		marker.id = i;
@@ -124,17 +123,17 @@ void ParticleFilter::updateParticlesMarker(void)
 
 	visualization_msgs::Marker marker;
 
-	marker.header.frame_id = "base_link";
+	marker.header.frame_id = "map";
 	marker.header.stamp = ros::Time();
 	marker.ns = "my_namespace";
 	marker.id = 0;
 	marker.type = visualization_msgs::Marker::ARROW;
 	marker.action = visualization_msgs::Marker::ADD;
-	marker.pose.position.x = last_x;
-	marker.pose.position.y = last_y;
+	marker.pose.position.x = last_pos.position.x;
+	marker.pose.position.y = last_pos.position.y;
 	marker.pose.position.z = 0;
-	marker.pose.orientation.x = cos(last_theta);
-	marker.pose.orientation.y = sin(last_theta);
+	marker.pose.orientation.x = cos(last_pos.position.th);
+	marker.pose.orientation.y = sin(last_pos.position.th);
 	marker.pose.orientation.z = 0.0;
 	marker.pose.orientation.w = 0.0;
 	marker.scale.x = 0.4;
@@ -157,9 +156,9 @@ void ParticleFilter::addRandomGaussianNoise()
 {
 	  boost::mt19937 rng(time(0));
 
-	  boost::normal_distribution<> nd_x(0.0, noise_x);
-	  boost::normal_distribution<> nd_y(0.0, 0.1*noise_y);
-	  boost::normal_distribution<> nd_theta(0.0, 0.1*noise_theta);
+	  boost::normal_distribution<> nd_x(0.0, move_noise);
+	  boost::normal_distribution<> nd_y(0.0, move_noise);
+	  boost::normal_distribution<> nd_theta(0.0, turn_noise);
 
 	  boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_x(rng, nd_x);
 	  boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_y(rng, nd_y);
@@ -167,7 +166,7 @@ void ParticleFilter::addRandomGaussianNoise()
 
 	  for (int i = 0; i < noParticles; ++i)
 	  {
-	 // particles[i]->x += var_x();
+		particles[i]->x += var_x();
 	    particles[i]->y += var_y();
 	    particles[i]->theta += var_theta();
 	  }
@@ -186,28 +185,40 @@ void ParticleFilter::printParticles()
 	}
 }
 
-void ParticleFilter::motionUpdate(const double& dx, const double& dy, const double& dtheta)
+void ParticleFilter::motionUpdate(const fmMsgs::vehicle_coordinate& delta_position)
 {
-	double temp_y = sqrt(pow(dx,2.0)+pow(dy,2.0))*sin(last_theta);
-//	double temp_x = sqrt(pow(dx,2.0)+pow(dy,2.0))*cos(last_theta);
-	std::cout << "Temp_y: " << temp_y << std::endl;
+	boost::mt19937 rng(time(0));
+
+	boost::normal_distribution<> nd_x(0.0, move_noise * delta_position.x);
+	boost::normal_distribution<> nd_y(0.0, move_noise * delta_position.y);
+	boost::normal_distribution<> nd_theta(0.0, turn_noise * delta_position.th);
+
+	boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_x(rng, nd_x);
+	boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_y(rng, nd_y);
+	boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_theta(rng, nd_theta);
+
 	for (int i = 0; i < noParticles; i++)
 	{
-		particles[i]->theta += dtheta;
+		particles[i]->theta += delta_position.th + var_theta();
 		if (particles[i]->theta < 0)
 			particles[i]->theta += 2*M_PI;
 		else if (particles[i]->theta > 2*M_PI)
 			particles[i]->theta -= 2*M_PI;
-		particles[i]->y += temp_y;
-	//	particles[i]->x += temp_x;
+
+		particles[i]->y += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*sin(particles[i]->theta+delta_position.th/2) + var_y();
+		particles[i]->x += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*cos(particles[i]->theta+delta_position.th/2) + var_x();
+
 	}
 }
 
-void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud)
+void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud, const nav_msgs::OccupancyGrid& map)
 {
 	double prob;
-	double error_temp = 0;
+	double temp_error = 0;
 	int valid_measurements = 0;
+	float res = map.info.resolution;
+	int width = map.info.width;
+	int height = map.info.height;
 
 	for (int i = 0; i < noParticles; i++)
 	{
@@ -216,21 +227,30 @@ void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud
 		{
 			// transponer laser målingerne ind omkring (0,0) for at muliggøre sortering
 			geometry_msgs::Point32 t;
-			t.x = pointCloud.points[j].x * cos(particles[i]->theta) - pointCloud.points[j].y * sin(particles[i]->theta) + particles[i]->x;
-			t.y = pointCloud.points[j].x * sin(particles[i]->theta) + pointCloud.points[j].y * cos(particles[i]->theta) + particles[i]->y;
+			t.x = pointCloud.points[j].x * cos(particles[i]->theta) - pointCloud.points[j].y * sin(particles[i]->theta);
+			t.y = pointCloud.points[j].x * sin(particles[i]->theta) + pointCloud.points[j].y * cos(particles[i]->theta);
 
 			// Beregn fejl hvis målingen er gyldig
 			if ((t.x < X_RANGE/2 && t.x > -X_RANGE/2) && (t.y < Y_RANGE/2 && t.y > -Y_RANGE/2))
 			{
+				t.y += particles[i]->y;
+				t.x += particles[i]->x;
+
 				valid_measurements++;
-				// Beregner fejlen i y-retningen
-				error_temp = pointCloud.points[j].x * sin(particles[i]->theta) + pointCloud.points[j].y * cos(particles[i]->theta) + particles[i]->y;
+
+				int y = t.y/res;
+				int x = t.x/res;
+
+				// Beregner fejlen
+				if (map.data[y*width+x] == 100)
+					temp_error = 0;
+				else if (map.data[(y+1)*width+x] == 100 || map.data[(y-1)*width+x] == 100 || map.data[y*width+x+1] == 100 || map.data[y*width+x-1] == 100)
+					temp_error = res;
+				else if (map.data[(y+1)*width+x+1] == 100 || map.data[(y+1)*width+x-1] == 100 || map.data[(y-1)*width+x+1] == 100 || map.data[(y-1)*width+x-1] == 100)
+					temp_error = sqrt(pow(res,2.0)+pow(res,2.0));
 
 				// bestemmer fejlen afhængig af om målingen ligger på den ene eller den anden række
-				if (error_temp < 0.75/2)
-					prob *= gaussian(0,noise_y,error_temp);
-				else
-					prob *= gaussian(0,noise_y,error_temp-0.75);
+				prob *= gaussian(0,measurement_noise,temp_error);
 			}
 		}
 		// Kontroller at der har været nok målinger
@@ -275,7 +295,6 @@ void ParticleFilter::resampling()
 
 fmMsgs::vehicle_position ParticleFilter::findVehicle()
 {
-	fmMsgs::vehicle_position r;
 	double x(0),y(0),theta(0);
 	for (int i = 0; i < noParticles; i++)
 	{
@@ -295,15 +314,15 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 		theta += temp_theta;
 
 	}
-	r.position.x = last_x = x / noParticles;
-	r.position.y = last_y = y / noParticles;
-	r.position.th = last_theta = theta / noParticles;
-	r.probability = max_prob;
-	r.header.stamp = ros::Time::now();
+	last_pos.position.x = x / noParticles;
+	last_pos.position.y = y / noParticles;
+	last_pos.position.th = theta / noParticles;
+	last_pos.probability = max_prob;
+	last_pos.header.stamp = ros::Time::now();
 
-	ROS_INFO("Row: x: %.3f y: %.3f th: %.3f",last_x,last_y,last_theta);
+	ROS_INFO("Position: x: %.3f y: %.3f th: %.3f",last_pos.position.x ,last_pos.position.y,last_pos.position.th);
 
-	return r;
+	return last_pos;
 
 }
 
@@ -323,13 +342,10 @@ void ParticleFilter::newParticles(double ratio)
 
 }
 
-fmMsgs::vehicle_position ParticleFilter::update(const sensor_msgs::PointCloud& pointCloud, const double& dx, const double& dy, const double& dtheta)
+fmMsgs::vehicle_position ParticleFilter::update(const sensor_msgs::PointCloud& pointCloud, const fmMsgs::vehicle_coordinate& delta_position, const nav_msgs::OccupancyGrid& map)
 {
-//	motionUpdate(dx,dy,dtheta);
-	addRandomGaussianNoise();
-	measurementUpdate(pointCloud);
-	newParticles(0.5);
-	measurementUpdate(pointCloud);
+	motionUpdate(delta_position);
+	measurementUpdate(pointCloud,map);
 	resampling();
 
 	return findVehicle();

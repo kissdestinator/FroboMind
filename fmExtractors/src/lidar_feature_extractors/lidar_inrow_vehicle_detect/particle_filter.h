@@ -8,6 +8,7 @@
 #include "ros/ros.h"
 #include "fmMsgs/Vector3.h"
 #include "fmMsgs/vehicle_position.h"
+#include "fmMsgs/vehicle_coordinate.h"
 #include "tf/transform_listener.h"
 #include "visualization_msgs/MarkerArray.h"
 
@@ -46,21 +47,20 @@ private:
   std::vector<Car*> particles;
 
   int noParticles;
+
+  double move_noise;
+  double turn_noise;
+  double measurement_noise;
+
   double offset_x;
   double length_x;
   double offset_y;
   double length_y;
   double max_angle;
 
-  double noise_x;
-  double noise_y;
-  double noise_theta;
-
-  double last_x;
-  double last_y;
-  double last_theta;
-
   double max_prob;
+
+  fmMsgs::vehicle_position last_pos;
 
   visualization_msgs::MarkerArray particlesMarker;
 
@@ -69,8 +69,8 @@ private:
   void newParticles(double ratio);
   Car* getRandomParticle(double seed);
   void printParticles();
-  void motionUpdate(const double& dx, const double& dy, const double& dtheta);
-  void measurementUpdate(const sensor_msgs::PointCloud& pointCloud);
+  void motionUpdate(const fmMsgs::vehicle_coordinate& delta_position);
+  void measurementUpdate(const sensor_msgs::PointCloud& pointCloud, const nav_msgs::OccupancyGrid& map);
   void resampling();
   double gaussian(double mu, double sigma, double x);
   void addRandomGaussianNoise();
@@ -79,11 +79,12 @@ private:
 public:
 
   ParticleFilter();
-  ParticleFilter(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double x_noise, double y_noise, double theta_noise);
+  ParticleFilter(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise);
 
   void updateParticlesMarker(void);
-  fmMsgs::vehicle_position update(const sensor_msgs::PointCloud& cloud, const double& dx, const double& dy, const double& dtheta);
+  fmMsgs::vehicle_position update(const sensor_msgs::PointCloud& pointCloud, const fmMsgs::vehicle_coordinate& delta_position, const nav_msgs::OccupancyGrid& map);
   visualization_msgs::MarkerArray getParticlesMarker(void);
+
 };
 
 #endif /* PARTICLE_FILTER_H_ */

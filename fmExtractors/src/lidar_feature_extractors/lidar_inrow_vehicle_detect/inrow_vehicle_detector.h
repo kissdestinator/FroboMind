@@ -7,15 +7,16 @@
 #include "laser_geometry/laser_geometry.h"
 #include "sensor_msgs/PointCloud.h"
 #include "ros/ros.h"
-#include "fmMsgs/row.h"
 #include "fmMsgs/Vector3.h"
 #include "fmMsgs/vehicle_position.h"
+#include "fmMsgs/vehicle_coordinate.h"
 
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
 
 #include "nav_msgs/OccupancyGrid.h"
 #include "nav_msgs/MapMetaData.h"
+#include "nav_msgs/Odometry.h"
 
 #include "particle_filter.h"
 
@@ -24,8 +25,6 @@
 class InRowVehicleDetector
 {
 private:
-
-  fmMsgs::row rows_;
 
   ParticleFilter particlefilter;
 
@@ -36,15 +35,9 @@ private:
   double 	e_angle;
   double 	e_distance;
 
-  double old_x;
-  double old_y;
-  double old_theta;
-  double x;
-  double y;
-  double theta;
-  double dx;
-  double dy;
-  double dtheta;
+  fmMsgs::vehicle_coordinate position;
+  fmMsgs::vehicle_coordinate last_position;
+  fmMsgs::vehicle_coordinate delta_position;
 
 public:
 
@@ -57,6 +50,7 @@ public:
   ros::Publisher map_pub;
 
   ros::Subscriber laser_scan_sub;
+
   ros::Subscriber position_sub;
 
   laser_geometry::LaserProjection projector;
@@ -65,8 +59,9 @@ public:
 
   InRowVehicleDetector();
   void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan);
-  void positionCallback(const fmMsgs::Vector3::ConstPtr& position);
+  void positionCallback(const fmMsgs::vehicle_coordinate::ConstPtr& pos);
   nav_msgs::OccupancyGrid buildMap();
+  nav_msgs::OccupancyGrid buildHollowMap();
   void publishMap();
 
 };

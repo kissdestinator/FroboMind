@@ -43,23 +43,34 @@
 
 InRowVehicleDetector::InRowVehicleDetector()
 {
-	particlefilter = ParticleFilter(1000,0,0,0.75,0.375,M_PI/2,0,0.1,0.1);
+	particlefilter = ParticleFilter(1000,1,10.5,1,10,M_PI/2,0.05,0.10,M_PI/32);
 
-	old_theta = 0;
-	old_x = 0;
-	old_y = 0;
-
-	map = buildMap();
+	map = buildHollowMap();
 }
 
-void InRowVehicleDetector::positionCallback(const fmMsgs::Vector3::ConstPtr& position)
+void InRowVehicleDetector::positionCallback(const fmMsgs::vehicle_coordinate::ConstPtr& pos)
 {
-	x = position->x;
-	y = position->y;
-	theta = position->th;
+	position.x = pos->x;
+	position.y = pos->y;
+	position.th = pos->th;
 }
 
-void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan )
+fmMsgs::vehicle_coordinate calcPositionChange(fmMsgs::vehicle_coordinate position, fmMsgs::vehicle_coordinate last_position)
+{
+	fmMsgs::vehicle_coordinate r;
+
+	r.x = position.x - last_position.x;
+	r.y = position.y - last_position.y;
+	r.th = position.th - last_position.th;
+	if (r.th > 2*M_PI)
+		r.th -= 2*M_PI;
+	if (r.th < 0)
+		r.th += 2*M_PI;
+
+	return r;
+}
+
+void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan)
 {
 	sensor_msgs::PointCloud cloud;
 
@@ -76,7 +87,28 @@ void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstP
     cloud.header.frame_id = "base_link";
     point_cloud_pub.publish(cloud);
 
-	fmMsgs::vehicle_position vp = particlefilter.update(cloud,dx,dy,dtheta);
+	fmMsgs::vehicle_position vp = particlefilter.update(cloud,delta_position,map);
+
+	tf::TransformBroadcaster map_broadcaster;
+
+	//since all odometry is 6DOF we'll need a quaternion created from yaw
+	geometry_msgs::Quaternion map_quat = tf::createQuaternionMsgFromYaw(vp.position.th);
+
+	//first, we'll publish the transform over tf
+	geometry_msgs::TransformStamped map_trans;
+	map_trans.header.stamp = ros::Time::now();
+	map_trans.header.frame_id = "map";
+	map_trans.child_frame_id = "base_link";
+
+	map_trans.transform.translation.x = vp.position.x;
+	map_trans.transform.translation.y = vp.position.y;
+	map_trans.transform.translation.z = 0.0;
+	map_trans.transform.rotation = map_quat;
+
+	//send the transform
+	map_broadcaster.sendTransform(map_trans);
+
+	publishMap();
 
 	vehicle_position_pub.publish(vp);
 
@@ -110,12 +142,8 @@ nav_msgs::OccupancyGrid InRowVehicleDetector::buildMap()
 	int range_y = r.info.height;
 
 	for (int y = 0; y < range_y; y++)
-	{
 		for (int x = 0; x < range_x; x++)
-		{
 			r.data.push_back(0);
-		}
-	}
 
 	for (int i = 0; i < NO_OF_ROWS; i++)
 	{
@@ -134,3 +162,43 @@ nav_msgs::OccupancyGrid InRowVehicleDetector::buildMap()
 	return r;
 }
 
+nav_msgs::OccupancyGrid InRowVehicleDetector::buildHollowMap()
+{
+	nav_msgs::OccupancyGrid r;
+	nav_msgs::MapMetaData temp;
+
+	temp.height = MAP_SIZE_Y / MAP_RESOLUTION;
+	temp.width = MAP_SIZE_X / MAP_RESOLUTION;
+	temp.resolution = MAP_RESOLUTION;
+	temp.map_load_time = ros::Time::now();
+
+	r.info = temp;
+	r.header.frame_id = "/map";
+	r.header.stamp = ros::Time::now();
+
+	int range_x = r.info.width;
+	int range_y = r.info.height;
+
+	for (int y = 0; y < range_y; y++)
+		for (int x = 0; x < range_x; x++)
+			r.data.push_back(0);
+
+	for (int i = 0; i < NO_OF_ROWS; i++)
+	{
+		int offset_x = (START_X + i*(ROW_SPACING+ROW_WIDTH)) / MAP_RESOLUTION;
+		int offset_y = START_Y / MAP_RESOLUTION;
+
+		for (int y = offset_y; y < offset_y+(ROW_LENGTH/MAP_RESOLUTION); y++)
+		{
+			for (int x = offset_x; x < offset_x+(ROW_WIDTH/MAP_RESOLUTION); x++)
+			{
+				if (y == offset_y || y == offset_y+(ROW_LENGTH/MAP_RESOLUTION)-1)
+					r.data[range_x*y+x] = 100;
+				else if (x == offset_x || x == offset_x+(ROW_WIDTH/MAP_RESOLUTION)-1)
+					r.data[range_x*y+x] = 100;
+			}
+		}
+	}
+
+	return r;
+}
