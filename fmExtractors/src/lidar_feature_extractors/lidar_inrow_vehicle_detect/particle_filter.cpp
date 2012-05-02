@@ -95,9 +95,9 @@ void ParticleFilter::updateParticlesMarker(void)
 	for (int i = 0; i < noParticles; i++)
 	{
 		double prob = (particles[i]->w / max_prob);
-
+		geometry_msgs::Quaternion pose =  tf::createQuaternionMsgFromYaw(particles[i]->theta);
 		visualization_msgs::Marker marker;
-		marker.header.frame_id = "/base_link";
+		marker.header.frame_id = "/map";
 		marker.header.stamp = ros::Time();
 		marker.ns = "particles";
 		marker.id = i;
@@ -106,10 +106,7 @@ void ParticleFilter::updateParticlesMarker(void)
 		marker.pose.position.x = particles[i]->x;
 		marker.pose.position.y = particles[i]->y;
 		marker.pose.position.z = 0;
-		marker.pose.orientation.x = cos(particles[i]->theta);
-		marker.pose.orientation.y = sin(particles[i]->theta);
-		marker.pose.orientation.z = 0.0;
-		marker.pose.orientation.w = 0.0;
+		marker.pose.orientation = pose;
 		marker.scale.x = 0.2;
 		marker.scale.y = 0.2;
 		marker.scale.z = 0.1;
@@ -123,7 +120,8 @@ void ParticleFilter::updateParticlesMarker(void)
 
 	visualization_msgs::Marker marker;
 
-	marker.header.frame_id = "/base_link";
+	geometry_msgs::Quaternion pose = tf::createQuaternionMsgFromYaw(last_pos.position.th);
+	marker.header.frame_id = "/map";
 	marker.header.stamp = ros::Time();
 	marker.ns = "my_namespace";
 	marker.id = 0;
@@ -132,10 +130,7 @@ void ParticleFilter::updateParticlesMarker(void)
 	marker.pose.position.x = last_pos.position.x;
 	marker.pose.position.y = last_pos.position.y;
 	marker.pose.position.z = 0;
-	marker.pose.orientation.x = cos(last_pos.position.th);
-	marker.pose.orientation.y = sin(last_pos.position.th);
-	marker.pose.orientation.z = 0.0;
-	marker.pose.orientation.w = 0.0;
+	marker.pose.orientation = pose;
 	marker.scale.x = 0.4;
 	marker.scale.y = 0.6;
 	marker.scale.z = 0.5;

@@ -34,16 +34,16 @@
 #define MAP_SIZE_Y 40
 #define MAP_RESOLUTION 0.05
 
-#define ROW_WIDTH 0.40
-#define ROW_LENGTH 20
+#define ROW_WIDTH 0.20
+#define ROW_LENGTH 3
 #define ROW_SPACING 0.75
-#define NO_OF_ROWS 20
+#define NO_OF_ROWS 3
 #define START_X 10
 #define START_Y 10
 
 InRowVehicleDetector::InRowVehicleDetector()
 {
-	particlefilter = ParticleFilter(25,1,10.75,1,11,M_PI/2,0.10,0.10,M_PI/16);
+	particlefilter = ParticleFilter(1000,1,10.75,1,11,M_PI/2,0.10,0.10,M_PI/16);
 
 	map = buildHollowMap();
 }
