@@ -43,7 +43,7 @@
 
 InRowVehicleDetector::InRowVehicleDetector()
 {
-	particlefilter = ParticleFilter(1000,1,10.5,1,10,M_PI/2,0.05,0.10,M_PI/32);
+	particlefilter = ParticleFilter(25,1,10.75,1,11,M_PI/2,0.10,0.10,M_PI/16);
 
 	map = buildHollowMap();
 }
@@ -74,6 +74,11 @@ void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstP
 {
 	sensor_msgs::PointCloud cloud;
 
+
+	delta_position = calcPositionChange(position,last_position);
+
+	last_position = position;
+
 	try
     {
     	projector.projectLaser(*laser_scan, cloud);
@@ -84,21 +89,21 @@ void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstP
         return;
     }
 
-    cloud.header.frame_id = "base_link";
+    cloud.header.frame_id = "lidar_scan";
+    cloud.header.stamp = ros::Time::now();
     point_cloud_pub.publish(cloud);
 
 	fmMsgs::vehicle_position vp = particlefilter.update(cloud,delta_position,map);
 
-	tf::TransformBroadcaster map_broadcaster;
+	ROS_INFO("Position: x: %.3f y: %.3f th: %.3f",vp.position.x ,vp.position.y,vp.position.th);
 
-	//since all odometry is 6DOF we'll need a quaternion created from yaw
 	geometry_msgs::Quaternion map_quat = tf::createQuaternionMsgFromYaw(vp.position.th);
 
 	//first, we'll publish the transform over tf
 	geometry_msgs::TransformStamped map_trans;
 	map_trans.header.stamp = ros::Time::now();
-	map_trans.header.frame_id = "map";
-	map_trans.child_frame_id = "base_link";
+	map_trans.header.frame_id = "/map";
+	map_trans.child_frame_id = "/odom";
 
 	map_trans.transform.translation.x = vp.position.x;
 	map_trans.transform.translation.y = vp.position.y;

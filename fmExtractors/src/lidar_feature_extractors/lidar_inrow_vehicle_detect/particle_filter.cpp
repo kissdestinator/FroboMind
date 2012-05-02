@@ -52,7 +52,7 @@ ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,d
 	move_noise = movement_noise;
 	turn_noise = turning_noise;
 
-	print = 0;
+	print = 1;
 
 	max_prob = 1;
 
@@ -97,7 +97,7 @@ void ParticleFilter::updateParticlesMarker(void)
 		double prob = (particles[i]->w / max_prob);
 
 		visualization_msgs::Marker marker;
-		marker.header.frame_id = "map";
+		marker.header.frame_id = "/base_link";
 		marker.header.stamp = ros::Time();
 		marker.ns = "particles";
 		marker.id = i;
@@ -123,7 +123,7 @@ void ParticleFilter::updateParticlesMarker(void)
 
 	visualization_msgs::Marker marker;
 
-	marker.header.frame_id = "map";
+	marker.header.frame_id = "/base_link";
 	marker.header.stamp = ros::Time();
 	marker.ns = "my_namespace";
 	marker.id = 0;
@@ -189,9 +189,9 @@ void ParticleFilter::motionUpdate(const fmMsgs::vehicle_coordinate& delta_positi
 {
 	boost::mt19937 rng(time(0));
 
-	boost::normal_distribution<> nd_x(0.0, move_noise * delta_position.x);
-	boost::normal_distribution<> nd_y(0.0, move_noise * delta_position.y);
-	boost::normal_distribution<> nd_theta(0.0, turn_noise * delta_position.th);
+	boost::normal_distribution<> nd_x(0.0, move_noise);
+	boost::normal_distribution<> nd_y(0.0, move_noise);
+	boost::normal_distribution<> nd_theta(0.0, turn_noise);
 
 	boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_x(rng, nd_x);
 	boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_y(rng, nd_y);
@@ -238,10 +238,11 @@ void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud
 
 				valid_measurements++;
 
-				int y = t.y/res;
-				int x = t.x/res;
+				int y = (int)((float)(t.y)/res);
+				int x = (int)((float)(t.x)/res);
 
 				// Beregner fejlen
+				temp_error = 0.1;
 				if (map.data[y*width+x] == 100)
 					temp_error = 0;
 				else if (map.data[(y+1)*width+x] == 100 || map.data[(y-1)*width+x] == 100 || map.data[y*width+x+1] == 100 || map.data[y*width+x-1] == 100)
@@ -312,15 +313,12 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 		temp_theta += particles[0]->theta - M_PI;
 
 		theta += temp_theta;
-
 	}
 	last_pos.position.x = x / noParticles;
 	last_pos.position.y = y / noParticles;
 	last_pos.position.th = theta / noParticles;
 	last_pos.probability = max_prob;
 	last_pos.header.stamp = ros::Time::now();
-
-	ROS_INFO("Position: x: %.3f y: %.3f th: %.3f",last_pos.position.x ,last_pos.position.y,last_pos.position.th);
 
 	return last_pos;
 
@@ -345,7 +343,9 @@ void ParticleFilter::newParticles(double ratio)
 fmMsgs::vehicle_position ParticleFilter::update(const sensor_msgs::PointCloud& pointCloud, const fmMsgs::vehicle_coordinate& delta_position, const nav_msgs::OccupancyGrid& map)
 {
 	motionUpdate(delta_position);
+	printParticles();
 	measurementUpdate(pointCloud,map);
+	printParticles();
 	resampling();
 
 	return findVehicle();

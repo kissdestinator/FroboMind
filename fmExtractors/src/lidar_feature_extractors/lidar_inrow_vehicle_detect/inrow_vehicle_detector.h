@@ -39,6 +39,8 @@ private:
   fmMsgs::vehicle_coordinate last_position;
   fmMsgs::vehicle_coordinate delta_position;
 
+  tf::TransformBroadcaster map_broadcaster;
+
 public:
 
   ros::Publisher point_cloud_pub;
