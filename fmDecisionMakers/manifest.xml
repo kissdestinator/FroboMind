@@ -1,14 +1,16 @@
 <package>
-  <description brief="fmDecisionMaking">
+  <description brief="fmDecisionMakers">
 
-     fmDecisionMaking
+     fmDecisionMakers
 
   </description>
   <author>Søren Hundevadt Nielsen</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/fmDecisionMaking</url>
+  <url>http://ros.org/wiki/fmDecisionMakers</url>
   <depend package="roscpp"/>
+  <depend package="fmMsgs"/>
+  <depend package="geometry_msgs"/>
 </package>
 
 
