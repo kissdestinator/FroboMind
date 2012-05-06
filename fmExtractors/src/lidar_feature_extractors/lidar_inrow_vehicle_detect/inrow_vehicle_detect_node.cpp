@@ -35,7 +35,7 @@
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "row_detector");
+  ros::init(argc, argv, "inrow_vehicle_detect_node");
 
   ros::NodeHandle nh("~");
   ros::NodeHandle n;
@@ -49,14 +49,56 @@ int main(int argc, char **argv)
   std::string vehicle_position_pub_topic;
   std::string map_pub_topic;
 
-  n.param<std::string>("lidar_sub_topic", lidar_sub_topic, "/fmSensors/lidar_scan_data");
-  n.param<std::string>("visualization_marker_pub_topic", viz_marker_pub_topic, "/fmExtractors/viz_marker_particle");
-  n.param<std::string>("point_cloud_pub_topic", point_cloud_pub_topic, "/fmExtractors/point_cloud");
-  n.param<std::string>("position_sub_topic", position_sub_topic, "/fmExtrators/vehicle_coordinate");
-  n.param<std::string>("vehicle_position_pub_topic", vehicle_position_pub_topic, "/fmExtractors/vehicle_position");
-  n.param<std::string>("map_pub_topic", map_pub_topic, "/fmExtractors/map");
+  int numberOfParticles;
+  double len_x;
+  double off_x;
+  double len_y;
+  double off_y;
+  double max_ang;
+  double measurements_noise;
+  double movement_noise;
+  double turning_noise;
 
-  InRowVehicleDetector rd;
+  double map_size_x;
+  double map_size_y;
+  double map_resolution;
+  double row_width;
+  double row_length;
+  double row_spacing;
+  double no_of_rows;
+  double start_x;
+  double start_y;
+
+  nh.param<int>("particles", numberOfParticles, 1000);
+  nh.param<double>("offset_x", off_x, 10.35);
+  nh.param<double>("length_x", len_x, 0.5);
+  nh.param<double>("offset_y", off_y, 11.2);
+  nh.param<double>("length_y", len_y, 0.5);
+  nh.param<double>("max_ang", max_ang, M_PI/4);
+  nh.param<double>("measurement_noise", measurements_noise, 0.05);
+  nh.param<double>("movement_noise", movement_noise, 0.01);
+  nh.param<double>("turning_noise", turning_noise, M_PI/16);
+
+  nh.param<double>("map_size_x",map_size_x,40);
+  nh.param<double>("map_size_y",map_size_y,40);
+  nh.param<double>("map_resolution",map_resolution,0.05);
+  nh.param<double>("row_width",row_width,0.75);
+  nh.param<double>("row_length",row_length,20);
+  nh.param<double>("row_spacing",row_spacing,0.35);
+  nh.param<double>("no_of_rows",no_of_rows,10);
+  nh.param<double>("start_x",start_x,10);
+  nh.param<double>("start_y",start_y,10);
+
+  nh.param<std::string>("lidar_sub_topic", lidar_sub_topic, "/fmSensors/lidar_scan_data");
+  nh.param<std::string>("visualization_marker_pub_topic", viz_marker_pub_topic, "/fmExtractors/viz_marker_particle");
+  nh.param<std::string>("point_cloud_pub_topic", point_cloud_pub_topic, "/fmExtractors/point_cloud");
+  nh.param<std::string>("position_sub_topic", position_sub_topic, "/fmExtractors/vehicle_coordinate");
+  nh.param<std::string>("vehicle_position_pub_topic", vehicle_position_pub_topic, "/fmExtractors/vehicle_position");
+  nh.param<std::string>("map_pub_topic", map_pub_topic, "/fmExtractors/map");
+
+  InRowVehicleDetector rd(numberOfParticles, len_x, off_x, len_y, off_y, max_ang, measurements_noise, movement_noise, turning_noise);
+
+  rd.createMap(map_size_x,map_size_y,map_resolution,row_width,row_length,row_spacing,no_of_rows,start_x,start_y);
 
   rd.laser_scan_sub = nh.subscribe<sensor_msgs::LaserScan> (lidar_sub_topic.c_str(), 2, &InRowVehicleDetector::processLaserScan, &rd);
 

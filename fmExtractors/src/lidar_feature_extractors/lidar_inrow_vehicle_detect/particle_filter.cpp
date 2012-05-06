@@ -62,6 +62,9 @@ ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,d
 	}
 	std::cout << "ParticleFilter created:" << std::endl;
 
+	ROS_INFO("Particles: %d, len_x: %.3f, off_x: %.3f, len_y: %.3f, off_y: %.3f, max_ang: %.3f, meas_noise: %.3f, move_noise: %.3f, turn_noise: %.3f", numberOfParticles, len_x, off_x, len_y, off_y, max_ang, measurements_noise, movement_noise, turning_noise);
+
+
 
 }
 
@@ -194,14 +197,15 @@ void ParticleFilter::motionUpdate(const fmMsgs::vehicle_coordinate& delta_positi
 
 	for (int i = 0; i < noParticles; i++)
 	{
+
+		particles[i]->y += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*sin(particles[i]->theta) + var_y();
+		particles[i]->x += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*cos(particles[i]->theta) + var_x();
+
 		particles[i]->theta += delta_position.th + var_theta();
 		if (particles[i]->theta < 0)
 			particles[i]->theta += 2*M_PI;
 		else if (particles[i]->theta > 2*M_PI)
 			particles[i]->theta -= 2*M_PI;
-
-		particles[i]->y += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*sin(particles[i]->theta+delta_position.th/2) + var_y();
-		particles[i]->x += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*cos(particles[i]->theta+delta_position.th/2) + var_x();
 
 	}
 }
@@ -237,13 +241,10 @@ void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud
 				int x = (int)((float)(t.x)/res);
 
 				// Beregner fejlen
-				temp_error = 0.1;
-				if (map.data[y*width+x] == 100)
-					temp_error = 0;
-				else if (map.data[(y+1)*width+x] == 100 || map.data[(y-1)*width+x] == 100 || map.data[y*width+x+1] == 100 || map.data[y*width+x-1] == 100)
-					temp_error = res;
-				else if (map.data[(y+1)*width+x+1] == 100 || map.data[(y+1)*width+x-1] == 100 || map.data[(y-1)*width+x+1] == 100 || map.data[(y-1)*width+x-1] == 100)
-					temp_error = sqrt(pow(res,2.0)+pow(res,2.0));
+				if (map.data[y*width+x] == 0)
+					temp_error = 0.1;
+				else
+					temp_error = (100 - map.data[y*width+x]) * 0.001;
 
 				// bestemmer fejlen afhængig af om målingen ligger på den ene eller den anden række
 				prob *= gaussian(0,measurement_noise,temp_error);
@@ -338,9 +339,7 @@ void ParticleFilter::newParticles(double ratio)
 fmMsgs::vehicle_position ParticleFilter::update(const sensor_msgs::PointCloud& pointCloud, const fmMsgs::vehicle_coordinate& delta_position, const nav_msgs::OccupancyGrid& map)
 {
 	motionUpdate(delta_position);
-	printParticles();
 	measurementUpdate(pointCloud,map);
-	printParticles();
 	resampling();
 
 	return findVehicle();
