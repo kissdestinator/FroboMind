@@ -1,0 +1,69 @@
+<launch>
+
+	<group ns="fmSensors">
+
+	</group>
+
+	<group ns="fmExtractors">
+		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector" output="screen">
+			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
+			<param name="visualization_marker_pub_topic" value="/fmExtractors/viz_marker_particle" />
+			<param name="point_cloud_pub_topic" value="/fmExtractors/point_cloud" />
+			<param name="position_sub_topic" value="/fmExtractors/vehicle_coordinate" />
+			<param name="vehicle_position_pub_topic" value="/fmExtractors/vehicle_position" />
+			<param name="map_pub_topic" value="/fmExtractors/map" />
+			<param name="particles" value="100" />
+			<param name="offset_x" value="10.3" />
+			<param name="length_x" value="0.5" />
+			<param name="offset_y" value="11.20" />
+			<param name="length_y" value="0.5" />
+			<param name="max_ang" value="0.8" />
+			<param name="measurement_noise" value="0.07" />
+			<param name="movement_noise" value="0.03" />
+			<param name="turning_noise" value="0.05" />
+			
+			<param name="map_size_x" value="20" />
+			<param name="map_size_y" value="20" />
+			<param name="map_resolution" value="0.025" />
+			<param name="row_width" value="0.15" />
+			<param name="row_length" value="3" />
+			<param name="no_of_rows" value="3" />
+			<param name="row_spacing" value="0.65" />
+			<param name="start_x" value="10" />
+			<param name="start_y" value="10" />
+		</node>
+	</group>
+
+	<group ns="fmTools">
+	</group>
+
+
+	<group ns="fmProcessors">
+
+	</group>
+
+	<group ns="fmHMI">
+
+	</group>
+
+ 	<group ns="fmDecisionMakers">
+	</group>
+
+	<group ns="fmExecutors">
+	</group>
+
+	<group ns="fmControllers">
+
+	</group>
+
+ 	<group ns="fmActuators">
+ 	</group>
+
+ 	<group ns="fmKinematics">
+	</group>
+
+	<group ns="fmCSP">
+
+	</group>
+</launch>
+

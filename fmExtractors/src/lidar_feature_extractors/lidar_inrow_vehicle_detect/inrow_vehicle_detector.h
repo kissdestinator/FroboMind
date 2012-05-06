@@ -35,11 +35,24 @@ private:
   double 	e_angle;
   double 	e_distance;
 
+  double map_size_x;
+  double map_size_y;
+  double map_resolution;
+  double row_width;
+  double row_length;
+  double row_spacing;
+  double no_of_rows;
+  double start_x;
+  double start_y;
+
   fmMsgs::vehicle_coordinate position;
   fmMsgs::vehicle_coordinate last_position;
   fmMsgs::vehicle_coordinate delta_position;
+  fmMsgs::vehicle_coordinate first_position;
 
   tf::TransformBroadcaster map_broadcaster;
+
+  nav_msgs::OccupancyGrid smoothMap(nav_msgs::OccupancyGrid map);
 
 public:
 
@@ -59,12 +72,13 @@ public:
 
   nav_msgs::OccupancyGrid map;
 
-  InRowVehicleDetector();
+  InRowVehicleDetector(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise);
   void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan);
   void positionCallback(const fmMsgs::vehicle_coordinate::ConstPtr& pos);
   nav_msgs::OccupancyGrid buildMap();
   nav_msgs::OccupancyGrid buildHollowMap();
   void publishMap();
+  void createMap(double MAP_SIZE_X, double MAP_SIZE_Y, double MAP_RESOLUTION, double ROW_WIDTH, double ROW_LENGTH, double ROW_SPACING, double NO_OF_ROWS, double START_X,double START_Y);
 
 };
 
