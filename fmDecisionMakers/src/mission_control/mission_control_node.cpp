@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 	
 	n.param<double> ("update", mc.update_frequency, 50);
 	n.param<std::string> ("Heading_Pub_Top", mc.heading_pub_top, "/fmDecisionMakers/Heading");
-	n.param<std::string> ("Map_Sub_Top", mc.map_sub_top, "/");
+	n.param<std::string> ("Map_Sub_Top", mc.map_sub_top, "/fmExtractors/map");
 	n.param<std::string> ("P_Filter_Sub_Top", mc.p_filter_sub_top, "/fmExtractors/vehicle_position");
 	
 	n.param<double> ("Length_of_rows", mc.length_of_rows, 20);

@@ -74,15 +74,15 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 
 	if (laser_inverted)
 		for (int i = LRS_size-1; i >= 0; i--)
-			ranges.push_back(laser_scan->ranges[i]);
+			ranges.push_back((double)laser_scan->ranges[i]);
 	else
-		for (int i = 0; i > LRS_size; i++)
-			ranges.push_back(laser_scan->ranges[i]);
+		for (int i = 0; i < LRS_size; i++)
+			ranges.push_back((double)laser_scan->ranges[i]);
 
 	double temp = desired_heading;
 	if (desired_heading > M_PI)
 		temp -= 2 * M_PI;
-	int temp_heading = (int)(temp * LRS_size / 2 * M_PI);
+	int temp_heading = (int)(temp * LRS_size / (2 * M_PI));
 
 	int hole_found = 0;
 
@@ -121,7 +121,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 
 					// Calculate and publish the vehicle speed
 					current_velocity = max_velocity * safetyCheck(ranges);
-					ROS_INFO("index: %d, left: %d, center: %d, right: %d, turn angle: %.3f, test range: %.3f, LeftClear: %.3f, RightClear: %.3f, rangeLeft: %3.f, rangeRight: %3.f", index, left_line, center, right_line,turn_angle,test_range,left_clearing_angle,right_clearing_angle, ranges[mMod(left_line+index,LRS_size)], ranges[mMod(right_line+index,LRS_size)]);
+					ROS_INFO("L: %d, L: %.3f, R: %d, R: %.3f, turn angle: %.3f, desired_heading: %.3f, index: %d",mMod(left_line+index,LRS_size),ranges[mMod(left_line+index,LRS_size)],mMod(right_line+index,LRS_size), ranges[mMod(right_line+index,LRS_size)], turn_angle, desired_heading, index);
 					calcAndPublishSpeed(turn_angle,current_velocity);
 
 					i = (LRS_size/step_size);

@@ -119,8 +119,8 @@ void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstP
 	map_trans.header.frame_id = "/map";
 	map_trans.child_frame_id = "/vehicle";
 
-	map_trans.transform.translation.x = vp.position.x;
-	map_trans.transform.translation.y = vp.position.y;
+	map_trans.transform.translation.x = vp.position.y;
+	map_trans.transform.translation.y = vp.position.x;
 	map_trans.transform.translation.z = 0.0;
 	map_trans.transform.rotation = map_quat;
 
@@ -260,28 +260,6 @@ nav_msgs::OccupancyGrid InRowVehicleDetector::buildHollowMap()
 						}
 					}
 				}
-			}
-		}
-	}
-
-	return r;
-}
-
-nav_msgs::OccupancyGrid InRowVehicleDetector::smoothMap(nav_msgs::OccupancyGrid map)
-{
-	nav_msgs::OccupancyGrid r = map;
-
-	int range_x = r.info.width;
-	int range_y = r.info.height;
-
-	ROS_INFO("Smooth X: %d, Y: %d",range_x,range_y);
-
-	for (int y = 0; y < range_y; y++)
-	{
-		for (int x = 0; x < range_x; x++)
-		{
-			if (r.data[range_y*x+y] == 100)
-			{
 			}
 		}
 	}

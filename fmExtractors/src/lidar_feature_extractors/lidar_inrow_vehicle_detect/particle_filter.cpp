@@ -42,10 +42,10 @@ ParticleFilter::ParticleFilter()
 ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise)
 {
 	noParticles = numberOfParticles;
-	length_x = len_x;
-	offset_x = off_x;
-	length_y = len_y;
-	offset_y = off_y;
+	length_y = len_x;
+	offset_y = off_x;
+	length_x = len_y;
+	offset_x = off_y;
 	max_angle = max_ang;
 
 	measurement_noise = measurements_noise;
@@ -316,7 +316,14 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 	last_pos.probability = max_prob;
 	last_pos.header.stamp = ros::Time::now();
 
-	return last_pos;
+	fmMsgs::vehicle_position r;
+	r.position.y = x / noParticles;
+	r.position.x = y = y / noParticles;
+	r.position.th = theta / noParticles;
+	r.probability = max_prob;
+	r.header.stamp = ros::Time::now();
+
+	return r;
 
 }
 

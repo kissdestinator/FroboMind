@@ -60,7 +60,7 @@ void MISSION_CONTROL::main_loop(){
 void MISSION_CONTROL::map_callback(nav_msgs::OccupancyGrid msg){
 	//my_position_x = msg.x;
 	//my_position_y = msg.y;
-	//my_position_th = msg.th;
+	//my_position_th = msg.th;r
 }
 
 void MISSION_CONTROL::p_filter_callback(fmMsgs::vehicle_position msg){

@@ -52,8 +52,6 @@ private:
 
   tf::TransformBroadcaster map_broadcaster;
 
-  nav_msgs::OccupancyGrid smoothMap(nav_msgs::OccupancyGrid map);
-
 public:
 
   ros::Publisher point_cloud_pub;
