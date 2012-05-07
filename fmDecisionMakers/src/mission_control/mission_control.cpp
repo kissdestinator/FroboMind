@@ -20,7 +20,7 @@ void MISSION_CONTROL::main_loop(){
 	current_state = IN_ROW;
 	current_y_placement = BOTTOM;
 	current_turn_direction = RIGHT;
-	row_number = 2;
+	row_number = 1;
 
 	while(ros::ok()){
 		switch(current_state){
@@ -49,9 +49,9 @@ void MISSION_CONTROL::main_loop(){
 			case EXPLORER_MODE:
 				break;
 		}
-		ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, turn_state: %d", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, current_turn_direction);
 		heading_msg.orientation = get_new_heading();
 		heading_pub.publish(heading_msg);
+		ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction);
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
