@@ -18,7 +18,7 @@ void MISSION_CONTROL::main_loop(){
 	my_position_x = 0;
 	my_position_th = 0;
 	current_state = IN_ROW;
-	current_y_placement = BOTTOM;
+	current_y_placement = TOP;
 	current_turn_direction = RIGHT;
 	row_number = 1;
 
