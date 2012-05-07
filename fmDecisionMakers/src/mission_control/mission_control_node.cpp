@@ -16,13 +16,13 @@ int main(int argc, char **argv) {
 	n.param<std::string> ("Map_Sub_Top", mc.map_sub_top, "/fmExtractors/map");
 	n.param<std::string> ("P_Filter_Sub_Top", mc.p_filter_sub_top, "/fmExtractors/vehicle_position");
 	
-	n.param<double> ("Length_of_rows", mc.length_of_rows, 20);
+	n.param<double> ("Length_of_rows", mc.length_of_rows, 3);
 	n.param<double> ("Width_of_rows", mc.width_of_rows, 0.75);
-	n.param<double> ("No_of_rows", mc.no_of_rows, 10);
+	n.param<double> ("No_of_rows", mc.no_of_rows, 3);
 	n.param<double> ("Map_offset_x", mc.map_offset_x, 10);
 	n.param<double> ("Map_offset_y", mc.map_offset_y, 10);
-	n.param<double> ("Point_proximity_treshold", mc.point_proximity_treshold, 0.3);
-	n.param<double> ("Width_of_pots", mc.width_of_pots, 0.45);
+	n.param<double> ("Point_proximity_treshold", mc.point_proximity_treshold, 0.1);
+	n.param<double> ("Width_of_pots", mc.width_of_pots, 0.18);
 	n.param<double> ("row_exit_length", mc.row_exit_length, 0.5);
 	n.param<double> ("End_row_limit", mc.end_row_limit, 0.5);
 	n.param<int> ("start_turn_direction", mc.direction, 0);

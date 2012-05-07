@@ -35,6 +35,7 @@ void MISSION_CONTROL::main_loop(){
 					generate_path_left_exit();
 				else if(current_turn_direction == RIGHT)
 					generate_path_right_exit();
+
 				get_current_path();
 				break;
 			case FIND_ROW:
@@ -51,7 +52,7 @@ void MISSION_CONTROL::main_loop(){
 		}
 		heading_msg.orientation = get_new_heading();
 		heading_pub.publish(heading_msg);
-		ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction);
+		//ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state);
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
@@ -102,12 +103,16 @@ void MISSION_CONTROL::get_current_path(){
 	/*
 	 * Calculate whether the robot is close enough to the current point.
 	 */
+
+	ROS_INFO("my_x: %f, my_y: %f, path0: %f, path1: %f, path2: %f, r1: %f, r2: %f, state: %d", my_position_x, my_position_y,path[0][current_path],path[1][current_path], path[2][current_path] , fabs(my_position_x - path[0][current_path]),fabs( my_position_y - path[1][current_path]), current_state );
+
 	if(current_state == EXIT_ROW){
-		if(abs(my_position_x - path[0][current_path]) < path[2][current_path] && abs(my_position_y - path[1][current_path]) < path[2][current_path]){
+		if((fabs(my_position_x - path[0][current_path] ) < path[2][current_path] )&&( fabs(my_position_y - path[1][current_path]) < path[2][current_path])){
 			current_state = FIND_ROW;
 			row_number++;
 		}
 	}
+
 	else if(current_state == FIND_ROW)
 		if(abs(my_position_x - path[0][current_path]) < path[2][current_path] && abs(my_position_y - path[1][current_path]) < path[2][current_path]){
 			current_state = IN_ROW;
@@ -162,13 +167,15 @@ void MISSION_CONTROL::generate_path_left_exit(){
 void MISSION_CONTROL::check_end_row(){
 	//End of row upwards
 	if(my_position_y > (map_offset_y + length_of_rows - end_row_limit))
-		if((my_position_th > 1.5 * M_PI) || (my_position_th < 0.5 * M_PI))
+		if((my_position_th > 1.5 * M_PI) || (my_position_th < 0.5 * M_PI)){
 			current_state = EXIT_ROW;
+		}
 
 	//End of row downwards
 	if(my_position_y < (map_offset_y + end_row_limit))
-		if((my_position_th < 1.5 * M_PI) && (my_position_th > 0.5 * M_PI))
+		if((my_position_th < 1.5 * M_PI) && (my_position_th > 0.5 * M_PI)){
 			current_state = EXIT_ROW;
+		}
 }
 
 void MISSION_CONTROL::generate_path_left_enter(){
