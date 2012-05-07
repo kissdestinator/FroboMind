@@ -6,6 +6,7 @@
 #include "fmMsgs/Vector3.h"
 #include "fmMsgs/vehicle_position.h"
 #include "nav_msgs/OccupancyGrid.h"
+#include "cmath"
 
 
 class MISSION_CONTROL {
