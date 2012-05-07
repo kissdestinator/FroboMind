@@ -4,6 +4,8 @@
 #include <ros/ros.h>
 #include "fmMsgs/heading_order.h"
 #include "fmMsgs/Vector3.h"
+#include "fmMsgs/vehicle_position.h"
+#include "nav_msgs/OccupancyGrid.h"
 
 
 class MISSION_CONTROL {
@@ -48,8 +50,8 @@ public:
 	virtual ~MISSION_CONTROL();
 	
 	void main_loop();
-	void map_callback(fmMsgs::Vector3 msg);
-	void p_filter_callback(fmMsgs::Vector3 msg);
+	void map_callback(nav_msgs::OccupancyGrid msg);
+	void p_filter_callback(fmMsgs::vehicle_position msg);
 	
 };
 

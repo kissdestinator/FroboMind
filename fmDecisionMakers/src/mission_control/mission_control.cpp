@@ -17,12 +17,12 @@ void MISSION_CONTROL::main_loop(){
 	my_position_y = 0;
 	my_position_x = 0;
 	my_position_th = 0;
-	current_state = FIND_ROW;
-	current_y_placement = TOP;
+	current_state = IN_ROW;
+	current_y_placement = BOTTOM;
 	current_turn_direction = RIGHT;
 	row_number = 2;
 
-	while(true){
+	while(ros::ok()){
 		switch(current_state){
 			case IN_ROW:
 				generate_path_in_row();
@@ -57,14 +57,16 @@ void MISSION_CONTROL::main_loop(){
 	}
 }
 
-void MISSION_CONTROL::map_callback(fmMsgs::Vector3 msg){
+void MISSION_CONTROL::map_callback(nav_msgs::OccupancyGrid msg){
 	//my_position_x = msg.x;
 	//my_position_y = msg.y;
 	//my_position_th = msg.th;
 }
 
-void MISSION_CONTROL::p_filter_callback(fmMsgs::Vector3 msg){
-
+void MISSION_CONTROL::p_filter_callback(fmMsgs::vehicle_position msg){
+	my_position_x = msg.position.x;
+	my_position_y = msg.position.y;
+	my_position_th = msg.position.th;
 }
 
 double MISSION_CONTROL::get_new_heading(){
