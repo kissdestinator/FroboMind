@@ -87,17 +87,22 @@ fmMsgs::vehicle_coordinate calcPositionChange(fmMsgs::vehicle_coordinate positio
 	return r;
 }
 
-void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan)
+void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
 {
 	sensor_msgs::PointCloud cloud;
 
 	delta_position = calcPositionChange(position,last_position);
 
+	laser_scan.angle_increment = -laser_scan.angle_increment;
+	double temp = laser_scan.angle_max;
+	laser_scan.angle_max = laser_scan.angle_min;
+	laser_scan.angle_min = temp;
+
 	last_position = position;
 
 	try
     {
-    	projector.projectLaser(*laser_scan, cloud);
+    	projector.projectLaser(laser_scan, cloud);
     }
     catch (tf::TransformException& e)
     {
@@ -105,7 +110,7 @@ void InRowVehicleDetector::processLaserScan(const sensor_msgs::LaserScan::ConstP
         return;
     }
 
-    cloud.header.frame_id = "vehicle";
+    cloud.header.frame_id = "/vehicle";
     cloud.header.stamp = ros::Time::now();
     point_cloud_pub.publish(cloud);
 

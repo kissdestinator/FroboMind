@@ -201,7 +201,7 @@ void ParticleFilter::motionUpdate(const fmMsgs::vehicle_coordinate& delta_positi
 		particles[i]->y += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*sin(particles[i]->theta) + var_y();
 		particles[i]->x += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*cos(particles[i]->theta) + var_x();
 
-		particles[i]->theta += delta_position.th + var_theta();
+		particles[i]->theta -= delta_position.th + var_theta();
 		if (particles[i]->theta < 0)
 			particles[i]->theta += 2*M_PI;
 		else if (particles[i]->theta > 2*M_PI)

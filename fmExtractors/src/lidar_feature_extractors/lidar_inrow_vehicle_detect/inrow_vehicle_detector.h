@@ -71,7 +71,7 @@ public:
   nav_msgs::OccupancyGrid map;
 
   InRowVehicleDetector(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise);
-  void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan);
+  void processLaserScan(sensor_msgs::LaserScan laser_scan);
   void positionCallback(const fmMsgs::vehicle_coordinate::ConstPtr& pos);
   nav_msgs::OccupancyGrid buildMap();
   nav_msgs::OccupancyGrid buildHollowMap();
