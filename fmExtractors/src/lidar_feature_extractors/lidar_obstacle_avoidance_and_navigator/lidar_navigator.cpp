@@ -64,12 +64,22 @@ void LidarNavigator::positionCallback(const fmMsgs::vehicle_coordinateConstPtr& 
 
 void LidarNavigator::headingCallback(const fmMsgs::heading_orderConstPtr& heading)
 {
-	desired_heading = heading->orientation;
+	if (desired_heading != heading->orientation)
+	{
+		desired_heading = heading->orientation;
+		update();
+	}
+	else
+	{
+		desired_heading = heading->orientation;
+	}
+
 }
 
 void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& laser_scan )
 {
-	std::vector<double> ranges;
+	ranges.clear();
+
 	int LRS_size = laser_scan->get_ranges_size();
 
 	if (laser_inverted)
@@ -79,6 +89,13 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 		for (int i = 0; i < LRS_size; i++)
 			ranges.push_back((double)laser_scan->ranges[i]);
 
+	update();
+
+}
+
+void LidarNavigator::update()
+{
+	int LRS_size = ranges.size();
 	double temp = desired_heading;
 	if (desired_heading > M_PI)
 		temp -= 2 * M_PI;
@@ -143,7 +160,6 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 		ROS_INFO("No holes wide enough found..! - setting speed to zero");
 		calcAndPublishSpeed(0,0);
 	}
-
 }
 
 double LidarNavigator::safetyCheck(const std::vector<double>& ranges)
