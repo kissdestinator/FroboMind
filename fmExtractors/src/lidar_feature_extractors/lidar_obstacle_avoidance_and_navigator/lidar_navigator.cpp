@@ -172,7 +172,7 @@ void LidarNavigator::calcAndPublishSpeed(double turn_angle, double velocity)
 	// Calculate Angular velocity
 	//ang_vel = pid_ang_vel.update(-turn_angle,0);
 
-	ang_vel = turn_angle * P_ang_vel;
+	ang_vel = -turn_angle * P_ang_vel;
 	if (abs(ang_vel) > max_angular_velocity)
 		{
 			if(ang_vel < 0)

@@ -18,7 +18,7 @@
 		<node pkg="fmSensors" name="Lidar" type="neato_lidar_node" output="screen" >
 			<param name="port" value="/dev/ttyUSB1" /> 
 			<param name="baud_rate" value="115200" /> 
-			<param name="frame_id" value="neato_lidar" /> 
+			<param name="frame_id" value="base_link" /> 
 			<param name="firmware_version" value="2" /> 
 			<param name="lidar_publisher_topic" value="lidar_scan_data" /> 
 		</node>
@@ -42,7 +42,7 @@
 			<param name="vehicle_position_pub_topic" value="/fmExtractors/vehicle_position" />
 			<param name="map_pub_topic" value="/fmExtractors/map" />
 			<param name="particles" value="100" />
-			<param name="offset_x" value="10.5" />
+			<param name="offset_x" value="10.6" />
 			<param name="length_x" value="0.5" />
 			<param name="offset_y" value="10.3" />
 			<param name="length_y" value="0.5" />
@@ -57,32 +57,11 @@
 			<param name="row_width" value="0.15" />
 			<param name="row_length" value="3" />
 			<param name="no_of_rows" value="3" />
-			<param name="row_spacing" value="0.6" />
+			<param name="row_spacing" value="0.75" />
 			<param name="start_x" value="10" />
 			<param name="start_y" value="10" />
 		</node>
 
-		<node pkg="fmExtractors" name="lidar_navigation" type="lidar_navigator" output="screen">
-			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
-			<param name="visualization_marker_pub_topic" value="/fmExtractors/viz_marker_navigator" />
-			<param name="velocity_pub_topic" value="/speed_from_joystick" />
-			<param name="vehicle_coordinate" value="/fmExtractors/vehicle_coordinate" />
-			<param name="heading_sub_topic" value="/fmDecisionMakers/Heading" />
-			
-			<param name="navigation_range" value="0.75" />
-			<param name="safety_range" value="0.25" />
-			<param name="minimum_range" value="0.12" />
-			<param name="desired_heading" value="0.0" />
-			<param name="maximum_angular_velocity" value="0.0" />
-			<param name="maximum_velocity" value="0.0" />
-			<param name="minimum_clearance" value="0.40" />
-			<param name="minimum_clearance_angle" value="60" /> 
-			<param name="p_angular_velocity" value="5" />
-			<param name="i_angular_velocity" value="0.0" />
-			<param name="d_angular_velocity" value="0.0" />
-			<param name="laser_inverted" value="1" />
-			
-		</node>
 	</group>
 
 	<group ns="fmTools">
@@ -90,7 +69,7 @@
 
 
 	<group ns="fmProcessors">
-		<node pkg="fmProcessors" name="Gyro_Odo_Fusion" type="Gyro_Odo_Fusion_Kalman_node.py" output="screen">
+		<node pkg="fmProcessors" name="Gyro_Odo_Fusion" type="Gyro_Odo_Fusion_Kalman_node.py">
 		</node>	
 	</group>
 
@@ -100,7 +79,7 @@
 		<param name="angular_velocity" value="0.5" />
 		</node>
 
-		<node pkg="fmHMI" name="joy_node" type="joy_node" output="screen" >
+		<node pkg="fmHMI" name="joy_node" type="joy_node" >
 		</node>
 	</group>
 
@@ -116,7 +95,7 @@
 			<param name="No_of_rows" value="3" /> 
 			<param name="Map_offset_x" value="10" /> 
 			<param name="Map_offset_y" value="10" /> 
-			<param name="Point_proximity_treshold" value="0.3" /> 
+			<param name="Point_proximity_treshold" value="0.25" /> 
 			<param name="Width_of_pots" value="0.15" /> 
 			<param name="row_exit_length" value="0.5" /> 
 			<param name="End_row_limit" value="0.5" /> 
@@ -128,7 +107,7 @@
 	</group>
 
 	<group ns="fmControllers">
-		<node pkg="fmControllers" name="motor_controller" type="motor_controller_node" output="screen" >
+		<node pkg="fmControllers" name="motor_controller" type="motor_controller_node" >
 			<param name="left_odo_subscriber_topic" value="/fmSensors/left_odometry" /> 
 			<param name="right_odo_subscriber_topic" value="/fmSensors/right_odometry" /> 
 			<param name="desired_speed_subscriber_topic" value="/speed_from_joystick" /> 
