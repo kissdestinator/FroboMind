@@ -49,12 +49,15 @@ private:
 
 	int laser_inverted;
 
+	std::vector<double> ranges;
+
 	visualization_msgs::MarkerArray vizMarker;
 
 	double calcTurnAngle(double goal, int LRS_size);
 	void publishVisualization(double turn_angle);
 	void calcAndPublishSpeed(double turn_angle, double velocity);
 	double safetyCheck(const std::vector<double>& ranges);
+	void update();
 
 public:
 
