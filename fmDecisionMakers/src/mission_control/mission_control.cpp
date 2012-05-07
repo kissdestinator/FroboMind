@@ -52,7 +52,29 @@ void MISSION_CONTROL::main_loop(){
 		}
 		heading_msg.orientation = get_new_heading();
 		heading_pub.publish(heading_msg);
-		//ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state);
+		ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state);
+
+		visualization_msgs::Marker marker;
+
+		marker.header.frame_id = "/map";
+		marker.header.stamp = ros::Time();
+		marker.ns = "my_namespace";
+		marker.id = 0;
+		marker.type = visualization_msgs::Marker::CUBE;
+		marker.action = visualization_msgs::Marker::ADD;
+		marker.pose.position.x = path[1][0];
+		marker.pose.position.y = path[0][0];
+		marker.pose.position.z = 0;
+		marker.scale.x = 0.2;
+		marker.scale.y = 0.2;
+		marker.scale.z = 0.2;
+		marker.color.a = 1.0;
+		marker.color.r = 0.0;
+		marker.color.g = 1.0;
+		marker.color.b = 1.0;
+
+		viz_pub.publish(marker);
+
 		ros::spinOnce();
 		loop_rate.sleep();
 	}

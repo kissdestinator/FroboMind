@@ -7,6 +7,7 @@
 #include "fmMsgs/vehicle_position.h"
 #include "nav_msgs/OccupancyGrid.h"
 #include "cmath"
+#include "visualization_msgs/Marker.h"
 
 
 class MISSION_CONTROL {
@@ -33,6 +34,7 @@ public:
 	std::string map_sub_top;
 	std::string p_filter_sub_top;
 	std::string heading_pub_top;
+	std::string viz_pub_top;
 	
 	enum turn_direction {RIGHT, LEFT, UNKNOWN};
 	state current_state;
@@ -44,6 +46,7 @@ public:
 	ros::Subscriber map_sub;
 	ros::Subscriber p_filter_sub;
 	ros::Publisher heading_pub;
+	ros::Publisher viz_pub;
 	
 	double update_frequency;
 
