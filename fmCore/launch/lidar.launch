@@ -1,0 +1,12 @@
+<launch>	
+	<group ns="fmSensors">
+	<node pkg="fmSensors" name="Lidar" type="neato_lidar_node" output="screen" >
+			<param name="port" value="/dev/ttyUSB1" /> 
+			<param name="baud_rate" value="115200" /> 
+			<param name="frame_id" value="neato_lidar" /> 
+			<param name="firmware_version" value="2" /> 
+			<param name="lidar_publisher_topic" value="lidar_scan_data" /> 
+		</node>
+	</group>
+</launch>
+
