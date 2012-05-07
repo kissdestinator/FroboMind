@@ -18,6 +18,8 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
+#include "fmMsgs/heading_order.h"
+
 class LidarNavigator
 {
 private:
@@ -62,9 +64,12 @@ public:
   ros::Subscriber laser_scan_sub;
   ros::Subscriber position_sub;
 
+  ros::Subscriber heading_sub;
+
   LidarNavigator();
   void processLaserScan(const sensor_msgs::LaserScanConstPtr& laser_scan );
   void positionCallback(const fmMsgs::vehicle_coordinateConstPtr& position);
+  void headingCallback(const fmMsgs::heading_orderConstPtr& heading);
 
   void setNavRange(double range) 				{ nav_range = range; }
   void setSafetyRange(double range) 			{ safety_range = range; }

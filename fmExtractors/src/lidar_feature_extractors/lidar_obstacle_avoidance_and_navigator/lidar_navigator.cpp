@@ -62,6 +62,11 @@ void LidarNavigator::positionCallback(const fmMsgs::vehicle_coordinateConstPtr& 
 
 }
 
+void LidarNavigator::headingCallback(const fmMsgs::heading_orderConstPtr& heading)
+{
+	desired_heading = heading->orientation;
+}
+
 void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& laser_scan )
 {
 	std::vector<double> ranges;
@@ -192,7 +197,9 @@ void LidarNavigator::publishVisualization(double turn_angle)
 
 	visualization_msgs::Marker marker;
 
-	marker.header.frame_id = "neato_lidar";
+	geometry_msgs::Quaternion pose = tf::createQuaternionMsgFromYaw(turn_angle);
+
+	marker.header.frame_id = "/vehicle";
 	marker.header.stamp = ros::Time();
 	marker.ns = "my_namespace";
 	marker.id = 0;
@@ -201,10 +208,7 @@ void LidarNavigator::publishVisualization(double turn_angle)
 	marker.pose.position.x = 0;
 	marker.pose.position.y = 0;
 	marker.pose.position.z = 0;
-	marker.pose.orientation.x = cos(-turn_angle/2);
-	marker.pose.orientation.y = sin(-turn_angle/2);
-	marker.pose.orientation.z = 0.0;
-	marker.pose.orientation.w = 0.0;
+	marker.pose.orientation = pose;
 	marker.scale.x = 0.4;
 	marker.scale.y = 0.6;
 	marker.scale.z = 0.5;

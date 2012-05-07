@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 	std::string viz_marker_pub_topic;
 	std::string velocity_pub_topic;
 	std::string position_sub_topic;
+	std::string heading_sub_topic;
 
 	double nav_range;
 	double safety_range;
@@ -66,6 +67,7 @@ int main(int argc, char **argv)
 	nh.param<std::string>("visualization_marker_pub_topic", viz_marker_pub_topic, "/fmExtractors/viz_marker_navigator");
 	nh.param<std::string>("velocity_pub_topic", velocity_pub_topic, "/speed_from_joystick");
 	nh.param<std::string>("vehicle_coordinate", position_sub_topic, "/fmExtractors/vehicle_coordinate");
+	nh.param<std::string>("heading_sub_topic",heading_sub_topic,"/fmDecisionMakers/Heading");
 	nh.param<double>("navigation_range", nav_range, 0.60);
 	nh.param<double>("safety_range", safety_range, 0.25);
 	nh.param<double>("minimum_range", min_range, 0.12);
@@ -94,6 +96,7 @@ int main(int argc, char **argv)
 
 	ln.laser_scan_sub = nh.subscribe<sensor_msgs::LaserScan> (lidar_sub_topic.c_str(), 2, &LidarNavigator::processLaserScan, &ln);
 	ln.position_sub = nh.subscribe<fmMsgs::vehicle_coordinate> (position_sub_topic.c_str(), 2, &LidarNavigator::positionCallback, &ln);
+	ln.heading_sub = nh.subscribe<fmMsgs::heading_order>(heading_sub_topic.c_str(), 1, &LidarNavigator::headingCallback, &ln);
 
 	ln.velocity_pub = n.advertise<geometry_msgs::TwistStamped>(velocity_pub_topic.c_str(), 1);
 	ln.marker_pub = n.advertise<visualization_msgs::MarkerArray>(viz_marker_pub_topic.c_str(), 1);
