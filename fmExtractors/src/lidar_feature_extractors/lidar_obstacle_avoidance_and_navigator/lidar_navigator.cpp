@@ -96,7 +96,8 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 void LidarNavigator::update()
 {
 	int LRS_size = ranges.size();
-	double temp = desired_heading;
+	double temp = 2*M_PI - desired_heading;
+
 	if (desired_heading > M_PI)
 		temp -= 2 * M_PI;
 	int temp_heading = (int)(temp * LRS_size / (2 * M_PI));
