@@ -117,7 +117,12 @@ double MISSION_CONTROL::get_new_heading(){
 			path_heading =  my_position_th - path_heading;
 		else
 			path_heading =  path_heading - my_position_th;
-
+	while(path_heading > (2*M_PI) || path_heading < 0){
+		if(path_heading > 2 * M_PI)
+			return path_heading - (2 * M_PI);
+		if(path_heading < 0)
+			return path_heading + (2 * M_PI);
+	}
 	return path_heading;
 }
 
