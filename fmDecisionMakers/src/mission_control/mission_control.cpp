@@ -104,7 +104,11 @@ double MISSION_CONTROL::get_new_heading(){
 
 	double path_heading = (2 * M_PI - (atan2(a,b)));
 
+	while(path_heading > M_PI/2)
+		path_heading -= (2*M_PI);
 
+	while(path_heading < -M_PI/2)
+		path_heading += (2*M_PI);
 
 	if((my_position_th < M_PI && path_heading < M_PI) || (my_position_th > M_PI && path_heading > M_PI)){
 		if(my_position_th > path_heading)
@@ -128,7 +132,7 @@ double MISSION_CONTROL::get_new_heading(){
 
 void MISSION_CONTROL::get_current_path(){
 	/*
-	 * Calculate whether the robot is close enough to the current point.
+	 * Calculate whether the  robot is close enough to the current point.
 	 */
 
 	if(current_state == EXIT_ROW){
