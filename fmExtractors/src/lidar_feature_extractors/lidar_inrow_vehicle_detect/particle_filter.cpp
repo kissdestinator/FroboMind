@@ -320,7 +320,7 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 	r.position.y = x / noParticles;
 	r.position.x = y = y / noParticles;
 	r.position.th = theta / noParticles;
-	r.position.th -= 2*M_PI;
+	r.position.th = 2*M_PI - r.position.th;
 	if (r.position.th > 2*M_PI)
 		r.position.th -= 2*M_PI;
 	else if (r.position.th < 0)
