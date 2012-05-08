@@ -206,7 +206,7 @@ void LidarNavigator::calcAndPublishSpeed(double turn_angle, double velocity)
 
 	geometry_msgs::TwistStamped twist;
 	twist.twist.linear.x = vel;
-	twist.twist.angular.z = -ang_vel;
+	twist.twist.angular.z = ang_vel;
 	//if (twist.twist.linear.x != 0 && twist.twist.angular.z != 0)
 		velocity_pub.publish(twist);
 

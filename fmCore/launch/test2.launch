@@ -69,15 +69,15 @@
 			<param name="vehicle_coordinate" value="/fmExtractors/vehicle_coordinate" />
 			<param name="heading_sub_topic" value="/fmDecisionMakers/Heading" />
 			
-			<param name="navigation_range" value="0.75" />
+			<param name="navigation_range" value="0.65" />
 			<param name="safety_range" value="0.25" />
 			<param name="minimum_range" value="0.12" />
 			<param name="desired_heading" value="0.0" />
-			<param name="maximum_angular_velocity" value="0" />
-			<param name="maximum_velocity" value="0.0" />
-			<param name="minimum_clearance" value="0.50" />
-			<param name="minimum_clearance_angle" value="65" /> 
-			<param name="p_angular_velocity" value="2" />
+			<param name="maximum_angular_velocity" value="2" />
+			<param name="maximum_velocity" value="0.4" />
+			<param name="minimum_clearance" value="0.40" />
+			<param name="minimum_clearance_angle" value="60" /> 
+			<param name="p_angular_velocity" value="3" />
 			<param name="i_angular_velocity" value="0.0" />
 			<param name="d_angular_velocity" value="0.0" />
 			<param name="laser_inverted" value="1" />
@@ -105,7 +105,7 @@
 	</group>
 
  	<group ns="fmDecisionMakers">
-		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL" output="screen">
+		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL">
 			<param name="Heading_Pub_Top" value="/fmDecisionMakers/Heading" /> 
 			<param name="update" value="10" /> 
 			<param name="Map_Sub_Top" value="/fmExtractors/map" /> 
@@ -116,7 +116,7 @@
 			<param name="No_of_rows" value="3" /> 
 			<param name="Map_offset_x" value="10" /> 
 			<param name="Map_offset_y" value="10" /> 
-			<param name="Point_proximity_treshold" value="0.2" /> 
+			<param name="Point_proximity_treshold" value="0.5" /> 
 			<param name="Width_of_pots" value="0.18" /> 
 			<param name="row_exit_length" value="0.8" /> 
 			<param name="End_row_limit" value="0.0" /> 
