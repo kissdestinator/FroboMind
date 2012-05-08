@@ -320,6 +320,12 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 	r.position.y = x / noParticles;
 	r.position.x = y = y / noParticles;
 	r.position.th = theta / noParticles;
+	r.position.th -= 2*M_PI;
+	if (r.position.th > 2*M_PI)
+		r.position.th -= 2*M_PI;
+	else if (r.position.th < 0)
+		r.position.th += 2*M_PI;
+
 	r.probability = max_prob;
 	r.header.stamp = ros::Time::now();
 
