@@ -116,7 +116,7 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
 
 	fmMsgs::vehicle_position vp = particlefilter.update(cloud,delta_position,map);
 
-	geometry_msgs::Quaternion map_quat = tf::createQuaternionMsgFromYaw(vp.position.th);
+	geometry_msgs::Quaternion map_quat = tf::createQuaternionMsgFromYaw(-vp.position.th);
 
 	//first, we'll publish the transform over tf
 	geometry_msgs::TransformStamped map_trans;
