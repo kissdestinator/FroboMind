@@ -131,8 +131,6 @@ void MISSION_CONTROL::get_current_path(){
 	 * Calculate whether the robot is close enough to the current point.
 	 */
 
-	ROS_INFO("my_x: %f, my_y: %f, path0: %f, path1: %f, path2: %f, r1: %f, r2: %f, state: %d", my_position_x, my_position_y,path[0][current_path],path[1][current_path], path[2][current_path] , fabs(my_position_x - path[0][current_path]),fabs( my_position_y - path[1][current_path]), current_state );
-
 	if(current_state == EXIT_ROW){
 		if((fabs(my_position_x - path[0][current_path] ) < path[2][current_path] )&&( fabs(my_position_y - path[1][current_path]) < path[2][current_path])){
 			current_state = FIND_ROW;
@@ -141,7 +139,7 @@ void MISSION_CONTROL::get_current_path(){
 	}
 
 	else if(current_state == FIND_ROW)
-		if(abs(my_position_x - path[0][current_path]) < path[2][current_path] && abs(my_position_y - path[1][current_path]) < path[2][current_path]){
+		if((fabs(my_position_x - path[0][current_path] ) < path[2][current_path] )&&( fabs(my_position_y - path[1][current_path]) < path[2][current_path])){
 			current_state = IN_ROW;
 			if(current_y_placement == BOTTOM)
 				current_y_placement = TOP;
@@ -157,9 +155,16 @@ void MISSION_CONTROL::get_current_path(){
 
 void MISSION_CONTROL::generate_path_in_row(){
 
-	path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (width_of_rows * 0.5);
-	path[1][0] = map_offset_y + length_of_rows + row_exit_length;
-	path[2][0] = point_proximity_treshold;
+	if(current_y_placement == BOTTOM){
+		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (width_of_rows * 0.5);
+		path[1][0] = map_offset_y - row_exit_length;
+		path[2][0] = point_proximity_treshold;
+	}
+	else if (current_y_placement == TOP){
+		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (width_of_rows * 0.5);
+		path[1][0] = map_offset_y + length_of_rows + row_exit_length;
+		path[2][0] = point_proximity_treshold;
+	}
 
 }
 
@@ -220,12 +225,12 @@ void MISSION_CONTROL::generate_path_left_enter(){
 
 void MISSION_CONTROL::generate_path_right_enter(){
 	if(current_y_placement == BOTTOM){
-		path[0][0] = map_offset_x + width_of_pots + ((width_of_pots + width_of_rows) * no_of_rows) - row_number * (width_of_pots + width_of_rows) - 0.5 * width_of_rows;
+		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (0.5 * width_of_rows);
 		path[1][0] = map_offset_y;
 		path[2][0] = point_proximity_treshold;
 	}
 	else if(current_y_placement == TOP){
-		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) + width_of_pots + (0.5 * width_of_rows);
+		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (0.5 * width_of_rows);
 		path[1][0] = map_offset_y + length_of_rows;
 		path[2][0] = point_proximity_treshold;
 	}
