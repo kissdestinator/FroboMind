@@ -96,8 +96,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 void LidarNavigator::update()
 {
 	int LRS_size = ranges.size();
-	double temp = 2*M_PI - desired_heading;
-
+	double temp = desired_heading;
 	if (desired_heading > M_PI)
 		temp -= 2 * M_PI;
 	int temp_heading = (int)(temp * LRS_size / (2 * M_PI));
@@ -186,7 +185,7 @@ void LidarNavigator::calcAndPublishSpeed(double turn_angle, double velocity)
 	else if (abs(turn_angle) < 90 * DEG2RAD)
 		vel = velocity * (90 - (abs(turn_angle)*RAD2DEG)) / 75;
 
-	// Calculate Angular velocity
+	//Calculate Angular velocity
 	//ang_vel = pid_ang_vel.update(-turn_angle,0);
 
 	ang_vel = turn_angle * P_ang_vel;
