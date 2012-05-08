@@ -16,7 +16,7 @@ void MISSION_CONTROL::main_loop(){
 	//my_position_y = map_offset_y;
 	my_position_y = 0;
 	my_position_x = 0;
-	my_position_th = 0;
+	my_position_th = M_PI;
 	current_state = IN_ROW;
 	current_y_placement = TOP;
 	current_turn_direction = RIGHT;
@@ -96,6 +96,12 @@ double MISSION_CONTROL::get_new_heading(){
 	/*
 	 * find the delta heading from the robot's own heading, to the heading of the line from the robot to the point.
 	 */
+	my_position_y = 0;
+	my_position_x = 0;
+	my_position_th = 0;
+	path[0][current_path] = 0.5;
+	path[1][current_path] = 10;
+
 	double a(0), b(0);
 	a = path[0][current_path] - my_position_x;
 	b = path[1][current_path] - my_position_y;
@@ -109,22 +115,21 @@ double MISSION_CONTROL::get_new_heading(){
 
 	ROS_INFO("%f", path_heading);
 
-	if((my_position_th < M_PI && path_heading < M_PI) || (my_position_th > M_PI && path_heading > M_PI)){
-		if(my_position_th > path_heading)
-			path_heading = my_position_th - path_heading;
-		else
-			path_heading = path_heading - my_position_th;
-	}
+	if((my_position_th < M_PI && path_heading < M_PI) || (my_position_th > M_PI && path_heading > M_PI))
+		path_heading = path_heading - my_position_th;
 	else
-		if(my_position_th > path_heading)
-			path_heading =  my_position_th - path_heading;
+		if(my_position_th < path_heading)
+			path_heading = path_heading - (my_position_th + (2* M_PI));
 		else
-			path_heading =  path_heading - my_position_th;
-	while(path_heading > (2*M_PI) || path_heading < 0){
+			path_heading = path_heading - (my_position_th - (2* M_PI));
+
+
+
+	while((path_heading > (2*M_PI) )||( path_heading < 0)){
 		if(path_heading > 2 * M_PI)
-			return path_heading - (2 * M_PI);
+			path_heading =  path_heading - (2 * M_PI);
 		if(path_heading < 0)
-			return path_heading + (2 * M_PI);
+			path_heading =  path_heading + (2 * M_PI);
 	}
 	return path_heading;
 }
