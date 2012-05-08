@@ -202,7 +202,8 @@ void LidarNavigator::calcAndPublishSpeed(double turn_angle, double velocity)
 	geometry_msgs::TwistStamped twist;
 	twist.twist.linear.x = vel;
 	twist.twist.angular.z = ang_vel;
-	velocity_pub.publish(twist);
+	if (twist.twist.linear.x == 0 && twist.twist.angular.z == 0)
+		velocity_pub.publish(twist);
 
 	ROS_INFO("Turn Angle: %.3f, Velocity: %.3f, Angular Velocity: %.3f",turn_angle,vel,ang_vel);
 }
