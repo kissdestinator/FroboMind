@@ -73,11 +73,11 @@
 			<param name="safety_range" value="0.25" />
 			<param name="minimum_range" value="0.12" />
 			<param name="desired_heading" value="0.0" />
-			<param name="maximum_angular_velocity" value="1.5" />
-			<param name="maximum_velocity" value="0.25" />
+			<param name="maximum_angular_velocity" value="0" />
+			<param name="maximum_velocity" value="0.0" />
 			<param name="minimum_clearance" value="0.50" />
 			<param name="minimum_clearance_angle" value="65" /> 
-			<param name="p_angular_velocity" value="3.5" />
+			<param name="p_angular_velocity" value="2" />
 			<param name="i_angular_velocity" value="0.0" />
 			<param name="d_angular_velocity" value="0.0" />
 			<param name="laser_inverted" value="1" />

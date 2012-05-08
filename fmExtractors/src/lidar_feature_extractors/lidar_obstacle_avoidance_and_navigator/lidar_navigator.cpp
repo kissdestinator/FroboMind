@@ -67,7 +67,7 @@ void LidarNavigator::headingCallback(const fmMsgs::heading_orderConstPtr& headin
 	if (desired_heading != heading->orientation)
 	{
 		desired_heading = heading->orientation;
-		update();
+		//update();
 	}
 	else
 	{
@@ -96,7 +96,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 void LidarNavigator::update()
 {
 	int LRS_size = ranges.size();
-	double temp = desired_heading;
+	double temp = 2 * M_PI - desired_heading;
 	if (desired_heading > M_PI)
 		temp -= 2 * M_PI;
 	int temp_heading = (int)(temp * LRS_size / (2 * M_PI));
@@ -135,6 +135,11 @@ void LidarNavigator::update()
 						center = (int)index+right_clearing_angle;
 
 					turn_angle = center * 2*M_PI/LRS_size;
+
+					if (turn_angle > M_PI)
+						turn_angle -= 2*M_PI;
+					else if (turn_angle < -M_PI)
+						turn_angle += 2*M_PI;
 
 					// Calculate and publish the vehicle speed
 					current_velocity = max_velocity * safetyCheck(ranges);
@@ -201,8 +206,8 @@ void LidarNavigator::calcAndPublishSpeed(double turn_angle, double velocity)
 
 	geometry_msgs::TwistStamped twist;
 	twist.twist.linear.x = vel;
-	twist.twist.angular.z = ang_vel;
-	if (twist.twist.linear.x == 0 && twist.twist.angular.z == 0)
+	twist.twist.angular.z = -ang_vel;
+	//if (twist.twist.linear.x != 0 && twist.twist.angular.z != 0)
 		velocity_pub.publish(twist);
 
 	ROS_INFO("Turn Angle: %.3f, Velocity: %.3f, Angular Velocity: %.3f",turn_angle,vel,ang_vel);
