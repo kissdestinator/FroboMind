@@ -62,7 +62,27 @@
 			<param name="start_y" value="10" />
 		</node>
 
-
+		<node pkg="fmExtractors" name="lidar_navigation" type="lidar_navigator" output="screen">
+			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
+			<param name="visualization_marker_pub_topic" value="/fmExtractors/viz_marker_navigator" />
+			<param name="velocity_pub_topic" value="/speed_from_joystick" />
+			<param name="vehicle_coordinate" value="/fmExtractors/vehicle_coordinate" />
+			<param name="heading_sub_topic" value="/fmDecisionMakers/Heading" />
+			
+			<param name="navigation_range" value="0.75" />
+			<param name="safety_range" value="0.25" />
+			<param name="minimum_range" value="0.12" />
+			<param name="desired_heading" value="0.0" />
+			<param name="maximum_angular_velocity" value="3" />
+			<param name="maximum_velocity" value="0.6" />
+			<param name="minimum_clearance" value="0.40" />
+			<param name="minimum_clearance_angle" value="60" /> 
+			<param name="p_angular_velocity" value="5" />
+			<param name="i_angular_velocity" value="0.0" />
+			<param name="d_angular_velocity" value="0.0" />
+			<param name="laser_inverted" value="1" />
+			
+		</node>
 	</group>
 
 	<group ns="fmTools">
