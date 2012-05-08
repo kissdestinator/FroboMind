@@ -97,9 +97,9 @@ void LidarNavigator::update()
 {
 	int LRS_size = ranges.size();
 	double temp = 2 * M_PI - desired_heading;
-	if (desired_heading > M_PI)
+	if (temp > M_PI)
 		temp -= 2 * M_PI;
-	int temp_heading = (int)(temp * LRS_size / (2 * M_PI));
+	int temp_heading = (int)(temp * (double)LRS_size / (2 * M_PI));
 
 	int hole_found = 0;
 
@@ -143,7 +143,7 @@ void LidarNavigator::update()
 
 					// Calculate and publish the vehicle speed
 					current_velocity = max_velocity * safetyCheck(ranges);
-					ROS_INFO("L: %d, L: %.3f, R: %d, R: %.3f, turn angle: %.3f, desired_heading: %.3f, index: %d",mMod(left_line+index,LRS_size),ranges[mMod(left_line+index,LRS_size)],mMod(right_line+index,LRS_size), ranges[mMod(right_line+index,LRS_size)], turn_angle, desired_heading, index);
+					ROS_INFO("L: %d, L: %.3f, R: %d, R: %.3f, turn angle: %.3f, desired_heading: %.3f, index: %d, temp_h: %d",mMod(left_line+index,LRS_size),ranges[mMod(left_line+index,LRS_size)],mMod(right_line+index,LRS_size), ranges[mMod(right_line+index,LRS_size)], turn_angle, desired_heading, index, temp_heading);
 					calcAndPublishSpeed(turn_angle,current_velocity);
 
 					i = (LRS_size/step_size);
