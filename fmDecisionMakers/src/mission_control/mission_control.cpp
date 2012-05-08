@@ -96,11 +96,7 @@ double MISSION_CONTROL::get_new_heading(){
 	/*
 	 * find the delta heading from the robot's own heading, to the heading of the line from the robot to the point.
 	 */
-	my_position_y = 0;
-	my_position_x = 0;
-	my_position_th = 0;
-	path[0][current_path] = 0.5;
-	path[1][current_path] = 10;
+	
 
 	double a(0), b(0);
 	a = path[0][current_path] - my_position_x;
@@ -207,13 +203,13 @@ void MISSION_CONTROL::generate_path_left_exit(){
 void MISSION_CONTROL::check_end_row(){
 	//End of row upwards
 	if(my_position_y > (map_offset_y + length_of_rows - end_row_limit))
-		if((my_position_th > 1.5 * M_PI) || (my_position_th < 0.5 * M_PI)){
+		if(current_y_placement == TOP){
 			current_state = EXIT_ROW;
 		}
 
 	//End of row downwards
 	if(my_position_y < (map_offset_y + end_row_limit))
-		if((my_position_th < 1.5 * M_PI) && (my_position_th > 0.5 * M_PI)){
+		if(current_y_placement == BOTTOM){
 			current_state = EXIT_ROW;
 		}
 }
