@@ -283,7 +283,7 @@ def filter(x, P, measurements):
         
         # prediction
         x = (F * x) + u
-        P = F * P * F.transpose()
+        P = F * P * F.transpose() + Q
         
         # measurement update
         Z = matrix([measurements[n]])
@@ -291,7 +291,7 @@ def filter(x, P, measurements):
         S = H * P * H.transpose() + R
         K = P * H.transpose() * S.inverse()
         x = x + (K * y)
-        P = (I - (K * H)) * P + Q
+        P = (I - (K * H)) * P
     
     return x, P
 
