@@ -216,7 +216,7 @@ void MISSION_CONTROL::check_end_row(){
 
 void MISSION_CONTROL::generate_path_left_enter(){
 	if(current_y_placement == BOTTOM){
-		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) + width_of_pots + (0.5 * width_of_rows);
+		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (0.5 * width_of_rows);
 		path[1][0] = map_offset_y;
 		path[2][0] = point_proximity_treshold;
 	}
