@@ -12,11 +12,9 @@ MISSION_CONTROL::~MISSION_CONTROL(){
 void MISSION_CONTROL::main_loop(){
 	ros::Rate loop_rate(update_frequency);
 	fmMsgs::heading_order heading_msg;
-	//my_position_x = map_offset_x + width_of_pots + 0.5 * width_of_rows + width_of_rows + width_of_pots;
-	//my_position_y = map_offset_y;
 	my_position_y = 0;
 	my_position_x = 0;
-	my_position_th = M_PI;
+	my_position_th = 0;
 	current_state = IN_ROW;
 	current_y_placement = TOP;
 	current_turn_direction = RIGHT;
@@ -216,7 +214,7 @@ void MISSION_CONTROL::check_end_row(){
 
 void MISSION_CONTROL::generate_path_left_enter(){
 	if(current_y_placement == BOTTOM){
-		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) + width_of_pots + (0.5 * width_of_rows);
+		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (0.5 * width_of_rows);
 		path[1][0] = map_offset_y;
 		path[2][0] = point_proximity_treshold;
 	}
@@ -227,8 +225,7 @@ void MISSION_CONTROL::generate_path_left_enter(){
 	}
 }
 
-void MISSION_CONTROL::generate_path_right_enter(){
-	if(current_y_placement == BOTTOM){
+void MISSION_CONTROL::generate_path_right_enter(){	if(current_y_placement == BOTTOM){
 		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (0.5 * width_of_rows);
 		path[1][0] = map_offset_y;
 		path[2][0] = point_proximity_treshold;
@@ -239,5 +236,3 @@ void MISSION_CONTROL::generate_path_right_enter(){
 		path[2][0] = point_proximity_treshold;
 	}
 }
-
-
