@@ -67,7 +67,7 @@ void LidarNavigator::headingCallback(const fmMsgs::heading_orderConstPtr& headin
 	if (desired_heading != heading->orientation)
 	{
 		desired_heading = heading->orientation;
-		//update();
+		update();
 	}
 	else
 	{
@@ -121,8 +121,8 @@ void LidarNavigator::update()
 				while((ranges[mMod(right_line+index,LRS_size)] > test_range || ranges[mMod(right_line+index,LRS_size)] < min_range) && abs(right_line) < (int)LRS_size/4)
 					right_line++;
 
-				double left_clearing_angle = (double)left_line + (asin((min_clearance_width/2.0)/ranges[mMod(left_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
-				double right_clearing_angle = (double)right_line - (asin((min_clearance_width/2.0)/ranges[mMod(right_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
+				double left_clearing_angle = left_line + 20;//(double)left_line + (asin((min_clearance_width/2.0)/ranges[mMod(left_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
+				double right_clearing_angle = right_line - 20;//(double)right_line - (asin((min_clearance_width/2.0)/ranges[mMod(right_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
 
 				if (left_clearing_angle < right_clearing_angle)
 				{
