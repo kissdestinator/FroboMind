@@ -32,10 +32,10 @@
 
 	<group ns="fmExtractors">
 		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node">
-			<param name="Left_encoder_sub_top" value="/fmSensors/left_odometryl" />
-			<param name="Right_encoder_sub_top" value="/fmSensors/right_odometryl" />
+			<param name="Left_encoder_sub_top" value="/fmSensors/left_odometry" />
+			<param name="Right_encoder_sub_top" value="/fmSensors/right_odometry" />
 			<param name="Kalman_sub_top" value="/fmExtractors/odom_th"/>
-			<param name="Odom_pub_top" value="xyz_position"/>
+			<param name="Odom_pub_top" value="/ubruelige/xyz_position"/>
 			<param name="Coordi_pub_top" value="vehicle_coordinate"/>
 			<param name="Odom_th_pub_top" value="/fmExtractors/odom_th" />
 		</node>
@@ -45,7 +45,7 @@
 			<param name="Right_encoder_sub_top" value="/fmSensors/right_odometry_window" />
 			<param name="Kalman_sub_top" value="/fmExtractors/odom_th1"/>
 			<param name="Odom_pub_top" value="/ubrugelige/xyz_position"/>
-			<param name="Coordi_pub_top" value="vehicle_coordinate"/>
+			<param name="Coordi_pub_top" value="/ubruelige/vehicle_coordinate"/>
 			<param name="Odom_th_pub_top" value="/fmExtractors/odom_th1"/>
 		</node>
 
@@ -53,7 +53,7 @@
 			<param name="Left_encoder_sub_top" value="/fmSensors/left_odometry_window" />
 			<param name="Right_encoder_sub_top" value="/fmSensors/right_odometry_window" />
 			<param name="Kalman_sub_top" value="/fmProcessors/Kalman_AngularVelocity"/>
-			<param name="Odom_pub_top" value="/ubrugelige/xyz_position"/>
+			<param name="Odom_pub_top" value="xyz_position"/>
 			<param name="Coordi_pub_top" value="vehicle_coordinate"/>
 			<param name="Odom_th_pub_top" value="/fmExtractors/odom_th12"/>
 		</node>
