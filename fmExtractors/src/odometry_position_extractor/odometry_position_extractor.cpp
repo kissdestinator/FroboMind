@@ -110,8 +110,14 @@ int main(int argc, char** argv)
 			th = kalman_th;
 			odo_th += delta_th;
 
-			odom_th_pub_msg.y = y;
-			odom_th_pub_msg.x = x;
+			delta_x = (vx * cos(odo_th) - vy * sin(odo_th)) * dt;
+			delta_y = (vx * sin(odo_th) + vy * cos(odo_th)) * dt;
+
+			odom_y += delta_y;
+			odom_x += delta_x;
+
+			odom_th_pub_msg.y = odom_y;
+			odom_th_pub_msg.x = odom_x;
 			odom_th_pub_msg.th = odo_th;
 
 			pub_msg.x = vx;
