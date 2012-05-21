@@ -35,8 +35,8 @@
 			<param name="Left_encoder_sub_top" value="/fmSensors/left_odometry" />
 			<param name="Right_encoder_sub_top" value="/fmSensors/right_odometry" />
 			<param name="Kalman_sub_top" value="/fmProcessors/Kalman_AngularVelocity"/>
-			<param name="Odom_pub_top" value="xyz_position"/>
-			<param name="Coordi_pub_top" value="vehicle_coordinate"/>
+			<param name="Odom_pub_top" value="/ubrugelig/xyz_position"/>
+			<param name="Coordi_pub_top" value="/ubrugelig/vehicle_coordinate"/>
 			<param name="Odom_th_pub_top" value="/fmExtractors/odom_th" />
 		</node>
 
