@@ -9,7 +9,7 @@
 			<param name="publisher_topic" value="encoder2" /> 
 			<param name="update_frequency" value="20" />
 		</node>
-		<node pkg="fmSensors" name="Odometry" type="corobot_wheel_feedback_node" output="screen" >
+		<node pkg="fmSensors" name="Odometry" type="corobot_wheel_feedback_node"   >
 			<param name="left_odo_pub_topic" value="left_odometry" /> 
 			<param name="right_odo_pub_topic" value="right_odometry" /> 
 			<param name="encoder1" value="/fmSensors/encoder1" /> 
@@ -56,7 +56,7 @@
 			<param name="map_resolution" value="0.025" />
 			<param name="row_width" value="0.15" />
 			<param name="row_length" value="3" />
-			<param name="no_of_rows" value="3" />
+			<param name="no_of_rows" value="4" />
 			<param name="row_spacing" value="0.75" />
 			<param name="start_x" value="10" />
 			<param name="start_y" value="10" />
@@ -84,7 +84,7 @@
 	</group>
 
  	<group ns="fmDecisionMakers">
-		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL" output="screen">
+		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL">
 			<param name="Heading_Pub_Top" value="/fmDecisionMakers/Heading" /> 
 			<param name="update" value="10" /> 
 			<param name="Map_Sub_Top" value="/fmExtractors/map" /> 
@@ -92,7 +92,7 @@
 
 			<param name="Length_of_rows" value="3" /> 
 			<param name="Width_of_rows" value="0.75" /> 
-			<param name="No_of_rows" value="3" /> 
+			<param name="No_of_rows" value="4" /> 
 			<param name="Map_offset_x" value="10" /> 
 			<param name="Map_offset_y" value="10" /> 
 			<param name="Point_proximity_treshold" value="0.25" /> 
@@ -115,12 +115,12 @@
 			<param name="maximum_speed" value="0.7" /> 
 			<param name="maximum_acceleration" value="0" /> 
 			<param name="maximum_deacceleration" value="0" /> 
-			<param name="p_left" value="1" /> 
-			<param name="i_left" value="0.3" />
-			<param name="d_left" value="0.5" /> 
-			<param name="p_right" value="1" /> 
-			<param name="i_right" value="0.3" /> 
-			<param name="d_right" value="0.5" /> 
+			<param name="p_left" value="0" /> 
+			<param name="i_left" value="0" />
+			<param name="d_left" value="0" /> 
+			<param name="p_right" value="0" /> 
+			<param name="i_right" value="0" /> 
+			<param name="d_right" value="0" /> 
 		</node>
 	</group>
 

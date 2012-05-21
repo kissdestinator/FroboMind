@@ -263,13 +263,15 @@ class matrix:
 
 gyroBelieve = 0.5
 odoBelieve = 0.5
+speedCount = [0.,0.,0.,0.,0.]
+speedCountCount = 0
     
 P =  matrix([[0.1,0.,0.],[0.,0.1,0.],[0.,0.,0.1]])
 F =  matrix([[1., dt * 0.5, dt * 0.5], [0.,1.,0.], [0.,0.,1.]])
 H =  matrix([[0.,1.,0.],[0.,0.,1.]])
 R =  matrix([[0.0001,0.],[0.,0.0001]])
 I =  matrix([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]] )
-Q = matrix([[0.00005,0.,0.],[0.,0.00005,0.],[0.,0.,0.00005]])
+Q = matrix([[0.01,0.,0.],[0.,0.1,0.],[0.,0.,0.1]])
 
 x = matrix([[initial_xy[0]], [initial_xy[1]], [initial_xy[2]]]) # initial state (location and velocity)
 u = matrix([[0.],[0.],[0.]]) # external motion
@@ -291,7 +293,7 @@ def filter(x, P, measurements):
         S = H * P * H.transpose() + R
         K = P * H.transpose() * S.inverse()
         x = x + (K * y)
-        P = (I - (K * H)) * P
+        P = (I - (K * H)) * P 
     
     return x, P
 
@@ -316,11 +318,11 @@ def kalman_calc(event):
 def update_Believes():
     global gyroAngVel,odoAngVel,gyroBelieve,odoBelieve
     if (gyroAngVel + odoAngVel < -0.02) or (gyroAngVel + odoAngVel > 0.02) :
-	gyroBelieve = 0.9
-	odoBelieve = 0.1
+	gyroBelieve = 0.5
+	odoBelieve = 0.5
     else:
-	gyroBelieve = 0
-        odoBelieve = 1
+	gyroBelieve = 0.5
+        odoBelieve = 0.5
 
 def drift_correction(gyroAng):
 	if (gyroAng < 0.004) and (gyroAng > -0.004):
@@ -332,8 +334,13 @@ def gyro_callback(data):
     gyroAngVel = data.z - gyroOffset
 
 def odo_callback(data):
-    global odoAngVel
-    odoAngVel = data.th
+    global odoAngVel, speedCount, speedCountCount
+    speedCount[speedCountCount] = data.th
+    speedCountCount += 1
+    if speedCountCount > len(speedCount) - 1:
+	speedCountCount = 0
+    odoAngVel = sum(speedCount)
+    odoAngVel = odoAngVel/len(speedCount)
 
 def Gyro_odo_fusion():
     rospy.init_node('Razor_Kalman')
@@ -344,4 +351,5 @@ def Gyro_odo_fusion():
 
 if __name__ == '__main__':
     pub = rospy.Publisher('Kalman_AngularVelocity', kalman_output)
+
     Gyro_odo_fusion()

@@ -4,6 +4,7 @@
 #include <fmMsgs/Joy.h>
 #include <signal.h>
 #include "fmMsgs/row_nav_allow.h"
+#include "geometry_msgs/TwistStamped.h"
 #include <termios.h>
 
 #define KEYCODE_R 0x43 
@@ -14,6 +15,7 @@
 #define KEYCODE_ENTER 0x0A
 
 ros::Publisher vel_pub;
+ros::Publisher vel_pub_1;
 ros::Publisher allow_pub;
 
 int kfd = 0;
@@ -29,6 +31,7 @@ int main(int argc, char** argv)
   std::string allow_pub_topic;
   nh.param<std::string>("velocity_pub_topic", allow_pub_topic, "allow");
   nh.param<std::string>("allow_pub_topic", velocity_pub_topic, "/speed_from_joystick1");
+  vel_pub_1 = h.advertise<geometry_msgs::TwistStamped>("/speed_from_joystick", 1);
   vel_pub = h.advertise<fmMsgs::desired_speed>(velocity_pub_topic, 1);
   allow_pub = h.advertise<fmMsgs::row_nav_allow>(allow_pub_topic, 1);
 
@@ -46,10 +49,11 @@ int main(int argc, char** argv)
   raw.c_cc[VEOL] = 1;
   raw.c_cc[VEOF] = 2;
   tcsetattr(kfd, TCSANOW, &raw);
+  geometry_msgs::TwistStamped pub_msg;
 
   puts("Reading from keyboard");
   puts("---------------------------");
-  puts("Use arrow keys to move the turtle.");
+  puts("Use arrow keys to feed the horse.");
 	ros::Rate loop_rate(50);
 
   for(;;)
@@ -69,18 +73,24 @@ int main(int argc, char** argv)
         ROS_DEBUG("LEFT");
         hastighed.speed_right = -1.0;
         hastighed.speed_left = 1.0;
+	pub_msg.twist.linear.x = 0;
+	pub_msg.twist.angular.z = 100;
         dirty = true;
         break;
       case KEYCODE_R:
         ROS_DEBUG("RIGHT");
         hastighed.speed_right = 1.0;
         hastighed.speed_left = -1.0;
+	pub_msg.twist.linear.x = 0;
+	pub_msg.twist.angular.z = -100;
         dirty = true;
         break;
       case KEYCODE_U:
         ROS_DEBUG("UP");
         hastighed.speed_right = 1.0;
         hastighed.speed_left = 1.0;
+	pub_msg.twist.linear.x = 1;
+	pub_msg.twist.angular.z = 0;
         dirty = true;
 	allow_pub_.allow = true;
         break;
@@ -88,6 +98,8 @@ int main(int argc, char** argv)
         ROS_DEBUG("DOWN");
         hastighed.speed_right = -1.0;
         hastighed.speed_left = -1.0;
+	pub_msg.twist.linear.x = -1;
+	pub_msg.twist.angular.z = 0;
 	allow_pub_.allow = false;
         dirty = true;
         break;
@@ -95,6 +107,8 @@ int main(int argc, char** argv)
       default:
 	hastighed.speed_right = 0;
 	hastighed.speed_left = 0;
+	pub_msg.twist.linear.x = 0;
+	pub_msg.twist.angular.z = 0;
 	break;
 
     }
@@ -104,8 +118,10 @@ int main(int argc, char** argv)
     float scale = 0.5;
     hastighed.speed_left *= scale;
     hastighed.speed_right *= scale;
-    if(dirty)
+    if(dirty){
     	vel_pub.publish(hastighed);
+	vel_pub_1.publish(pub_msg);
+    }
 
      allow_pub.publish(allow_pub_);  
 

@@ -1,6 +1,8 @@
 #include "fmMsgs/encoder.h"
 #include "fmMsgs/odometry.h"
 #include "ros/ros.h"
+#include <queue>
+
 
 #ifndef COROBOT_WHEEL_FEEDBACK_H_
 #define COROBOT_WHEEL_FEEDBACK_H_
@@ -19,6 +21,17 @@ private:
    ros::Time _PreviousTimeRightEncoder;
 
    fmMsgs::odometry odo_msg;
+   fmMsgs::odometry odo_msg_window;
+
+   double ticksLeft[5];
+   double ticksRight[5];
+
+   double calcTicksLeft(double ticks);
+   double calcTicksRight(double ticks);
+
+   int ticksCounterLeft;
+   int ticksCounterRight;
+   
 
 public:
 
@@ -27,6 +40,8 @@ public:
 
   ros::Publisher left_odometry_pub;
   ros::Publisher right_odometry_pub;
+  ros::Publisher left_odometry_pub_window;
+  ros::Publisher right_odometry_pub_window;
 
   CorobotWheelFeedback();
   void callbackHandlerEncoder1(const fmMsgs::encoderConstPtr& msg);

@@ -46,8 +46,8 @@ link_directories(/usr/lib/)
 
 #Phidget Encoder (for CoroBot)
 #rosbuild_add_executable(phidget_encoder_node src/odometry_feedback/phidget_encoder_node.cpp)
-#rosbuild_add_executable(corobot_wheel_feedback_node src/odometry_feedback/corobot_wheel_feedback_node.cpp)
-#rosbuild_add_executable(corobot_wheel_feedback_node src/odometry_feedback/corobot_wheel_feedback.cpp)
+rosbuild_add_executable(corobot_wheel_feedback_node src/odometry_feedback/corobot_wheel_feedback_node.cpp)
+rosbuild_add_executable(corobot_wheel_feedback_node src/odometry_feedback/corobot_wheel_feedback.cpp)
 #target_link_libraries(phidget_encoder_node /usr/lib/libphidget21.so)
 
 #Neato LIDAR (From Neato XV-15 robot vacuumcleaner)
