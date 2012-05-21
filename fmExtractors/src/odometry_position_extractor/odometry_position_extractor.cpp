@@ -13,7 +13,7 @@
 using namespace std;
 
 bool start, left_updated, right_updated;
-double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset, kalman_th, odo_th;
+double x,y,th,vl,vr,vx,vy,vth,xr,xl, lxr, lxl, offset, kalman_th, odo_th, odom_x, odom_y;
 ros::Time current_time, last_time;
 double lengthBetweenTwoWheels = 0.39;
 ros::Time right_time, right_last_time, left_time, left_last_time;
@@ -48,27 +48,39 @@ int main(int argc, char** argv)
 	ros::init(argc, argv, "odometry_position_extractor");
 	
 	ros::NodeHandle h;
+	ros::NodeHandle nh("~");
+
+	std::string left_sub, right_sub, kalman_sub, odom_pub_top, coordi_pub_top, odom_th_pub_top;
 	
-	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = kalman_th = odo_th = 0;
+	nh.param<std::string> ("Left_encoder_sub_top", left_sub, "/fmSensors/left_odometry");
+	nh.param<std::string> ("Right_encoder_sub_top", right_sub, "/fmSensors/right_odometry");
+	nh.param<std::string> ("Kalman_sub_top", kalman_sub, "/fmProcessors/Kalman_AngularVelocity");
+	nh.param<std::string> ("Odom_pub_top", odom_pub_top, "xyz_position");
+	nh.param<std::string> ("Coordi_pub_top", coordi_pub_top, "vehicle_coordinate");
+	nh.param<std::string> ("Odom_th_pub_top", odom_th_pub_top, "/fmExtractors/odom_th");
+	
+	vl = vr = vy = vx = th = x = y = vth = xr = xl = lxl = lxr = kalman_th = odo_th = odom_x = odom_y = 0;
 	left_last_time = right_last_time = ros::Time::now();
 	start = true;
 	left_updated = false;
 	right_updated = false;
 
-	ros::Subscriber sub_left = h.subscribe("/fmSensors/left_odometry", 1, left_callback);
-	ros::Subscriber sub_right = h.subscribe("/fmSensors/right_odometry", 1, right_callback);
-	ros::Subscriber sub_kalman = h.subscribe("/fmProcessors/Kalman_AngularVelocity", 1, kalman_callback);
+	ros::Subscriber sub_left = h.subscribe(left_sub, 1, left_callback);
+	ros::Subscriber sub_right = h.subscribe(right_sub, 1, right_callback);
+	ros::Subscriber sub_kalman = h.subscribe(kalman_sub, 1, kalman_callback);
 	
 	ros::Publisher odom_pub2 = h.advertise<nav_msgs::Odometry>("/odom", 50);
 	tf::TransformBroadcaster odom_broadcaster;
 
    	fmMsgs::Vector3 pub_msg;
+   	fmMsgs::Vector3 odom_th_pub_msg;
 	fmMsgs::vehicle_coordinate coord_pub_msg;
 
 	ros::Rate loop_rate(20);
 
-        ros::Publisher odom_pub = h.advertise<fmMsgs::Vector3>("xyz_position", 1); 
-        ros::Publisher coordi_pub = h.advertise<fmMsgs::vehicle_coordinate>("vehicle_coordinate", 1); 
+        ros::Publisher odom_pub = h.advertise<fmMsgs::Vector3>(odom_pub_top, 1); 
+        ros::Publisher odom_th_pub = h.advertise<fmMsgs::Vector3>(odom_th_pub_top, 1); 
+        ros::Publisher coordi_pub = h.advertise<fmMsgs::vehicle_coordinate>(coordi_pub_top, 1); 
 
 	while(h.ok()){
 
@@ -97,6 +109,10 @@ int main(int argc, char** argv)
 			y += delta_y;
 			th = kalman_th;
 			odo_th += delta_th;
+
+			odom_th_pub_msg.y = y;
+			odom_th_pub_msg.x = x;
+			odom_th_pub_msg.th = odo_th;
 
 			pub_msg.x = vx;
 			pub_msg.y = vy;
@@ -147,6 +163,8 @@ int main(int argc, char** argv)
 			coordi_pub.publish(coord_pub_msg);
 
 			odom_pub.publish(pub_msg);
+
+			odom_th_pub.publish(odom_th_pub_msg);
 
 			last_time = current_time;
 			left_updated = false;
