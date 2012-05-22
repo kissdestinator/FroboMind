@@ -271,7 +271,7 @@ F =  matrix([[1., dt * 0.5, dt * 0.5], [0.,1.,0.], [0.,0.,1.]])
 H =  matrix([[0.,1.,0.],[0.,0.,1.]])
 R =  matrix([[0.0001,0.],[0.,0.0001]])
 I =  matrix([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]] )
-Q = matrix([[0.01,0.,0.],[0.,0.1,0.],[0.,0.,0.1]])
+Q = matrix([[0.01,0.,0.],[0.,0.0000001,0.],[0.,0.,0.0000001]])
 
 x = matrix([[initial_xy[0]], [initial_xy[1]], [initial_xy[2]]]) # initial state (location and velocity)
 u = matrix([[0.],[0.],[0.]]) # external motion
