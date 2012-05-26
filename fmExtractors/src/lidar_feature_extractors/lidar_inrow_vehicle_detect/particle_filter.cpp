@@ -289,7 +289,50 @@ void ParticleFilter::resampling()
 	for (int i = 0; i<noParticles; i++)
 		particles.push_back(temp[i]);
 }
+/*
+fmMsgs::vehicle_position ParticleFilter::findVehicle()
+{
+	double x(0),y(0),theta(0);
+	for (int i = 0; i < noParticles; i++)
+	{
+		x += particles[i]->x;
+		y += particles[i]->y;
 
+		// orientation is tricky because it is cyclic. By normalizing
+		// around the first particle we are somewhat more robust to
+		// the 0=2pi problem
+		double temp_theta = (particles[i]->theta - particles[0]->theta + M_PI);
+		if (temp_theta < 0)
+			temp_theta += 2*M_PI;
+		else if (temp_theta > 2*M_PI)
+			temp_theta -= 2*M_PI;
+		temp_theta += particles[0]->theta - M_PI;
+
+		theta += temp_theta;
+	}
+	last_pos.position.x = x / noParticles;
+	last_pos.position.y = y / noParticles;
+	last_pos.position.th = theta / noParticles;
+	last_pos.probability = max_prob;
+	last_pos.header.stamp = ros::Time::now();
+
+	fmMsgs::vehicle_position r;
+	r.position.y = x / noParticles;
+	r.position.x = y = y / noParticles;
+	r.position.th = theta / noParticles;
+	r.position.th = 2*M_PI - r.position.th;
+	if (r.position.th > 2*M_PI)
+		r.position.th -= 2*M_PI;
+	else if (r.position.th < 0)
+		r.position.th += 2*M_PI;
+
+	r.probability = max_prob;
+	r.header.stamp = ros::Time::now();
+
+	return r;
+
+}
+*/
 fmMsgs::vehicle_position ParticleFilter::findVehicle()
 {
 	double x(0),y(0),theta(0);

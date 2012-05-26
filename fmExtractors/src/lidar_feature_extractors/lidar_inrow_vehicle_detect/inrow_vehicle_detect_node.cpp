@@ -98,8 +98,6 @@ int main(int argc, char **argv)
 
   InRowVehicleDetector rd(numberOfParticles, len_x, off_x, len_y, off_y, max_ang, measurements_noise, movement_noise, turning_noise);
 
-  rd.createMap(map_size_x,map_size_y,map_resolution,row_width,row_length,row_spacing,no_of_rows,start_x,start_y);
-
   rd.laser_scan_sub = nh.subscribe<sensor_msgs::LaserScan> (lidar_sub_topic.c_str(), 2, &InRowVehicleDetector::processLaserScan, &rd);
 
   rd.position_sub = nh.subscribe<fmMsgs::vehicle_coordinate> (position_sub_topic.c_str(), 2, &InRowVehicleDetector::positionCallback, &rd);
@@ -108,6 +106,8 @@ int main(int argc, char **argv)
   rd.point_cloud_pub = n.advertise<sensor_msgs::PointCloud>(point_cloud_pub_topic.c_str(), 1);
   rd.vehicle_position_pub = n.advertise<fmMsgs::vehicle_position>(vehicle_position_pub_topic.c_str(), 1);
   rd.map_pub = n.advertise<nav_msgs::OccupancyGrid>(map_pub_topic.c_str(),1);
+
+  rd.createMap(map_size_x,map_size_y,map_resolution,row_width,row_length,row_spacing,no_of_rows,start_x,start_y);
 
   ros::spin();
 

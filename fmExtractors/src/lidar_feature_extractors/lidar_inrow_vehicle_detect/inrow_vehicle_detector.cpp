@@ -56,6 +56,7 @@ void InRowVehicleDetector::createMap(double MAP_SIZE_X, double MAP_SIZE_Y, doubl
 	start_y = START_Y;
 
 	map = buildHollowMap();
+	publishMap();
 }
 
 
@@ -87,6 +88,25 @@ fmMsgs::vehicle_coordinate calcPositionChange(fmMsgs::vehicle_coordinate positio
 	return r;
 }
 
+void InRowVehicleDetector::sendMapTransform(fmMsgs::vehicle_position vp)
+{
+	geometry_msgs::Quaternion map_quat = tf::createQuaternionMsgFromYaw(-vp.position.th);
+
+	//first, we'll publish the transform over tf
+	geometry_msgs::TransformStamped map_trans;
+	map_trans.header.stamp = ros::Time::now();
+	map_trans.header.frame_id = "/map";
+	map_trans.child_frame_id = "/vehicle";
+
+	map_trans.transform.translation.x = vp.position.y;
+	map_trans.transform.translation.y = vp.position.x;
+	map_trans.transform.translation.z = 0.0;
+	map_trans.transform.rotation = map_quat;
+
+	//send the transform
+	map_broadcaster.sendTransform(map_trans);
+}
+
 void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
 {
 	sensor_msgs::PointCloud cloud;
@@ -116,24 +136,10 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
 
 	fmMsgs::vehicle_position vp = particlefilter.update(cloud,delta_position,map);
 
-	geometry_msgs::Quaternion map_quat = tf::createQuaternionMsgFromYaw(-vp.position.th);
-
-	//first, we'll publish the transform over tf
-	geometry_msgs::TransformStamped map_trans;
-	map_trans.header.stamp = ros::Time::now();
-	map_trans.header.frame_id = "/map";
-	map_trans.child_frame_id = "/vehicle";
-
-	map_trans.transform.translation.x = vp.position.y;
-	map_trans.transform.translation.y = vp.position.x;
-	map_trans.transform.translation.z = 0.0;
-	map_trans.transform.rotation = map_quat;
+	sendMapTransform(vp);
 
 	ROS_INFO("Position in map: x: %.3f y: %.3f th: %.3f",vp.position.x ,vp.position.y,vp.position.th);
 	ROS_INFO("Odom: x: %.3f y: %.3f th: %.3f",position.x ,position.y,position.th);
-
-	//send the transform
-	map_broadcaster.sendTransform(map_trans);
 
 	publishMap();
 
@@ -154,14 +160,11 @@ void InRowVehicleDetector::publishMap()
 nav_msgs::OccupancyGrid InRowVehicleDetector::buildMap()
 {
 	nav_msgs::OccupancyGrid r;
-	nav_msgs::MapMetaData temp;
 
-	temp.height = map_size_y / map_resolution;
-	temp.width = map_size_x / map_resolution;
-	temp.resolution = map_resolution;
-	temp.map_load_time = ros::Time::now();
-
-	r.info = temp;
+	r.info.height = (uint32_t)(map_size_y / map_resolution);
+	r.info.width = (uint32_t)(map_size_x / map_resolution);
+	r.info.resolution = map_resolution;
+	r.info.map_load_time = ros::Time::now();
 	r.header.frame_id = "/map";
 	r.header.stamp = ros::Time::now();
 
@@ -192,14 +195,11 @@ nav_msgs::OccupancyGrid InRowVehicleDetector::buildMap()
 nav_msgs::OccupancyGrid InRowVehicleDetector::buildHollowMap()
 {
 	nav_msgs::OccupancyGrid r;
-	nav_msgs::MapMetaData temp;
 
-	temp.height = map_size_y / map_resolution;
-	temp.width = map_size_x / map_resolution;
-	temp.resolution = map_resolution;
-	temp.map_load_time = ros::Time::now();
-
-	r.info = temp;
+	r.info.height = (uint32_t)(map_size_y / map_resolution);
+	r.info.width = (uint32_t)(map_size_x / map_resolution);
+	r.info.resolution = map_resolution;
+	r.info.map_load_time = ros::Time::now();
 	r.header.frame_id = "/map";
 	r.header.stamp = ros::Time::now();
 

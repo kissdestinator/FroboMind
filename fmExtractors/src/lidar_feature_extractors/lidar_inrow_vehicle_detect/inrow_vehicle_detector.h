@@ -77,6 +77,7 @@ public:
   nav_msgs::OccupancyGrid buildHollowMap();
   void publishMap();
   void createMap(double MAP_SIZE_X, double MAP_SIZE_Y, double MAP_RESOLUTION, double ROW_WIDTH, double ROW_LENGTH, double ROW_SPACING, double NO_OF_ROWS, double START_X,double START_Y);
+  void sendMapTransform(fmMsgs::vehicle_position vp);
 
 };
 
