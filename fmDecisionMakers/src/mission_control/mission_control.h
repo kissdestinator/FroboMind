@@ -8,12 +8,21 @@
 #include "nav_msgs/OccupancyGrid.h"
 #include "cmath"
 #include "visualization_msgs/Marker.h"
+#include "fstream"
+#include "string"
+#include "cctype"
+#include "iostream"
 
 
 class MISSION_CONTROL {
 
 private:
-	double path[3][10];
+	int temp_count;
+	int temp_type;
+	double temp;
+	double path[3][30];
+	double in_path[30];
+	char in_turns[30];
 	double my_position_x, my_position_y, my_position_th;
 	int current_path;
 	double get_new_heading();
@@ -29,12 +38,16 @@ private:
 	void generate_path_left_exit();
 	void generate_path_left_enter();
 	void generate_path_right_enter();
+	void get_file_path();
+	void make_path_from_orders();
 
 public:
 	std::string map_sub_top;
 	std::string p_filter_sub_top;
 	std::string heading_pub_top;
 	std::string viz_pub_top;
+	int task;
+	std::string filename;
 	
 	enum turn_direction {RIGHT, LEFT, UNKNOWN};
 	state current_state;

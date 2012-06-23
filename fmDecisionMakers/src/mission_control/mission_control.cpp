@@ -3,6 +3,12 @@
 MISSION_CONTROL::MISSION_CONTROL(){
 	current_path = 0;
 	row_number = 1;
+	get_file_path();
+	make_path_from_orders();
+	
+	
+	for(int i = 0; i < 29; i++)
+		ROS_INFO("path0: %f, path1: %f", path[0][i], path[1][i]); 
 }
 
 MISSION_CONTROL::~MISSION_CONTROL(){
@@ -21,36 +27,42 @@ void MISSION_CONTROL::main_loop(){
 	row_number = 1;
 
 	while(ros::ok()){
-		switch(current_state){
-			case IN_ROW:
-				generate_path_in_row();
-				check_end_row();
-				break;
-			case EXIT_ROW:
-				if(current_turn_direction == UNKNOWN)
-					current_state = EXPLORER_MODE;
-				else if(current_turn_direction == LEFT)
-					generate_path_left_exit();
-				else if(current_turn_direction == RIGHT)
-					generate_path_right_exit();
-
-				get_current_path();
-				break;
-			case FIND_ROW:
-				if(current_turn_direction == LEFT)
-					generate_path_left_enter();
-				else if(current_turn_direction == RIGHT)
-					generate_path_right_enter();
-				get_current_path();
-				break;
-			case BLOCKED_ROW:
-				break;
-			case EXPLORER_MODE:
-				break;
+		if(task==1){
+			switch(current_state){
+				case IN_ROW:
+					generate_path_in_row();
+					check_end_row();
+					break;
+				case EXIT_ROW:
+					if(current_turn_direction == UNKNOWN)
+						current_state = EXPLORER_MODE;
+					else if(current_turn_direction == LEFT)
+						generate_path_left_exit();
+					else if(current_turn_direction == RIGHT)
+						generate_path_right_exit();
+	
+					get_current_path();
+					break;
+				case FIND_ROW:
+					if(current_turn_direction == LEFT)
+						generate_path_left_enter();
+					else if(current_turn_direction == RIGHT)
+						generate_path_right_enter();
+					get_current_path();
+					break;
+				case BLOCKED_ROW:
+					break;
+				case EXPLORER_MODE:
+					break;
+			}
+		}
+		
+		else if(task == 2){
+			
 		}
 		heading_msg.orientation = get_new_heading();
 		heading_pub.publish(heading_msg);
-		ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state);
+		//ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state);
 
 		visualization_msgs::Marker marker;
 
@@ -107,7 +119,7 @@ double MISSION_CONTROL::get_new_heading(){
 	while(path_heading > (2 * M_PI))
 		path_heading -= (2* M_PI);
 
-	ROS_INFO("%f", path_heading);
+	//ROS_INFO("%f", path_heading);
 
 	if((my_position_th < M_PI && path_heading < M_PI) || (my_position_th > M_PI && path_heading > M_PI))
 		path_heading = path_heading - my_position_th;
@@ -156,7 +168,6 @@ void MISSION_CONTROL::get_current_path(){
 }
 
 void MISSION_CONTROL::generate_path_in_row(){
-
 	if(current_y_placement == BOTTOM){
 		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (width_of_rows * 0.5);
 		path[1][0] = map_offset_y - row_exit_length;
@@ -225,7 +236,8 @@ void MISSION_CONTROL::generate_path_left_enter(){
 	}
 }
 
-void MISSION_CONTROL::generate_path_right_enter(){	if(current_y_placement == BOTTOM){
+void MISSION_CONTROL::generate_path_right_enter(){	
+	if(current_y_placement == BOTTOM){
 		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (0.5 * width_of_rows);
 		path[1][0] = map_offset_y;
 		path[2][0] = point_proximity_treshold;
@@ -234,5 +246,111 @@ void MISSION_CONTROL::generate_path_right_enter(){	if(current_y_placement == BOT
 		path[0][0] = map_offset_x + row_number * (width_of_rows + width_of_pots) - (0.5 * width_of_rows);
 		path[1][0] = map_offset_y + length_of_rows;
 		path[2][0] = point_proximity_treshold;
+	}
+}
+
+void MISSION_CONTROL::get_file_path(){
+	char *path=NULL;
+	size_t size;
+	path=getcwd(path,size);
+	ROS_INFO(path);
+	
+	
+	char c;
+	std::ifstream file;
+	file.open("direction.txt");
+	if(file.fail()){
+		ROS_INFO("Something went wrong, mother fucker! Filename: %s", filename.c_str());
+		exit(1);
+	}
+	temp_count = 0;
+	temp_type = 1;
+	file.get(c);
+	while(!file.eof()){
+		switch (c)
+		{
+			case 'S':
+				temp_count = 0;
+				in_path[temp_count] = -1;
+				in_turns[temp_count] = c;
+				break;
+				
+			case '-':
+				temp_count++;
+				break;
+			
+			case ' ':
+				break;
+				
+			case 'F':
+				file >> c;
+				break;
+				
+			case '0':
+				in_path[temp_count] = c - 48;
+				in_turns[temp_count] = c;
+				break;
+	        default:
+	        	if(temp_type == 1){
+	        		in_path[temp_count] = c - 48;
+	        		temp_type = 0;
+	        	}
+	        	else{
+	        		in_turns[temp_count] = c;
+	        		temp_type = 1;
+	        	}
+				break;
+	        }
+	       file >> c;
+	  }  
+	/*
+	for(int i = 0; i < 29; i++)
+		ROS_INFO("turn: %c", in_turns[i]); */
+}
+
+void MISSION_CONTROL::make_path_from_orders(){
+	temp = -1;
+	path[0][0] = 1;
+	path[1][0] = 1;
+	path[2][0] = 1;
+	for(int i = 0; i < sizeof(in_turns)-1; i++){
+		temp = temp * -1;
+		/*
+		if(in_turns[i] == 'S'){
+			ROS_INFO("S");
+			generate_path_in_row();
+		}
+		*/
+
+		
+		 if(in_turns[i] == 'F'){
+			break;
+		}
+		
+		else if(in_turns[i] == 'R'){
+			ROS_INFO("in_path: %f, widt: %f, width: %f, temp: %f", in_path[i],width_of_rows, width_of_pots, temp);
+			path[0][i] = path[0][i-1] + (double)in_path[i] * (width_of_rows + width_of_pots) * temp;
+			if(temp < 0)
+				path[1][i] = map_offset_y - row_exit_length;
+			else
+				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
+			
+			path[2][i] = point_proximity_treshold;
+		}
+		
+		else if(in_turns[i] == 'L'){
+			ROS_INFO("L");
+			path[0][i] = path[0][i-1] - (double)in_path[i] * (width_of_rows + width_of_pots) * temp;
+			if(temp < 0)
+				path[1][i] = map_offset_y - row_exit_length;
+			else
+				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
+			
+			path[2][i] = point_proximity_treshold;
+		}
+				
+
+		
+		
 	}
 }

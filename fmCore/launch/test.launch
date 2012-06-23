@@ -90,6 +90,7 @@
 			<param name="update" value="10" /> 
 			<param name="Map_Sub_Top" value="/fmExtractors/map" /> 
 			<param name="P_Filter_Sub_Top" value="/fmExtractors/vehicle_position" /> 
+			<param name="orders_string" value="direction.txt" /> 
 
 			<param name="Length_of_rows" value="3" /> 
 			<param name="Width_of_rows" value="0.75" /> 
