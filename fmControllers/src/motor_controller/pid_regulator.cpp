@@ -88,9 +88,15 @@ double PIDRegulator::update(double feedback, double setpoint)
 
 	//	Calculate I-term
 	i_term += i_coef * errors[0] * dt;
+	if (i_term > windup_limit)
+		i_term = windup_limit;
+	else if (i_term < -windup_limit)
+		i_term = -windup_limit;
+	if (setpoint == 0)
+		i_term = 0;
 
 	//	Calculate D-term
-	d_term = d_coef * (position[0] - position[1]) * dt;
+	d_term = -1 * d_coef * (position[1] - position[0]) * dt;
 
 	//	Return PID
 	return p_term + i_term + d_term;
@@ -121,4 +127,8 @@ double PIDRegulator::getD ()
 void PIDRegulator::setD (double d)
 {
 	d_coef = d;
+}
+void PIDRegulator::setIWindupLimit(double limit)
+{
+	windup_limit = limit;
 }

@@ -1,7 +1,6 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "fmMsgs/motor_power.h"
 #include "fmMsgs/odometry.h"
-#include "fmMsgs/motor_test.h"
 #include "ros/ros.h"
 #include "pid_regulator.h"
 
@@ -41,9 +40,6 @@ public:
   ros::Subscriber left_odo_sub;
   ros::Subscriber right_odo_sub;
 
-  ros::Publisher left_motor_test;
-  ros::Publisher right_motor_test;
-
   ros::Publisher motor_power_pub;
 
   MotorController(double p_left, double i_left, double d_left, double p_right, double i_right, double d_right);
@@ -75,6 +71,9 @@ public:
   double getPright(void) { return pid_regulator_right.getP(); };
   double getIright(void) { return pid_regulator_right.getI(); };
   double getDright(void) { return pid_regulator_right.getD(); };
+
+  void setIWindupLimitLeft(double limit) {pid_regulator_left.setIWindupLimit(limit);};
+  void setIWindupLimitRight(double limit) {pid_regulator_right.setIWindupLimit(limit);};
 };
 
 #endif

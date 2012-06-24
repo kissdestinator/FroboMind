@@ -94,15 +94,6 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	power_msg.power_left = motor_power_left;
 	motor_power_pub.publish(power_msg);
 
-	// publish test data
-	fmMsgs::motor_test test;
-	test.header.stamp = ros::Time::now();
-	test.target_speed = target_speed_left;
-	test.normalized_target_speed = last_target_speed_left;
-	test.pid_error = pid_error;
-	test.motor_power = motor_power_left;
-	test.wheel_speed = msg->speed;
-	left_motor_test.publish(test);
 }
 
 void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
@@ -123,15 +114,5 @@ void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	// publish the motor power
 	power_msg.power_right = motor_power_right;
 	motor_power_pub.publish(power_msg);
-
-	// publish test data
-	fmMsgs::motor_test test;
-	test.header.stamp = ros::Time::now();
-	test.target_speed = target_speed_right;
-	test.normalized_target_speed = last_target_speed_right;
-	test.pid_error = pid_error;
-	test.motor_power = motor_power_right;
-	test.wheel_speed = msg->speed;
-	right_motor_test.publish(test);
 }
 

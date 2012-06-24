@@ -131,8 +131,8 @@
 
 	<group ns="fmControllers">
 		<node pkg="fmControllers" name="motor_controller" type="motor_controller_node" >
-			<param name="left_odo_subscriber_topic" value="/fmSensors/left_odometry" /> 
-			<param name="right_odo_subscriber_topic" value="/fmSensors/right_odometry" /> 
+			<param name="left_odo_subscriber_topic" value="/fmSensors/left_odometry_window" /> 
+			<param name="right_odo_subscriber_topic" value="/fmSensors/right_odometry_window" /> 
 			<param name="desired_speed_subscriber_topic" value="/speed_from_joystick" /> 
 			<param name="motor_power_topic" value="/fmControllers/motor_power" /> 
 			<param name="maximum_speed" value="0.6" /> 
@@ -144,6 +144,8 @@
 			<param name="p_right" value="1.1" /> 
 			<param name="i_right" value="1.2" /> 
 			<param name="d_right" value="50" /> 
+			<param name="windup_left" value="2" /> 
+			<param name="windup_right" value="2" /> 
 		</node>
 	</group>
 
