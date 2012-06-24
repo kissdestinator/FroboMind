@@ -9,7 +9,7 @@
 			<param name="publisher_topic" value="encoder2" /> 
 			<param name="update_frequency" value="20" />
 		</node>
-		<node pkg="fmSensors" name="Odometry" type="corobot_wheel_feedback_node"   >
+		<node pkg="fmSensors" name="Odometry" type="corobot_wheel_feedback_node" output="screen" >
 			<param name="left_odo_pub_topic" value="left_odometry" /> 
 			<param name="right_odo_pub_topic" value="right_odometry" /> 
 			<param name="encoder1" value="/fmSensors/encoder1" /> 
@@ -34,7 +34,7 @@
 		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node">
 		</node>
 
-		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector">
+		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector" >
 			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
 			<param name="visualization_marker_pub_topic" value="/fmExtractors/viz_marker_particle" />
 			<param name="point_cloud_pub_topic" value="/fmExtractors/point_cloud" />
@@ -54,7 +54,7 @@
 			<param name="map_size_x" value="20" />
 			<param name="map_size_y" value="20" />
 			<param name="map_resolution" value="0.025" />
-			<param name="row_width" value="0.15" />
+			<param name="row_width" value="0.2" />
 			<param name="row_length" value="3" />
 			<param name="no_of_rows" value="4" />
 			<param name="row_spacing" value="0.75" />
@@ -62,6 +62,27 @@
 			<param name="start_y" value="10" />
 		</node>
 
+		<node pkg="fmExtractors" name="lidar_navigation" type="lidar_navigator" output="screen">
+			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
+			<param name="visualization_marker_pub_topic" value="/fmExtractors/viz_marker_navigator" />
+			<param name="velocity_pub_topic" value="/speed_from_joystick" />
+			<param name="vehicle_coordinate" value="/fmExtractors/vehicle_coordinate" />
+			<param name="heading_sub_topic" value="/fmDecisionMakers/Heading" />
+			
+			<param name="navigation_range" value="0.65" />
+			<param name="safety_range" value="0.25" />
+			<param name="minimum_range" value="0.12" />
+			<param name="desired_heading" value="0.0" />
+			<param name="maximum_angular_velocity" value="2" />
+			<param name="maximum_velocity" value="0.6" />
+			<param name="minimum_clearance" value="0.40" />
+			<param name="minimum_clearance_angle" value="60" /> 
+			<param name="p_angular_velocity" value="10.0" />
+			<param name="i_angular_velocity" value="0.0" />
+			<param name="d_angular_velocity" value="0.0" />
+			<param name="laser_inverted" value="1" />
+			
+		</node>
 	</group>
 
 	<group ns="fmTools">
@@ -84,21 +105,23 @@
 	</group>
 
  	<group ns="fmDecisionMakers">
-		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL">
+		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL" output = "screen">
 			<param name="Heading_Pub_Top" value="/fmDecisionMakers/Heading" /> 
 			<param name="update" value="10" /> 
 			<param name="Map_Sub_Top" value="/fmExtractors/map" /> 
 			<param name="P_Filter_Sub_Top" value="/fmExtractors/vehicle_position" /> 
+			<param name="orders_string" value="/home/superthomz/ros_workspace/direction.txt"/>
+			<param name="Task_nu" value="2" />
 
 			<param name="Length_of_rows" value="3" /> 
 			<param name="Width_of_rows" value="0.75" /> 
 			<param name="No_of_rows" value="4" /> 
 			<param name="Map_offset_x" value="10" /> 
 			<param name="Map_offset_y" value="10" /> 
-			<param name="Point_proximity_treshold" value="0.25" /> 
-			<param name="Width_of_pots" value="0.15" /> 
+			<param name="Point_proximity_treshold" value="0.30" /> 
+			<param name="Width_of_pots" value="0.20" /> 
 			<param name="row_exit_length" value="0.5" /> 
-			<param name="End_row_limit" value="0.5" /> 
+			<param name="End_row_limit" value="0.0" /> 
 			<param name="start_turn_direction" value="0" /> 
 		</node>
 	</group>
@@ -146,5 +169,6 @@
 			<param name="publisher_topic" value="ypr_serial"/>
 		</node>
 	</group>
+	<node pkg="tf" type="static_transform_publisher" name="laser_scan_tf" args="0 0 0 3.14 0 0 /base_link /lidar_scan 100" />
 </launch>
 

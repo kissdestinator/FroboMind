@@ -111,8 +111,8 @@ WiiToTwist::WiiToTwist()
   }
 
   //  Get parameters from parameter server if it's avaiable, otherwise set to default values.
-  local_n.param("max_angular_velocity", max_angular_velocity, 0.0);
-  local_n.param("max_linear_velocity", max_linear_velocity, 0.0);
+  local_n.param("max_angular_velocity", max_angular_velocity, 1.0);
+  local_n.param("max_linear_velocity", max_linear_velocity, 1.0);
   local_n.param("normal_movement_button", normal_movement_button, 3);
   local_n.param("slow_movement_button", slow_movement_button, 2);
   local_n.param("x_axis", x_axis, 0);

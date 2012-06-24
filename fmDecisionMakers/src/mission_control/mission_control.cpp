@@ -3,6 +3,7 @@
 MISSION_CONTROL::MISSION_CONTROL(){
 	current_path = 0;
 	row_number = 1;
+	blocked = false;
 }
 
 MISSION_CONTROL::~MISSION_CONTROL(){
@@ -21,6 +22,9 @@ void MISSION_CONTROL::main_loop(){
 	row_number = 1;
 
 	while(ros::ok()){
+		if(simulation == true){
+			get_pos_from_sim();
+		}
 		if(task==1){
 			switch(current_state){
 				case IN_ROW:
@@ -49,17 +53,22 @@ void MISSION_CONTROL::main_loop(){
 				case EXPLORER_MODE:
 					break;
 			}
+			heading_msg.orientation = get_new_heading();
 		}
-		
 		else if(task == 2){
 			get_file_path();
 			make_path_from_orders();
+			check_current_marker();
+			heading_msg.orientation = get_new_heading();
+
+			/*
 			for(int i = 0; i < 29; i++)
 				ROS_INFO("path0: %f, path1: %f", path[0][i], path[1][i]); 
+				*/
 		}
-		heading_msg.orientation = get_new_heading();
+
 		heading_pub.publish(heading_msg);
-		//ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state);
+		//ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s, task: %f", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state, (double)task);
 
 		visualization_msgs::Marker marker;
 
@@ -69,8 +78,8 @@ void MISSION_CONTROL::main_loop(){
 		marker.id = 0;
 		marker.type = visualization_msgs::Marker::CUBE;
 		marker.action = visualization_msgs::Marker::ADD;
-		marker.pose.position.x = path[1][0];
-		marker.pose.position.y = path[0][0];
+		marker.pose.position.x = path[1][current_path];
+		marker.pose.position.y = path[0][current_path];
 		marker.pose.position.z = 0;
 		marker.scale.x = 0.2;
 		marker.scale.y = 0.2;
@@ -94,9 +103,15 @@ void MISSION_CONTROL::map_callback(nav_msgs::OccupancyGrid msg){
 }
 
 void MISSION_CONTROL::p_filter_callback(fmMsgs::vehicle_position msg){
-	my_position_x = msg.position.x;
-	my_position_y = msg.position.y;
-	my_position_th = msg.position.th;
+		my_position_x = msg.position.x;
+		my_position_y = msg.position.y;
+		my_position_th = msg.position.th;
+}
+
+void MISSION_CONTROL::check_current_marker(){
+	if((fabs(my_position_x - path[0][current_path] ) < path[2][current_path] )&&( fabs(my_position_y - path[1][current_path]) < path[2][current_path])){
+		current_path++;
+	}
 }
 
 double MISSION_CONTROL::get_new_heading(){
@@ -247,15 +262,10 @@ void MISSION_CONTROL::generate_path_right_enter(){
 }
 
 void MISSION_CONTROL::get_file_path(){
-	char *path=NULL;
-	size_t size;
-	path=getcwd(path,size);
-	ROS_INFO(path);
-	
 	
 	char c;
 	std::ifstream file;
-	file.open("direction.txt");
+	file.open(filename.c_str());
 	if(file.fail()){
 		ROS_INFO("Something went wrong, mother fucker! Filename: %s", filename.c_str());
 		exit(1);
@@ -305,7 +315,29 @@ void MISSION_CONTROL::get_file_path(){
 		ROS_INFO("turn: %c", in_turns[i]); */
 }
 
+void MISSION_CONTROL::get_pos_from_sim(){
+	gazebo_msgs::GetModelState getmodelstate;
+	getmodelstate.request.model_name = "robot_description";
+	client.call(getmodelstate);
+	my_position_x = getmodelstate.response.pose.position.x;
+	my_position_y = getmodelstate.response.pose.position.y;
+	double q0(getmodelstate.response.pose.orientation.x), q1(getmodelstate.response.pose.orientation.y), q2(getmodelstate.response.pose.orientation.z), q3(getmodelstate.response.pose.orientation.w);
+	my_position_th = atan2(2*q0*q3-2*q1*q2, 1-2*(q0*q0)-2*q2*q2);
+
+	/*
+	btQuaternion q;
+	q.getRPY()
+	double roll, pitch, yaw;
+tf::quaternionMsgToTF(getmodelstate.response.pose.orientation, q);
+	btMatrix3x3(q).getRPY(roll, pitch, yaw);
+	ROS_INFO("RPY = (%lf, %lf, %lf)", roll, pitch, yaw);
+
+	//ROS_INFO("My pos th: %f", my_position_th);*/
+
+}
+
 void MISSION_CONTROL::make_path_from_orders(){
+
 	temp = 1;
 	path[0][0] = 1;
 	path[1][0] = 1;
@@ -315,7 +347,6 @@ void MISSION_CONTROL::make_path_from_orders(){
 		temp = temp * -1;
 		
 		if(in_turns[i/2] == 'S'){
-			ROS_INFO("S");
 			generate_path_in_row();
 			path[0][i+1] = path[0][i];
 			path[1][i+1] = path[1][i];
@@ -344,8 +375,6 @@ void MISSION_CONTROL::make_path_from_orders(){
 		}
 		
 		else if(in_turns[i/2] == 'R'){
-
-			ROS_INFO("R");
 			
 			path[0][i] = path[0][i-1] + (double)in_path[i/2] * (width_of_rows + width_of_pots) * temp;
 			if(temp < 0)
@@ -366,7 +395,6 @@ void MISSION_CONTROL::make_path_from_orders(){
 		}
 		
 		else if(in_turns[i/2] == 'L'){
-			ROS_INFO("L");
 			
 			path[0][i] = path[0][i-1] - (double)in_path[i/2] * (width_of_rows + width_of_pots) * temp;
 			if(temp < 0)

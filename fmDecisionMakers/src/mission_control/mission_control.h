@@ -12,7 +12,8 @@
 #include "string"
 #include "cctype"
 #include "iostream"
-
+#include "gazebo_msgs/GetModelState.h"
+#include "/opt/ros/electric/stacks/geometry_experimental/tf2/include/LinearMath/btQuaternion.h"
 
 class MISSION_CONTROL {
 
@@ -25,6 +26,7 @@ private:
 	char in_turns[30];
 	double my_position_x, my_position_y, my_position_th;
 	int current_path;
+	bool blocked;
 	double get_new_heading();
 	void get_current_path();
 	void generate_path();
@@ -40,6 +42,8 @@ private:
 	void generate_path_right_enter();
 	void get_file_path();
 	void make_path_from_orders();
+	void check_current_marker();
+	void get_pos_from_sim();
 
 public:
 	std::string map_sub_top;
@@ -48,6 +52,7 @@ public:
 	std::string viz_pub_top;
 	int task;
 	std::string filename;
+	bool simulation;
 	
 	enum turn_direction {RIGHT, LEFT, UNKNOWN};
 	state current_state;
@@ -60,6 +65,7 @@ public:
 	ros::Subscriber p_filter_sub;
 	ros::Publisher heading_pub;
 	ros::Publisher viz_pub;
+	ros::ServiceClient client;
 	
 	double update_frequency;
 
