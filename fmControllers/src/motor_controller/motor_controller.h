@@ -1,6 +1,7 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "fmMsgs/motor_power.h"
 #include "fmMsgs/odometry.h"
+#include "fmMsgs/motor_test.h"
 #include "ros/ros.h"
 #include "pid_regulator.h"
 
@@ -39,6 +40,9 @@ public:
   ros::Subscriber target_speed_sub;
   ros::Subscriber left_odo_sub;
   ros::Subscriber right_odo_sub;
+
+  ros::Publisher left_motor_test;
+  ros::Publisher right_motor_test;
 
   ros::Publisher motor_power_pub;
 

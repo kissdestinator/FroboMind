@@ -46,6 +46,7 @@ PIDRegulator::PIDRegulator()
 	//	Setup ringbuffers
 	time_now = boost::circular_buffer<double>(2);
 	errors = boost::circular_buffer<double>(2);
+	position = boost::circular_buffer<double>(2);
 }
 
 PIDRegulator::PIDRegulator(double p, double i, double d)
@@ -58,11 +59,14 @@ PIDRegulator::PIDRegulator(double p, double i, double d)
 	//	Setup ringbuffers
 	time_now = boost::circular_buffer<double>(2);
 	errors = boost::circular_buffer<double>(2);
+	position = boost::circular_buffer<double>(2);
 
 	time_now.push_back(0);
 	time_now.push_back(0);
 	errors.push_back(0);
 	errors.push_back(0);
+	position.push_back(0);
+	position.push_back(0);
 }
 
 double PIDRegulator::update(double feedback, double setpoint)
@@ -70,10 +74,11 @@ double PIDRegulator::update(double feedback, double setpoint)
 
 	//ROS_INFO("update called");
 
-	//	Put error and time in ring buffer
+	//Put error and time in ring buffer
 	time_now.push_back(ros::Time::now().toSec());
 	//ROS_INFO("time pushed back %f" ,time_now[0] );
 	errors.push_back(setpoint - feedback);
+	position.push_back(feedback);
 	//ROS_INFO("error %f" ,errors[0] );
 	dt = (time_now[1]-time_now[0]);
 	//ROS_INFO("dt calculated %f", dt);
@@ -85,7 +90,7 @@ double PIDRegulator::update(double feedback, double setpoint)
 	i_term += i_coef * errors[0] * dt;
 
 	//	Calculate D-term
-	d_term = d_coef * (errors[0] - errors[1]) * dt;
+	d_term = d_coef * (position[0] - position[1]) * dt;
 
 	//	Return PID
 	return p_term + i_term + d_term;

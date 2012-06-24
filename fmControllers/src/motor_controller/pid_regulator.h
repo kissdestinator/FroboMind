@@ -63,6 +63,7 @@ private:
 	double dt;
 
 	//	Ringbuffers for time and error
-	boost::circular_buffer<double> 	time_now;
-	boost::circular_buffer<double> 		errors;
+	boost::circular_buffer<double> time_now;
+	boost::circular_buffer<double> errors;
+	boost::circular_buffer<double> position;
 };
