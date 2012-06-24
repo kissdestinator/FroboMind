@@ -3,12 +3,6 @@
 MISSION_CONTROL::MISSION_CONTROL(){
 	current_path = 0;
 	row_number = 1;
-	get_file_path();
-	make_path_from_orders();
-	
-	
-	for(int i = 0; i < 29; i++)
-		ROS_INFO("path0: %f, path1: %f", path[0][i], path[1][i]); 
 }
 
 MISSION_CONTROL::~MISSION_CONTROL(){
@@ -58,7 +52,10 @@ void MISSION_CONTROL::main_loop(){
 		}
 		
 		else if(task == 2){
-			
+			get_file_path();
+			make_path_from_orders();
+			for(int i = 0; i < 29; i++)
+				ROS_INFO("path0: %f, path1: %f", path[0][i], path[1][i]); 
 		}
 		heading_msg.orientation = get_new_heading();
 		heading_pub.publish(heading_msg);
@@ -309,48 +306,84 @@ void MISSION_CONTROL::get_file_path(){
 }
 
 void MISSION_CONTROL::make_path_from_orders(){
-	temp = -1;
+	temp = 1;
 	path[0][0] = 1;
 	path[1][0] = 1;
 	path[2][0] = 1;
-	for(int i = 0; i < sizeof(in_turns)-1; i++){
+	for(int i = 0; i < 2*sizeof(in_turns)-1 ; i+=2){
+
 		temp = temp * -1;
-		/*
-		if(in_turns[i] == 'S'){
+		
+		if(in_turns[i/2] == 'S'){
 			ROS_INFO("S");
 			generate_path_in_row();
+			path[0][i+1] = path[0][i];
+			path[1][i+1] = path[1][i];
+			path[2][i+1] = path[2][i];
 		}
-		*/
-
 		
-		 if(in_turns[i] == 'F'){
+		else if(in_turns[i/2] == 'F'){
 			break;
 		}
 		
-		else if(in_turns[i] == 'R'){
-			ROS_INFO("in_path: %f, widt: %f, width: %f, temp: %f", in_path[i],width_of_rows, width_of_pots, temp);
-			path[0][i] = path[0][i-1] + (double)in_path[i] * (width_of_rows + width_of_pots) * temp;
+		else if(in_turns[i/2] == '0'){
+			path[0][i] = path[0][i-1];
 			if(temp < 0)
 				path[1][i] = map_offset_y - row_exit_length;
 			else
 				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
-			
 			path[2][i] = point_proximity_treshold;
+			
+			path[0][i+1] = path[0][i];
+			if(temp > 0)
+				path[1][i+1] = map_offset_y - row_exit_length;
+			else
+				path[1][i+1] = map_offset_y + length_of_rows + row_exit_length;
+			path[2][i+1] = point_proximity_treshold;
+			
 		}
 		
-		else if(in_turns[i] == 'L'){
-			ROS_INFO("L");
-			path[0][i] = path[0][i-1] - (double)in_path[i] * (width_of_rows + width_of_pots) * temp;
-			if(temp < 0)
-				path[1][i] = map_offset_y - row_exit_length;
-			else
-				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
-			
-			path[2][i] = point_proximity_treshold;
-		}
-				
+		else if(in_turns[i/2] == 'R'){
 
+			ROS_INFO("R");
+			
+			path[0][i] = path[0][i-1] + (double)in_path[i/2] * (width_of_rows + width_of_pots) * temp;
+			if(temp < 0)
+				path[1][i] = map_offset_y - row_exit_length;
+			else
+				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
+			
+			path[2][i] = point_proximity_treshold;
+			
+			
+			path[0][i+1] = path[0][i];
+			if(temp > 0)
+				path[1][i+1] = map_offset_y - row_exit_length;
+			else
+				path[1][i+1] = map_offset_y + length_of_rows + row_exit_length;
+			path[2][i+1] = point_proximity_treshold;
+			
+		}
 		
+		else if(in_turns[i/2] == 'L'){
+			ROS_INFO("L");
+			
+			path[0][i] = path[0][i-1] - (double)in_path[i/2] * (width_of_rows + width_of_pots) * temp;
+			if(temp < 0)
+				path[1][i] = map_offset_y - row_exit_length;
+			else
+				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
+			
+			path[2][i] = point_proximity_treshold;
+			
+			
+			path[0][i+1] = path[0][i];
+			if(temp > 0 )
+				path[1][i+1] = map_offset_y - row_exit_length;
+			else
+				path[1][i+1] = map_offset_y + length_of_rows + row_exit_length;
+			path[2][i+1] = point_proximity_treshold;
+		}
 		
 	}
 }
