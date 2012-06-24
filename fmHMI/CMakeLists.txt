@@ -31,7 +31,7 @@ else(HAVE_LINUX_JOYSTICK_H)
   message("Warning: no <linux/joystick.h>; won't build joy node")
 endif(HAVE_LINUX_JOYSTICK_H)
 
-#rosbuild_add_executable(wiimote_to_twist src/wiimote_to_twist.cpp)
+rosbuild_add_executable(wiimote_to_twist src/wiimote_to_twist.cpp)
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
@@ -43,3 +43,4 @@ endif(HAVE_LINUX_JOYSTICK_H)
 rosbuild_add_executable(joystick_speed src/joystick_velocity.cpp)
 rosbuild_add_executable(joy_node joy_node.cpp)
 rosbuild_add_executable(keyboard_speed src/keyboard_velocity.cpp)
+rosbuild_add_executable(wii_start_stop src/wii_start_stop.cpp)
