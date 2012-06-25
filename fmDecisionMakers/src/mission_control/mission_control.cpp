@@ -122,6 +122,7 @@ void MISSION_CONTROL::p_filter_callback(fmMsgs::vehicle_position msg){
 void MISSION_CONTROL::check_current_marker(){
 	if((fabs(my_position_x - path[0][current_path] ) < path[2][current_path] )&&( fabs(my_position_y - path[1][current_path]) < path[2][current_path])){
 		current_path++;
+		current_smoothed_path = 0;
 		make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
 	}
 
@@ -558,7 +559,6 @@ void MISSION_CONTROL::calcAndPublishSpeedSim(double turn_angle, double velocity)
 }
 
 void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
-	current_smoothed_path = 0;
 	double distance_x = fabs(path[0][current_path-1] - path[0][current_path]);
 	double distance_y = fabs(path[1][current_path-1] - path[1][current_path]);
 	double direction = -1;
@@ -594,16 +594,16 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		smoothed_path[2][0] = p_thresh;
 		ROS_INFO("CLose enough. Point: x: %f, y: %f, distance_x: %f, distance_y: %f, my_posx: %f, my_posy: %f:",smoothed_path[0][0], smoothed_path[1][0], distance_x, distance_y,my_position_x, my_position_y );
 	}
-	smoothed_path[0][i+1] = -1;
-	smoothed_path[1][i+1] = -1;
-	smoothed_path[2][i+1] = -1;
+	smoothed_path[0][i+1] = path[0][current_path];
+	smoothed_path[1][i+1] = path[1][current_path];
+	smoothed_path[2][i+1] = path[2][current_path];
 
 
 	visualization_msgs::MarkerArray markerarray;
 
 
 
- 	i = 0;
+ 	i = current_smoothed_path;
 	while(smoothed_path[0][i] != -1){
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/map";
