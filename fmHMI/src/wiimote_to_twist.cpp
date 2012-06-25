@@ -125,7 +125,7 @@ WiiToTwist::WiiToTwist()
   local_n.param("scale_angular_velocity_z", scale_angular_velocity_z, 1.0);
   local_n.param("scale_slow_velocity", scale_slow_velocity, 0.1);
   local_n.param<std::string> ("subscriber_topic", subscriber_topic, "/joy");
-  local_n.param<std::string> ("publisher_topic", publisher_topic, "/speed_from_joystick2");
+  local_n.param<std::string> ("publisher_topic", publisher_topic, "/fmHMI/wii_cmd_vel");
 
   // Initialize ring-buffers
   x_buffer.set_capacity(6);

@@ -70,7 +70,7 @@
   			<param name="scale_angular_velocity_z" value="1.0" />
   			<param name="scale_slow_velocity" value="0.3" />
   			<param name="subscriber_topic" value="/joy" />
-  			<param name="publisher_topic" value="/speed_from_joystick" />
+  			<param name="publisher_topic" value="/fmHMI/wii_cmd_vel" />
 		</node>
 
 	</group>
@@ -86,7 +86,9 @@
 		<node pkg="fmControllers" name="motor_controller" type="motor_controller_node" >
 			<param name="left_odo_subscriber_topic" value="/fmSensors/left_odometry_window" /> 
 			<param name="right_odo_subscriber_topic" value="/fmSensors/right_odometry_window" /> 
-			<param name="desired_speed_subscriber_topic" value="/speed_from_joystick" /> 
+			<param name="navigation_speed_subscriber_topic" value="/navigation_vel" /> 
+			<param name="wii_speed_subscriber_topic" value="/fmHMI/wii_cmd_vel" /> 
+			<param name="warhorse_state_topic" value="/state" /> 
 			<param name="motor_power_topic" value="/fmControllers/motor_power" /> 
 			<param name="maximum_speed" value="0.6" /> 
 			<param name="maximum_acceleration" value="0" /> 
