@@ -2,8 +2,10 @@
 
 MISSION_CONTROL::MISSION_CONTROL(){
 	current_path = 0;
+	current_smoothed_path = 0;
 	row_number = 1;
 	blocked = false;
+	start_smooth = 0;
 }
 
 MISSION_CONTROL::~MISSION_CONTROL(){
@@ -20,6 +22,7 @@ void MISSION_CONTROL::main_loop(){
 	current_y_placement = TOP;
 	current_turn_direction = RIGHT;
 	row_number = 1;
+	get_file_path();
 
 	while(ros::ok()){
 		if(simulation == true){
@@ -38,7 +41,6 @@ void MISSION_CONTROL::main_loop(){
 						generate_path_left_exit();
 					else if(current_turn_direction == RIGHT)
 						generate_path_right_exit();
-	
 					get_current_path();
 					break;
 				case FIND_ROW:
@@ -56,7 +58,6 @@ void MISSION_CONTROL::main_loop(){
 			heading_msg.orientation = get_new_heading();
 		}
 		else if(task == 2){
-			get_file_path();
 			make_path_from_orders();
 			check_current_marker();
 			heading_msg.orientation = get_new_heading();
@@ -72,7 +73,7 @@ void MISSION_CONTROL::main_loop(){
 		}
 		heading_pub.publish(heading_msg);
 
-		ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s, task: %f", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state, (double)task);
+		//ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s, task: %f", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state, (double)task);
 
 		visualization_msgs::Marker marker;
 
@@ -115,6 +116,7 @@ void MISSION_CONTROL::p_filter_callback(fmMsgs::vehicle_position msg){
 void MISSION_CONTROL::check_current_marker(){
 	if((fabs(my_position_x - path[0][current_path] ) < path[2][current_path] )&&( fabs(my_position_y - path[1][current_path]) < path[2][current_path])){
 		current_path++;
+		make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
 	}
 }
 
@@ -178,7 +180,7 @@ double MISSION_CONTROL::get_new_headnig_quat(){
 
 	//q_path.setEulerZYX(path_heading,0,0);
 
-	ROS_INFO("turn_angle: %f, path_heading: %f, q_angle: %f",q.angle(q_path), path_heading, q.getAngle());
+	//ROS_INFO("turn_angle: %f, path_heading: %f, q_angle: %f",q.angle(q_path), path_heading, q.getAngle());
 
 	return q.angle(q_path);
 }
@@ -458,6 +460,16 @@ void MISSION_CONTROL::make_path_from_orders(){
 		}
 		
 	}
+
+	if(start_smooth == 0){
+		current_path++;
+		path[0][0] = 10;
+		path[1][0] = 10;
+		path[2][0] = point_proximity_treshold;;
+		make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
+		start_smooth = 1;
+	}
+
 }
 
 void MISSION_CONTROL::calcAndPublishSpeedSim(double turn_angle, double velocity)
@@ -495,5 +507,74 @@ void MISSION_CONTROL::calcAndPublishSpeedSim(double turn_angle, double velocity)
 	//if (twist.twist.linear.x != 0 && twist.twist.angular.z != 0)
 	pub_.publish(twistSim);
 
-	ROS_INFO("Turn Angle: %.3f, Velocity: %.3f, Angular Velocity: %.3f",turn_angle,vel,ang_vel);
+	//ROS_INFO("Turn Angle: %.3f, Velocity: %.3f, Angular Velocity: %.3f",turn_angle,vel,ang_vel);
+}
+
+void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
+	current_smoothed_path = 0;
+	double distance_x = fabs(path[0][current_path-1] - path[0][current_path]);
+	double distance_y = fabs(path[1][current_path-1] - path[1][current_path]);
+	double direction = -1;
+	int i = 0;
+	if(distance_x > 1){
+		if(path[0][current_path-1] < path[0][current_path])
+			direction = 1;
+		for( i = 0; i < distance_x; i++){
+			smoothed_path[0][i] = path[0][current_path-1] + i*direction;
+			smoothed_path[1][i] = y;
+			smoothed_path[2][i] = p_thresh;
+			ROS_INFO("X_direction. Point: x: %f, y: %f",smoothed_path[0][i], smoothed_path[1][i] );
+		}
+	}
+	else if(distance_y > 1){
+		if(path[1][current_path-1] < path[1][current_path])
+			direction = 1;
+		for( i = 0; i < distance_y; i++){
+			smoothed_path[0][i] = x;
+			smoothed_path[1][i] = path[1][current_path-1] + i*direction;
+			smoothed_path[2][i] = p_thresh;
+			ROS_INFO("Y_direction. Point: x: %f, y: %f",smoothed_path[0][i], smoothed_path[1][i] );
+		}
+	}
+	else{
+		i = 0;
+		smoothed_path[0][0] = x;
+		smoothed_path[1][0] = y;
+		smoothed_path[2][0] = p_thresh;
+		ROS_INFO("CLose enough. Point: x: %f, y: %f",smoothed_path[0][0], smoothed_path[1][0] );
+	}
+	smoothed_path[0][i+1] = -1;
+	smoothed_path[1][i+1] = -1;
+	smoothed_path[2][i+1] = -1;
+
+	visualization_msgs::Marker marker;
+	visualization_msgs::MarkerArray markerarray;
+
+	marker.header.frame_id = "/map";
+	marker.header.stamp = ros::Time();
+	marker.ns = "my_namespace";
+	marker.id = 0;
+	marker.type = visualization_msgs::Marker::CUBE;
+	marker.action = visualization_msgs::Marker::ADD;
+	marker.pose.position.x = smoothed_path[1][current_path];
+	marker.pose.position.y = smoothed_path[0][current_path];
+	marker.pose.position.z = 0;
+	marker.scale.x = 0.1;
+	marker.scale.y = 0.1;
+	marker.scale.z = 0.1;
+	marker.color.a = 2.0;
+	marker.color.r = 0.0;
+	marker.color.g = 2.0;
+	marker.color.b = 2.0;
+
+	for(i = 0; i < 100; i++){
+		markerarray.markers.push_back(marker);
+		break;
+	}
+
+	viz_pub_marker.publish(markerarray);
+
+
+
+
 }

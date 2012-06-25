@@ -8,6 +8,7 @@
 #include "nav_msgs/OccupancyGrid.h"
 #include "cmath"
 #include "visualization_msgs/Marker.h"
+#include "visualization_msgs/MarkerArray.h"
 #include "fstream"
 #include "string"
 #include "cctype"
@@ -25,12 +26,14 @@ private:
 	int temp_count;
 	int temp_type;
 	double temp;
+	int start_smooth;
 	double path[3][30];
 	double in_path[30];
 	char in_turns[30];
 	double smoothed_path[3][30];
 	double my_position_x, my_position_y, my_position_th;
 	int current_path;
+	int current_smoothed_path;
 	bool blocked;
 	double get_new_heading();
 	void get_current_path();
@@ -61,6 +64,7 @@ public:
 	std::string p_filter_sub_top;
 	std::string heading_pub_top;
 	std::string viz_pub_top;
+	std::string viz_pub_top_marker;
 	int task;
 	std::string filename;
 	bool simulation;
@@ -76,6 +80,7 @@ public:
 	ros::Subscriber p_filter_sub;
 	ros::Publisher heading_pub;
 	ros::Publisher viz_pub;
+	ros::Publisher viz_pub_marker;
 	ros::ServiceClient client;
 	ros::Publisher pub_;
 	
