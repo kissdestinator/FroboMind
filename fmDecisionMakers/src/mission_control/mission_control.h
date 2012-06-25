@@ -14,6 +14,10 @@
 #include "iostream"
 #include "gazebo_msgs/GetModelState.h"
 #include "/opt/ros/electric/stacks/geometry_experimental/tf2/include/LinearMath/btQuaternion.h"
+#include "/opt/ros/electric/stacks/geometry_experimental/tf2/include/LinearMath/btMatrix3x3.h"
+
+#define DEG2RAD M_PI/180
+#define RAD2DEG 180/M_PI
 
 class MISSION_CONTROL {
 
@@ -34,6 +38,8 @@ private:
 	enum y_placement {BOTTOM, TOP};
 	y_placement current_y_placement;
 	double row_number;
+	btQuaternion q;
+	btQuaternion q_path;
 	void check_end_row();
 	void generate_path_in_row();
 	void generate_path_right_exit();
@@ -44,6 +50,8 @@ private:
 	void make_path_from_orders();
 	void check_current_marker();
 	void get_pos_from_sim();
+	void calcAndPublishSpeedSim(double turn_angle, double velocity);
+	double get_new_headnig_quat();
 
 public:
 	std::string map_sub_top;
@@ -66,6 +74,7 @@ public:
 	ros::Publisher heading_pub;
 	ros::Publisher viz_pub;
 	ros::ServiceClient client;
+	ros::Publisher pub_;
 	
 	double update_frequency;
 

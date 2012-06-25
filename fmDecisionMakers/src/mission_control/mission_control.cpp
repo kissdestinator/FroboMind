@@ -66,9 +66,13 @@ void MISSION_CONTROL::main_loop(){
 				ROS_INFO("path0: %f, path1: %f", path[0][i], path[1][i]); 
 				*/
 		}
-
+		if(simulation == true){
+			//calcAndPublishSpeedSim(heading_msg.orientation, 0.5);
+			get_new_headnig_quat();
+		}
 		heading_pub.publish(heading_msg);
-		//ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s, task: %f", path[0][0], path[1][0], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state, (double)task);
+
+		ROS_INFO("x: %f, y: %f, my_x %f, my_y: %f, my_th: %f, y_state: %d, heading: %.3f, turn_state: %d, row_number: %f, state: %d, if: %s, task: %f", path[0][current_path], path[1][current_path], my_position_x, my_position_y, my_position_th, current_y_placement, heading_msg.orientation, current_turn_direction, row_number, current_state, (double)task);
 
 		visualization_msgs::Marker marker;
 
@@ -150,6 +154,33 @@ double MISSION_CONTROL::get_new_heading(){
 			path_heading =  path_heading + (2 * M_PI);
 	}
 	return path_heading;
+}
+
+double MISSION_CONTROL::get_new_headnig_quat(){
+	double a(0), b(0);
+	a = path[0][current_path] - my_position_x;
+	b = path[1][current_path] - my_position_y;
+	if(a == 0)
+		a += 0.0001;
+
+	double path_heading = (2 * M_PI - (atan2(a,b)));
+
+	while(path_heading > (2 * M_PI))
+		path_heading -= (2* M_PI);
+
+	path_heading = (path_heading - M_PI/2);
+
+	while(path_heading < (2 * M_PI))
+		path_heading += (2* M_PI);
+
+	while(path_heading > (2 * M_PI))
+		path_heading -= (2* M_PI);
+
+	//q_path.setEulerZYX(path_heading,0,0);
+
+	ROS_INFO("turn_angle: %f, path_heading: %f, q_angle: %f",q.angle(q_path), path_heading, q.getAngle());
+
+	return q.angle(q_path);
 }
 
 void MISSION_CONTROL::get_current_path(){
@@ -319,25 +350,38 @@ void MISSION_CONTROL::get_pos_from_sim(){
 	gazebo_msgs::GetModelState getmodelstate;
 	getmodelstate.request.model_name = "robot_description";
 	client.call(getmodelstate);
-	my_position_x = getmodelstate.response.pose.position.x;
-	my_position_y = getmodelstate.response.pose.position.y;
+	my_position_x = getmodelstate.response.pose.position.x + 10;
+	my_position_y = getmodelstate.response.pose.position.y + 10;
 	double q0(getmodelstate.response.pose.orientation.x), q1(getmodelstate.response.pose.orientation.y), q2(getmodelstate.response.pose.orientation.z), q3(getmodelstate.response.pose.orientation.w);
-	my_position_th = atan2(2*q0*q3-2*q1*q2, 1-2*(q0*q0)-2*q2*q2);
 
+	q.setX(q0);
+	q.setY(q1);
+	q.setZ(q2);
+	q.setW(q3);
+	//ROS_INFO("angle: %f, x: %f, y: %f, z: %f, w: %f", (double)q.getAngle(), q0,q1,q2,q3);
+	/*my_position_th = (double)q.getAngle() ; //+ M_PI/2;
+	if(my_position_th > 2*M_PI)
+		my_position_th-= 2*M_PI;
+
+	// Convert quaternion to RPY.
+
+	    double roll, pitch, yaw;
+	    tf::quaternionMsgToTF(msg->orientation, q);
+	    btMatrix3x3(q).getRPY(roll, pitch, yaw);
+	    ROS_DEBUG("RPY = (%lf, %lf, %lf)", roll, pitch, yaw);
 	/*
 	btQuaternion q;
-	q.getRPY()
 	double roll, pitch, yaw;
-tf::quaternionMsgToTF(getmodelstate.response.pose.orientation, q);
+	tf::quaternionMsgToTF(getmodelstate.response.pose.orientation, q);
 	btMatrix3x3(q).getRPY(roll, pitch, yaw);
 	ROS_INFO("RPY = (%lf, %lf, %lf)", roll, pitch, yaw);
+	*/
 
-	//ROS_INFO("My pos th: %f", my_position_th);*/
+	//ROS_INFO("My pos th: %f", my_position_th);
 
 }
 
 void MISSION_CONTROL::make_path_from_orders(){
-
 	temp = 1;
 	path[0][0] = 1;
 	path[1][0] = 1;
@@ -414,4 +458,42 @@ void MISSION_CONTROL::make_path_from_orders(){
 		}
 		
 	}
+}
+
+void MISSION_CONTROL::calcAndPublishSpeedSim(double turn_angle, double velocity)
+{
+	/*
+	 * geometry_msgs::Twist cmdvel_;
+			cmdvel_.angular.z = heading_msg.orientation;
+			cmdvel_.linear.x = 0;
+	        pub_.publish(cmdvel_);
+	 */
+	double vel = 0;
+	double ang_vel = 0;
+
+	// Calculate velocity
+	if (abs(turn_angle) < 15 * DEG2RAD)
+		vel = velocity;
+	else if (abs(turn_angle) < 90 * DEG2RAD)
+		vel = velocity * (90 - (abs(turn_angle)*RAD2DEG)) / 75;
+
+	//Calculate Angular velocity
+	//ang_vel = pid_ang_vel.update(-turn_angle,0);
+
+	ang_vel = turn_angle * 10;
+	if (abs(ang_vel) > 2)
+		{
+			if(ang_vel < 0)
+				ang_vel = -2;
+			else
+				ang_vel = 2;
+		}
+
+	geometry_msgs::Twist twistSim;
+	twistSim.linear.x = vel;
+	twistSim.angular.z = ang_vel;
+	//if (twist.twist.linear.x != 0 && twist.twist.angular.z != 0)
+	pub_.publish(twistSim);
+
+	ROS_INFO("Turn Angle: %.3f, Velocity: %.3f, Angular Velocity: %.3f",turn_angle,vel,ang_vel);
 }

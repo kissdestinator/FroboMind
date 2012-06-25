@@ -62,7 +62,7 @@
 			<param name="start_y" value="10" />
 		</node>
 
-		<node pkg="fmExtractors" name="lidar_navigation" type="lidar_navigator" output="screen">
+		<node pkg="fmExtractors" name="lidar_navigation" type="lidar_navigator" >
 			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
 			<param name="visualization_marker_pub_topic" value="/fmExtractors/viz_marker_navigator" />
 			<param name="velocity_pub_topic" value="/speed_from_joystick" />

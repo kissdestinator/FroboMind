@@ -43,7 +43,8 @@ int main(int argc, char **argv) {
 		mc.p_filter_sub = nh.subscribe<fmMsgs::vehicle_position>(mc.p_filter_sub_top.c_str(),1,&MISSION_CONTROL::p_filter_callback, &mc);
 	}
 	else{
-		mc.client = n.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+		mc.client = nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+		mc.pub_ = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 	}
 
 
