@@ -48,6 +48,8 @@ int main(int argc, char **argv)
   std::string position_sub_topic;
   std::string vehicle_position_pub_topic;
   std::string map_pub_topic;
+  std::string warhorse_state_topic;
+
 
   int numberOfParticles;
   double len_x;
@@ -73,7 +75,7 @@ int main(int argc, char **argv)
   nh.param<double>("offset_x", off_x, 10.35);
   nh.param<double>("length_x", len_x, 0.5);
   nh.param<double>("offset_y", off_y, 11.2);
-  nh.param<double>("length_y", len_y, 0.5);
+  nh.param<double>("length_y", len_y, 6);
   nh.param<double>("max_ang", max_ang, M_PI/4);
   nh.param<double>("measurement_noise", measurements_noise, 0.05);
   nh.param<double>("movement_noise", movement_noise, 0.01);
@@ -95,6 +97,8 @@ int main(int argc, char **argv)
   nh.param<std::string>("position_sub_topic", position_sub_topic, "/fmExtractors/vehicle_coordinate");
   nh.param<std::string>("vehicle_position_pub_topic", vehicle_position_pub_topic, "/fmExtractors/vehicle_position");
   nh.param<std::string>("map_pub_topic", map_pub_topic, "/fmExtractors/map");
+  nh.param<std::string> ("warhorse_state_topic", warhorse_state_topic, "/state"); //Specify the publisher name
+
 
   InRowVehicleDetector rd(numberOfParticles, len_x, off_x, len_y, off_y, max_ang, measurements_noise, movement_noise, turning_noise);
 
@@ -106,6 +110,7 @@ int main(int argc, char **argv)
   rd.point_cloud_pub = n.advertise<sensor_msgs::PointCloud>(point_cloud_pub_topic.c_str(), 1);
   rd.vehicle_position_pub = n.advertise<fmMsgs::vehicle_position>(vehicle_position_pub_topic.c_str(), 1);
   rd.map_pub = n.advertise<nav_msgs::OccupancyGrid>(map_pub_topic.c_str(),1);
+  rd.warhorse_state_sub = n.subscribe<fmMsgs::warhorse_state>(warhorse_state_topic.c_str(),1,&InRowVehicleDetector::stateHandler,&rd);
 
   rd.createMap(map_size_x,map_size_y,map_resolution,row_width,row_length,row_spacing,no_of_rows,start_x,start_y);
 

@@ -30,8 +30,17 @@
 
 #include "inrow_vehicle_detector.h"
 
-InRowVehicleDetector::InRowVehicleDetector(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise)
+InRowVehicleDetector::InRowVehicleDetector(int NumberOfParticles,double Len_x,double Off_x,double Len_y,double Off_y,double Max_ang, double Measurements_noise, double Movement_noise, double Turning_noise)
 {
+	numberOfParticles = NumberOfParticles;
+	len_x = Len_x;
+	off_x = Off_x;
+	len_y = Len_y;
+	off_y = Off_y;
+	max_ang = Max_ang;
+	measurements_noise = Measurements_noise;
+	movement_noise = Movement_noise;
+	turning_noise = Turning_noise;
 
 	particlefilter = ParticleFilter(numberOfParticles,len_x,off_x,len_y,off_y,max_ang, measurements_noise, movement_noise, turning_noise);
 
@@ -71,6 +80,16 @@ void InRowVehicleDetector::positionCallback(const fmMsgs::vehicle_coordinate::Co
 	position.x = pos->x;
 	position.y = pos->y;
 	position.th = pos->th;
+}
+
+void InRowVehicleDetector::stateHandler(const fmMsgs::warhorse_stateConstPtr& msg)
+{
+	if (msg->drive_state == warhorse_state.DRIVE && warhorse_state.drive_state == warhorse_state.STOP)
+	{
+		particlefilter = ParticleFilter(numberOfParticles,len_x,off_x,len_y,off_y,max_ang, measurements_noise, movement_noise, turning_noise);
+	}
+	warhorse_state.drive_state = msg->drive_state;
+	warhorse_state.task_state = msg->task_state;
 }
 
 fmMsgs::vehicle_coordinate calcPositionChange(fmMsgs::vehicle_coordinate position, fmMsgs::vehicle_coordinate last_position)
@@ -134,22 +153,25 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
     cloud.header.stamp = ros::Time::now();
     point_cloud_pub.publish(cloud);
 
-	fmMsgs::vehicle_position vp = particlefilter.update(cloud,delta_position,map);
+    if (warhorse_state.drive_state == warhorse_state.DRIVE)
+    {
+        fmMsgs::vehicle_position vp = particlefilter.update(cloud,delta_position,map);
 
-	sendMapTransform(vp);
+    	ROS_INFO("Position in map: x: %.3f y: %.3f th: %.3f",vp.position.x ,vp.position.y,vp.position.th);
+    	ROS_INFO("Odom: x: %.3f y: %.3f th: %.3f",position.x ,position.y,position.th);
 
-	ROS_INFO("Position in map: x: %.3f y: %.3f th: %.3f",vp.position.x ,vp.position.y,vp.position.th);
-	ROS_INFO("Odom: x: %.3f y: %.3f th: %.3f",position.x ,position.y,position.th);
+    	publishMap();
 
-	publishMap();
+        particlefilter.updateParticlesMarker();
 
-	vehicle_position_pub.publish(vp);
+    	visualization_msgs::MarkerArray markerArray = particlefilter.getParticlesMarker();
 
-    particlefilter.updateParticlesMarker();
+    	marker_pub.publish(markerArray);
 
-	visualization_msgs::MarkerArray markerArray = particlefilter.getParticlesMarker();
+    	sendMapTransform(vp);
 
-	marker_pub.publish(markerArray);
+    	vehicle_position_pub.publish(vp);
+    }
 }
 
 void InRowVehicleDetector::publishMap()
