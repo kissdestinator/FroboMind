@@ -17,6 +17,7 @@
 #include "nav_msgs/OccupancyGrid.h"
 #include "nav_msgs/MapMetaData.h"
 #include "nav_msgs/Odometry.h"
+#include "fmMsgs/warhorse_state.h"
 
 #include "particle_filter.h"
 
@@ -45,6 +46,9 @@ private:
   double start_x;
   double start_y;
 
+  int numberOfParticles;
+  double len_x,off_x,len_y,off_y,max_ang, measurements_noise, movement_noise, turning_noise;
+
   fmMsgs::vehicle_coordinate position;
   fmMsgs::vehicle_coordinate last_position;
   fmMsgs::vehicle_coordinate delta_position;
@@ -66,13 +70,18 @@ public:
 
   ros::Subscriber position_sub;
 
+  ros::Subscriber warhorse_state_sub;
+
   laser_geometry::LaserProjection projector;
 
   nav_msgs::OccupancyGrid map;
 
+  fmMsgs::warhorse_state warhorse_state;
+
   InRowVehicleDetector(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise);
   void processLaserScan(sensor_msgs::LaserScan laser_scan);
   void positionCallback(const fmMsgs::vehicle_coordinate::ConstPtr& pos);
+  void stateHandler(const fmMsgs::warhorse_stateConstPtr& msg);
   nav_msgs::OccupancyGrid buildMap();
   nav_msgs::OccupancyGrid buildHollowMap();
   void publishMap();

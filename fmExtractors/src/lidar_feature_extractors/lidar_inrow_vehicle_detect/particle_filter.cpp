@@ -31,6 +31,8 @@
 #define X_RANGE 2.00
 #define Y_RANGE 1.50
 #define MIN_VALID_MEASUREMENTS 25
+#define MAX_DISTANCE 0.10
+#define MAX_ANGLE M_PI/12 // 15 degrees
 
 #include "particle_filter.h"
 
@@ -56,10 +58,23 @@ ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,d
 
 	max_prob = 1;
 
+	time_t sec;
+	time(&sec);
+	srand(uint(sec));
 	for (int i = 0; i < noParticles; i++)
 	{
-		particles.push_back(getRandomParticle(i));
+		double x = (double)rand()/double(RAND_MAX) * length_x + offset_x - 0.5 * length_x;
+		srand(uint(x*1000.0+i*1000));
+		double y = (double)rand()/double(RAND_MAX) * length_y + offset_y - 0.5 * length_y;
+		srand(uint(y*1000.0+i*2000));
+		double theta = (double)rand()/double(RAND_MAX) * max_angle - 0.5 * max_angle;
+		if (theta < 0)
+			theta += 2*M_PI;
+		srand(uint(theta*1000.0+i*3000));
+
+		particles.push_back(new Car(x,y,theta));
 	}
+
 	std::cout << "ParticleFilter created:" << std::endl;
 
 	ROS_INFO("Particles: %d, len_x: %.3f, off_x: %.3f, len_y: %.3f, off_y: %.3f, max_ang: %.3f, meas_noise: %.3f, move_noise: %.3f, turn_noise: %.3f", numberOfParticles, len_x, off_x, len_y, off_y, max_ang, measurements_noise, movement_noise, turning_noise);
@@ -242,7 +257,7 @@ void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud
 
 				// Beregner fejlen
 				if (map.data[y*width+x] == 0)
-					temp_error = 0.1;
+					temp_error = 0.25;
 				else
 					temp_error = (100 - map.data[y*width+x]) * 0.001;
 
@@ -261,21 +276,23 @@ void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud
 void ParticleFilter::resampling()
 {
 	srand(time(0));
-	std::vector<Car*> temp;
-	int count[noParticles];
-	for (int i = 0; i < noParticles; i++)
-		count[i] = 0;
+	std::vector<Car*> temp_particles;
+
+	// initialize the start index to a random particle
 	int index = (double)rand()/double(RAND_MAX)*noParticles;
-	double beta = 0;
+
 	max_prob = 0;
+	// Find the highest weight
 	for (int i = 0; i < noParticles; i++)
 		if (particles[i]->w > max_prob)
 			max_prob = particles[i]->w;
 
-	std::cout << "Max prob: " << max_prob << std::endl;
+	double beta = 0;
+	// Perform the selection
 	for (int i = 0; i < noParticles; i++)
 	{
 		srand(uint(beta+i));
+		// Increase beta with a random number between 0 and 2 * max_prob
 		beta += (double)rand()/double(RAND_MAX) * 2.0 * max_prob;
 		while (beta > particles[index]->w)
 		{
@@ -283,86 +300,60 @@ void ParticleFilter::resampling()
 			index = (index + 1) % noParticles;
 		}
 		Car* c = new Car(particles[index]->x,particles[index]->y,particles[index]->theta,particles[index]->w);
-		temp.push_back(c);
+		temp_particles.push_back(c);
 	}
 	particles.clear();
 	for (int i = 0; i<noParticles; i++)
-		particles.push_back(temp[i]);
+		particles.push_back(temp_particles[i]);
 }
-/*
+// Find Vehicle using the robust mean method
 fmMsgs::vehicle_position ParticleFilter::findVehicle()
 {
 	double x(0),y(0),theta(0);
+	double norm = 0;
+
+	max_prob = 0;
+	int index;
+	for (int i = 0; i < noParticles; i++)
+		if (particles[i]->w > max_prob)
+		{
+			max_prob = particles[i]->w;
+			index = i;
+		}
+	Car* c = new Car(particles[index]->x,particles[index]->y,particles[index]->theta,particles[index]->w);
+
 	for (int i = 0; i < noParticles; i++)
 	{
-		x += particles[i]->x;
-		y += particles[i]->y;
+		if (sqrt(pow(c->x-particles[i]->x,2.0) + pow(c->y-particles[i]->y,2.0)) < MAX_DISTANCE && (abs(c->theta - particles[i]->theta < MAX_ANGLE) || abs(c->theta + 2*M_PI - particles[i]->theta) < MAX_ANGLE || abs(c->theta - 2*M_PI - particles[i]->theta) < MAX_ANGLE))
+		{
+			x += particles[i]->x * particles[i]->w;
+			y += particles[i]->y * particles[i]->w;
 
-		// orientation is tricky because it is cyclic. By normalizing
-		// around the first particle we are somewhat more robust to
-		// the 0=2pi problem
-		double temp_theta = (particles[i]->theta - particles[0]->theta + M_PI);
-		if (temp_theta < 0)
-			temp_theta += 2*M_PI;
-		else if (temp_theta > 2*M_PI)
-			temp_theta -= 2*M_PI;
-		temp_theta += particles[0]->theta - M_PI;
+			// orientation is tricky because it is cyclic. By normalizing
+			// around the first particle we are somewhat more robust to
+			// the 0=2pi problem
+			double temp_theta = (particles[i]->theta - particles[0]->theta + M_PI);
+			if (temp_theta < 0)
+				temp_theta += 2*M_PI;
+			else if (temp_theta > 2*M_PI)
+				temp_theta -= 2*M_PI;
+			temp_theta += particles[0]->theta - M_PI;
 
-		theta += temp_theta;
+			theta += temp_theta * particles[i]->w;
+
+			norm += particles[i]->w;
+		}
 	}
-	last_pos.position.x = x / noParticles;
-	last_pos.position.y = y / noParticles;
-	last_pos.position.th = theta / noParticles;
+	last_pos.position.x = x / norm;
+	last_pos.position.y = y / norm;
+	last_pos.position.th = theta / norm;
 	last_pos.probability = max_prob;
 	last_pos.header.stamp = ros::Time::now();
 
 	fmMsgs::vehicle_position r;
-	r.position.y = x / noParticles;
-	r.position.x = y = y / noParticles;
-	r.position.th = theta / noParticles;
-	r.position.th = 2*M_PI - r.position.th;
-	if (r.position.th > 2*M_PI)
-		r.position.th -= 2*M_PI;
-	else if (r.position.th < 0)
-		r.position.th += 2*M_PI;
-
-	r.probability = max_prob;
-	r.header.stamp = ros::Time::now();
-
-	return r;
-
-}
-*/
-fmMsgs::vehicle_position ParticleFilter::findVehicle()
-{
-	double x(0),y(0),theta(0);
-	for (int i = 0; i < noParticles; i++)
-	{
-		x += particles[i]->x;
-		y += particles[i]->y;
-
-		// orientation is tricky because it is cyclic. By normalizing
-		// around the first particle we are somewhat more robust to
-		// the 0=2pi problem
-		double temp_theta = (particles[i]->theta - particles[0]->theta + M_PI);
-		if (temp_theta < 0)
-			temp_theta += 2*M_PI;
-		else if (temp_theta > 2*M_PI)
-			temp_theta -= 2*M_PI;
-		temp_theta += particles[0]->theta - M_PI;
-
-		theta += temp_theta;
-	}
-	last_pos.position.x = x / noParticles;
-	last_pos.position.y = y / noParticles;
-	last_pos.position.th = theta / noParticles;
-	last_pos.probability = max_prob;
-	last_pos.header.stamp = ros::Time::now();
-
-	fmMsgs::vehicle_position r;
-	r.position.y = x / noParticles;
-	r.position.x = y = y / noParticles;
-	r.position.th = theta / noParticles;
+	r.position.y = x / norm;
+	r.position.x = y = y / norm;
+	r.position.th = theta / norm;
 	r.position.th = 2*M_PI - r.position.th;
 	if (r.position.th > 2*M_PI)
 		r.position.th -= 2*M_PI;
@@ -379,10 +370,25 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 void ParticleFilter::newParticles(double ratio)
 {
 	std::vector<Car*> temp;
+	time_t sec;
+	time(&sec);
+	srand(uint(sec));
+
 	for (int i = 0; i < noParticles; i++)
 	{
 		if (particles[i]->w < max_prob * ratio)
-			temp.push_back(getRandomParticle(i));
+		{
+			double x = (double)rand()/double(RAND_MAX) * length_x + offset_x - 0.5 * length_x;
+			srand(uint(x*1000.0+i*1000));
+			double y = (double)rand()/double(RAND_MAX) * length_y + offset_y - 0.5 * length_y;
+			srand(uint(y*1000.0+i*2000));
+			double theta = (double)rand()/double(RAND_MAX) * max_angle - 0.5 * max_angle;
+			if (theta < 0)
+				theta += 2*M_PI;
+			srand(uint(theta*1000.0+i*3000));
+
+			temp.push_back(new Car(x,y,theta));
+		}
 		else
 			temp.push_back(particles[i]);
 	}

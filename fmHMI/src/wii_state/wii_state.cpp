@@ -22,15 +22,17 @@
 
 enum states {
 	manual_drive = 0,
-	task1 = 1,
-	task2 = 2,
-	task3 = 3
+	task1left = 1,
+	task1right = 2,
+	task2 = 3,
+	task3 = 4
 };
 
 enum modes {
 	drive = 10,
 	stop = 11,
-	menu = 12
+	menu = 12,
+	paused = 13
 };
 
 WiiState::WiiState()
@@ -112,7 +114,7 @@ void WiiState::stateLoop()
 						led(OFF,ON,ON,ON);
 						warhorse_state.task_state = warhorse_state.MANUAL_DRIVE;
 						if (buttons_pushed[wiiPlus])
-							state = task1;
+							state = task1left;
 						if (buttons_pushed[wiiMinus])
 							state = task3;
 						if (buttons_pushed[wiiHome])
@@ -121,11 +123,11 @@ void WiiState::stateLoop()
 							led(ON,OFF,OFF,OFF);
 						}
 						break;
-					case task1:
+					case task1left:
 						led(ON,OFF,ON,ON);
-						warhorse_state.task_state = warhorse_state.TASK1;
+						warhorse_state.task_state = warhorse_state.TASK1LEFT;
 						if (buttons_pushed[wiiPlus])
-							state = task2;
+							state = task1right;
 						if (buttons_pushed[wiiMinus])
 							state = manual_drive;
 						if (buttons_pushed[wiiHome])
@@ -134,21 +136,34 @@ void WiiState::stateLoop()
 							led(OFF,ON,OFF,OFF);
 						}
 						break;
-					case task2:
+					case task1right:
 						led(ON,ON,OFF,ON);
-						warhorse_state.task_state = warhorse_state.TASK2;
+						warhorse_state.task_state = warhorse_state.TASK1RIGHT;
 						if (buttons_pushed[wiiPlus])
-							state = task3;
+							state = task2;
 						if (buttons_pushed[wiiMinus])
-							state = task1;
+							state = task1left;
 						if (buttons_pushed[wiiHome])
 						{
 							mode = drive;
 							led(OFF,OFF,ON,OFF);
 						}
 						break;
-					case task3:
+					case task2:
 						led(ON,ON,ON,OFF);
+						warhorse_state.task_state = warhorse_state.TASK2;
+						if (buttons_pushed[wiiPlus])
+							state = task3;
+						if (buttons_pushed[wiiMinus])
+							state = task1right;
+						if (buttons_pushed[wiiHome])
+						{
+							mode = drive;
+							led(OFF,OFF,OFF,ON);
+						}
+						break;
+					case task3:
+						led(OFF,OFF,ON,ON);
 						warhorse_state.task_state = warhorse_state.TASK3;
 						if (buttons_pushed[wiiPlus])
 							state = manual_drive;
@@ -157,7 +172,7 @@ void WiiState::stateLoop()
 						if (buttons_pushed[wiiHome])
 						{
 							mode = drive;
-							led(OFF,OFF,OFF,ON);
+							led(ON,ON,OFF,OFF);
 						}
 						break;
 					default:
@@ -171,9 +186,20 @@ void WiiState::stateLoop()
 					mode = menu;
 					warhorse_state.drive_state = warhorse_state.STOP;
 				}
+				if (buttons_pushed[wiiOne])
+				{
+					mode = paused;
+				}
 				break;
 			case stop:
 
+				break;
+			case paused:
+				warhorse_state.drive_state = warhorse_state.PAUSED;
+				if (buttons_pushed[wiiOne])
+				{
+					mode = drive;
+				}
 				break;
 			default:
 				break;
