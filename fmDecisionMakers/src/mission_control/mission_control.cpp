@@ -22,13 +22,13 @@ void MISSION_CONTROL::main_loop(){
 	current_y_placement = TOP;
 	current_turn_direction = RIGHT;
 	row_number = 1;
-	get_file_path();
+
 
 	while(ros::ok()){
 		if(simulation == true){
 			get_pos_from_sim();
 		}
-		if(task==1){
+		if(task==1){/*
 			switch(current_state){
 				case IN_ROW:
 					generate_path_in_row();
@@ -54,19 +54,25 @@ void MISSION_CONTROL::main_loop(){
 					break;
 				case EXPLORER_MODE:
 					break;
-			}
-			heading_msg.orientation = get_new_heading();
-		}
-		else if(task == 2){
+			}*/
+			filename = filename_task_1;
+			get_file_path();
 			make_path_from_orders();
 			check_current_marker();
-			heading_msg.orientation = get_new_heading();
-
-			/*
-			for(int i = 0; i < 29; i++)
-				ROS_INFO("path0: %f, path1: %f", path[0][i], path[1][i]); 
-				*/
+			make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
+			heading_msg.orientation = get_new_heading_smooth();
 		}
+		else if(task == 2){
+			get_file_path();
+			make_path_from_orders();
+			check_current_marker();
+			make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
+			heading_msg.orientation = get_new_heading_smooth();
+
+		}
+
+		ROS_INFO("x: %f, y: %f, ppt: %f, current_smoothed_path: %d, my_pos_x: %f, my_pos_y: %f", smoothed_path[0][current_smoothed_path],smoothed_path[1][current_smoothed_path],smoothed_path[2][current_smoothed_path], current_smoothed_path, my_position_x, my_position_y);
+
 		if(simulation == true){
 			//calcAndPublishSpeedSim(heading_msg.orientation, 0.5);
 			get_new_headnig_quat();
@@ -118,6 +124,48 @@ void MISSION_CONTROL::check_current_marker(){
 		current_path++;
 		make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
 	}
+
+	if((fabs(my_position_x - smoothed_path[0][current_smoothed_path] ) < smoothed_path[2][current_smoothed_path] )&&( fabs(my_position_y - smoothed_path[1][current_smoothed_path]) < smoothed_path[2][current_smoothed_path]))
+		current_smoothed_path++;
+
+}
+
+double MISSION_CONTROL::get_new_heading_smooth(){
+	/*
+	 * find the delta heading from the robot's own heading, to the heading of the line from the robot to the point.
+	 */
+
+
+	double a(0), b(0);
+	a = smoothed_path[0][current_smoothed_path] - my_position_x;
+	b = smoothed_path[1][current_smoothed_path] - my_position_y;
+	if(a == 0)
+		a += 0.0001;
+
+	double path_heading = (2 * M_PI - (atan2(a,b)));
+
+	while(path_heading > (2 * M_PI))
+		path_heading -= (2* M_PI);
+
+	//ROS_INFO("%f", path_heading);
+
+	if((my_position_th < M_PI && path_heading < M_PI) || (my_position_th > M_PI && path_heading > M_PI))
+		path_heading = path_heading - my_position_th;
+	else
+		if(my_position_th < path_heading)
+			path_heading = path_heading - (my_position_th + (2* M_PI));
+		else
+			path_heading = path_heading - (my_position_th - (2* M_PI));
+
+
+
+	while((path_heading > (2*M_PI) )||( path_heading < 0)){
+		if(path_heading > 2 * M_PI)
+			path_heading =  path_heading - (2 * M_PI);
+		if(path_heading < 0)
+			path_heading =  path_heading + (2 * M_PI);
+	}
+	return path_heading;
 }
 
 double MISSION_CONTROL::get_new_heading(){
@@ -389,7 +437,6 @@ void MISSION_CONTROL::make_path_from_orders(){
 	path[1][0] = 1;
 	path[2][0] = 1;
 	for(int i = 0; i < 2*sizeof(in_turns)-1 ; i+=2){
-
 		temp = temp * -1;
 		
 		if(in_turns[i/2] == 'S'){
@@ -397,6 +444,9 @@ void MISSION_CONTROL::make_path_from_orders(){
 			path[0][i+1] = path[0][i];
 			path[1][i+1] = path[1][i];
 			path[2][i+1] = path[2][i];
+			path[0][0] = 10;
+			path[1][0] = 10 + marker_distance;
+			path[2][0] = 10;
 		}
 		
 		else if(in_turns[i/2] == 'F'){
@@ -463,9 +513,6 @@ void MISSION_CONTROL::make_path_from_orders(){
 
 	if(start_smooth == 0){
 		current_path++;
-		path[0][0] = 10;
-		path[1][0] = 10;
-		path[2][0] = point_proximity_treshold;;
 		make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
 		start_smooth = 1;
 	}
@@ -516,6 +563,8 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 	double distance_y = fabs(path[1][current_path-1] - path[1][current_path]);
 	double direction = -1;
 	int i = 0;
+	int i_count = 0;
+
 	if(distance_x > 1){
 		if(path[0][current_path-1] < path[0][current_path])
 			direction = 1;
@@ -524,16 +573,18 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 			smoothed_path[1][i] = y;
 			smoothed_path[2][i] = p_thresh;
 			ROS_INFO("X_direction. Point: x: %f, y: %f",smoothed_path[0][i], smoothed_path[1][i] );
+			i_count++;
 		}
 	}
 	else if(distance_y > 1){
 		if(path[1][current_path-1] < path[1][current_path])
 			direction = 1;
-		for( i = 0; i < distance_y; i++){
+		for( i = 0; i < distance_y;  i++){
 			smoothed_path[0][i] = x;
 			smoothed_path[1][i] = path[1][current_path-1] + i*direction;
 			smoothed_path[2][i] = p_thresh;
 			ROS_INFO("Y_direction. Point: x: %f, y: %f",smoothed_path[0][i], smoothed_path[1][i] );
+			i_count++;
 		}
 	}
 	else{
@@ -541,39 +592,43 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		smoothed_path[0][0] = x;
 		smoothed_path[1][0] = y;
 		smoothed_path[2][0] = p_thresh;
-		ROS_INFO("CLose enough. Point: x: %f, y: %f",smoothed_path[0][0], smoothed_path[1][0] );
+		ROS_INFO("CLose enough. Point: x: %f, y: %f, distance_x: %f, distance_y: %f, my_posx: %f, my_posy: %f:",smoothed_path[0][0], smoothed_path[1][0], distance_x, distance_y,my_position_x, my_position_y );
 	}
 	smoothed_path[0][i+1] = -1;
 	smoothed_path[1][i+1] = -1;
 	smoothed_path[2][i+1] = -1;
 
-	visualization_msgs::Marker marker;
+
 	visualization_msgs::MarkerArray markerarray;
 
-	marker.header.frame_id = "/map";
-	marker.header.stamp = ros::Time();
-	marker.ns = "my_namespace";
-	marker.id = 0;
-	marker.type = visualization_msgs::Marker::CUBE;
-	marker.action = visualization_msgs::Marker::ADD;
-	marker.pose.position.x = smoothed_path[1][current_path];
-	marker.pose.position.y = smoothed_path[0][current_path];
-	marker.pose.position.z = 0;
-	marker.scale.x = 0.1;
-	marker.scale.y = 0.1;
-	marker.scale.z = 0.1;
-	marker.color.a = 2.0;
-	marker.color.r = 0.0;
-	marker.color.g = 2.0;
-	marker.color.b = 2.0;
 
-	for(i = 0; i < 100; i++){
+
+ 	i = 0;
+	while(smoothed_path[0][i] != -1){
+		visualization_msgs::Marker marker;
+		marker.header.frame_id = "/map";
+		marker.header.stamp = ros::Time();
+		marker.ns = "my_namespace";
+		marker.id = i;
+		marker.type = visualization_msgs::Marker::CUBE;
+		marker.action = visualization_msgs::Marker::ADD;
+		marker.pose.position.x = smoothed_path[1][i];
+		marker.pose.position.y = smoothed_path[0][i];
+		marker.pose.position.z = 0;
+		marker.scale.x = 0.1;
+		marker.scale.y = 0.1;
+		marker.scale.z = 0.1;
+		marker.color.a = 1.0;
+		marker.color.r = 0.0;
+		marker.color.g = 0.0;
+		marker.color.b = 1.0;
 		markerarray.markers.push_back(marker);
-		break;
+		i++;
+
 	}
 
-	viz_pub_marker.publish(markerarray);
 
+	viz_pub_marker.publish(markerarray);
 
 
 

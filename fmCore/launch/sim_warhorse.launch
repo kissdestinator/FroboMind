@@ -31,9 +31,10 @@
 			<param name="update" value="10" /> 
 			<param name="Map_Sub_Top" value="/fmExtractors/map" /> 
 			<param name="P_Filter_Sub_Top" value="/fmExtractors/vehicle_position" /> 
-			<param name="orders_string" value="/home/superthomz/ros_workspace/direction.txt"/>
-			<param name="Task_no" value="2" />
+			<param name="orders_string" value="/home/warhorse/ros_workspace/FroboMind/direction.txt"/>
+			<param name="Task_no" value="1" />
 			<param name="set_simulation" value="true" />
+			<param name="orders_string_task1" value="/home/warhorse/ros_workspace/FroboMind/task1.txt"/>
 
 			<param name="Length_of_rows" value="3" /> 
 			<param name="Width_of_rows" value="0.75" /> 

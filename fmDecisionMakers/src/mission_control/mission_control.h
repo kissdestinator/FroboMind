@@ -29,6 +29,7 @@ private:
 	int start_smooth;
 	double path[3][30];
 	double in_path[30];
+
 	char in_turns[30];
 	double smoothed_path[3][30];
 	double my_position_x, my_position_y, my_position_th;
@@ -56,6 +57,7 @@ private:
 	void get_pos_from_sim();
 	void calcAndPublishSpeedSim(double turn_angle, double velocity);
 	double get_new_headnig_quat();
+	double get_new_heading_smooth();
 
 	void make_smoothed_path(double x, double y, double p_thresh);
 
@@ -67,7 +69,9 @@ public:
 	std::string viz_pub_top_marker;
 	int task;
 	std::string filename;
+	std::string filename_task_1;
 	bool simulation;
+	double marker_distance;
 	
 	enum turn_direction {RIGHT, LEFT, UNKNOWN};
 	state current_state;

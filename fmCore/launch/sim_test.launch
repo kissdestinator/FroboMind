@@ -125,6 +125,16 @@
 		</node>
 	</group>
 
+ 	<group ns="fmHMI">
+		<node pkg="fmHMI" name="joystick_speed" type="joystick_speed">	 
+		<param name="linear_velocity" value="0.5" />
+		<param name="angular_velocity" value="0.5" />
+		</node>
+
+		<node pkg="fmHMI" name="joy_node" type="joy_node" >
+		</node>
+	</group>
+
  	<group ns="fmDecisionMakers">
 		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL" output = "screen">
 			<param name="Heading_Pub_Top" value="/fmDecisionMakers/Heading" /> 
@@ -132,21 +142,20 @@
 			<param name="Map_Sub_Top" value="/fmExtractors/map" /> 
 			<param name="P_Filter_Sub_Top" value="/fmExtractors/vehicle_position" /> 
 			<param name="orders_string" value="/home/warhorse/ros_workspace/FroboMind/direction.txt"/>
+			<param name="Task_no" value="1" />
+			<param name="set_simulation" value="true" />
 			<param name="orders_string_task1" value="/home/warhorse/ros_workspace/FroboMind/task1.txt"/>
-			<param name="Marker_distance" value="1" />
 
 			<param name="Length_of_rows" value="3" /> 
 			<param name="Width_of_rows" value="0.75" /> 
-			<param name="No_of_rows" value="5" /> 
+			<param name="No_of_rows" value="4" /> 
 			<param name="Map_offset_x" value="10" /> 
 			<param name="Map_offset_y" value="10" /> 
-			<param name="Point_proximity_treshold" value="0.30" /> 
+			<param name="Point_proximity_treshold" value="1.30" /> 
 			<param name="Width_of_pots" value="0.20" /> 
 			<param name="row_exit_length" value="0.5" /> 
 			<param name="End_row_limit" value="0.0" /> 
-			<param name="start_turn_direction" value="0" />
-			<param name="Task_no" value="2" /> 
-			<param name="set_simulation" value="false" />
+			<param name="start_turn_direction" value="0" /> 
 		</node>
 	</group>
 

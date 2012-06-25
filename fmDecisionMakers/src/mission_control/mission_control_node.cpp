@@ -17,6 +17,8 @@ int main(int argc, char **argv) {
 	n.param<std::string> ("P_Filter_Sub_Top", mc.p_filter_sub_top, "/fmExtractors/vehicle_position");
 	n.param<std::string> ("viz_pub_top", mc.viz_pub_top, "/fmDecisionMakers/viz_route");
 	n.param<std::string> ("orders_string", mc.filename, "direction.txt");
+	n.param<std::string> ("orders_string_task1", mc.filename_task_1, "direction.txt");
+
 	n.param<std::string> ("viz_pub_top_marker", mc.viz_pub_top_marker, "/fmDecisionMakers/viz_route_smooth");
 	
 	n.param<double> ("Length_of_rows", mc.length_of_rows, 3);
@@ -28,6 +30,7 @@ int main(int argc, char **argv) {
 	n.param<double> ("Width_of_pots", mc.width_of_pots, 0.18);
 	n.param<double> ("row_exit_length", mc.row_exit_length, 0.5);
 	n.param<double> ("End_row_limit", mc.end_row_limit, 0.5);
+	n.param<double> ("Marker_distance", mc.marker_distance, 1);
 	n.param<int> ("start_turn_direction", mc.direction, 0);
 	n.param<int> ("Task_no", mc.task, 2);
 	n.param<bool> ("set_simulation", mc.simulation, false);
