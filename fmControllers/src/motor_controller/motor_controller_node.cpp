@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
 	mc.navigation_speed_sub = n.subscribe<geometry_msgs::TwistStamped>(navigation_speed_sub_topic.c_str(),1,&MotorController::navigationSpeedHandler,&mc);
 	mc.wii_speed_sub = n.subscribe<geometry_msgs::TwistStamped>(wii_speed_sub_topic.c_str(),1,&MotorController::wiiSpeedHandler,&mc);
-	mc.warhorse_state_sub = n.subscribe<fmMsgs::warhorse_state>(wii_speed_sub_topic.c_str(),1,&MotorController::stateHandler,&mc);
+	mc.warhorse_state_sub = n.subscribe<fmMsgs::warhorse_state>(warhorse_state_topic.c_str(),1,&MotorController::stateHandler,&mc);
 	mc.left_odo_sub = n.subscribe(left_odometry_sub_topic.c_str(), 1, &MotorController::leftMotorHandler,&mc);
 	mc.right_odo_sub = n.subscribe(right_odometry_sub_topic.c_str(), 1, &MotorController::rightMotorHandler,&mc);
 	mc.motor_power_pub = n.advertise<fmMsgs::motor_power>(motor_power_pub_topic.c_str(), 1);

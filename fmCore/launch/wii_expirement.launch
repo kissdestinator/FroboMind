@@ -73,6 +73,13 @@
   			<param name="publisher_topic" value="/fmHMI/wii_cmd_vel" />
 		</node>
 
+		<node pkg="fmHMI" name="wii_state" type="wii_state" output="screen">
+			<param name="wiimote_sub_topic" value="/wiimote/state"/>
+ 			<param name="led_pub_topic" value="/wiimote/leds" />
+  			<param name="rumble_pub_topic" value="/wiimote/rumble" />
+  			<param name="state_pub_topic" value="/state" />		
+		</node>
+
 	</group>
 
  	<group ns="fmDecisionMakers">
