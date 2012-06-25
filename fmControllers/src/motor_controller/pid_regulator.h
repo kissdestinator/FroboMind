@@ -53,6 +53,7 @@ public:
 	void 	setI (double p);
 	double 	getD ();
 	void 	setD (double p);
+	void setIWindupLimit(double limit);
 
 private:
 	//	Coefficients for regulation and terms
@@ -62,7 +63,10 @@ private:
 	//	Delta time
 	double dt;
 
+	double windup_limit;
+
 	//	Ringbuffers for time and error
-	boost::circular_buffer<double> 	time_now;
-	boost::circular_buffer<double> 		errors;
+	boost::circular_buffer<double> time_now;
+	boost::circular_buffer<double> errors;
+	boost::circular_buffer<double> position;
 };

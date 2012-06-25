@@ -33,6 +33,9 @@ endif(HAVE_LINUX_JOYSTICK_H)
 
 rosbuild_add_executable(wiimote_to_twist src/wiimote_to_twist.cpp)
 
+rosbuild_add_executable(wii_state src/wii_state/wii_state_node.cpp)
+rosbuild_add_executable(wii_state src/wii_state/wii_state.cpp)
+
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
@@ -43,4 +46,3 @@ rosbuild_add_executable(wiimote_to_twist src/wiimote_to_twist.cpp)
 rosbuild_add_executable(joystick_speed src/joystick_velocity.cpp)
 rosbuild_add_executable(joy_node joy_node.cpp)
 rosbuild_add_executable(keyboard_speed src/keyboard_velocity.cpp)
-rosbuild_add_executable(wii_start_stop src/wii_start_stop.cpp)

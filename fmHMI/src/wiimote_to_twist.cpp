@@ -124,8 +124,8 @@ WiiToTwist::WiiToTwist()
   local_n.param("scale_linear_velocity_x", scale_linear_velocity_x, 1.0);
   local_n.param("scale_angular_velocity_z", scale_angular_velocity_z, 1.0);
   local_n.param("scale_slow_velocity", scale_slow_velocity, 0.1);
-  local_n.param<std::string> ("subscriber_topic", subscriber_topic, "joy");
-  local_n.param<std::string> ("publisher_topic", publisher_topic, "/speed_from_joystick");
+  local_n.param<std::string> ("subscriber_topic", subscriber_topic, "/joy");
+  local_n.param<std::string> ("publisher_topic", publisher_topic, "/fmHMI/wii_cmd_vel");
 
   // Initialize ring-buffers
   x_buffer.set_capacity(6);
@@ -167,11 +167,25 @@ void WiiToTwist::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
   pitch = atan2(x_acceleration, sqrt(pow(y_acceleration, 2) + pow(z_acceleration, 2))) / M_PI_2;
   roll = atan2(y_acceleration, sqrt(pow(x_acceleration, 2) + pow(z_acceleration, 2))) / M_PI_2;
 
+  if (joy->buttons[normal_movement_button])
+{
 
   twist_msg.twist.linear.x = pitch * max_linear_velocity * scale_linear_velocity_x;
 
   twist_msg.twist.angular.z = roll * max_angular_velocity * scale_angular_velocity_z;
+}
+ else if (joy->buttons[slow_movement_button])
+{
+  twist_msg.twist.linear.x = pitch * max_linear_velocity * scale_linear_velocity_x * scale_slow_velocity;
 
+  twist_msg.twist.angular.z = roll * max_angular_velocity * scale_angular_velocity_z * scale_slow_velocity;
+}
+else
+{
+  twist_msg.twist.linear.x = 0;
+
+  twist_msg.twist.angular.z = 0;
+}
   twist_msg.twist.linear.y = 0.0;
   twist_msg.twist.linear.z = 0.0;
 

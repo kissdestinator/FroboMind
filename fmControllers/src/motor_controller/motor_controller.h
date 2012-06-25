@@ -3,6 +3,7 @@
 #include "fmMsgs/odometry.h"
 #include "ros/ros.h"
 #include "pid_regulator.h"
+#include "fmMsgs/warhorse_state.h"
 
 #ifndef MOTOR_CONTROLLER_H_
 #define MOTOR_CONTROLLER_H_
@@ -33,20 +34,29 @@ private:
    PIDRegulator pid_regulator_right;
 
    double maxAcceleration(const double& target_speed, const double& last_target_speed, ros::Time& last_time);
+   void calcSpeed(const geometry_msgs::TwistStampedConstPtr& msg);
+   void zeroSpeed();
 
 public:
 
-  ros::Subscriber target_speed_sub;
+  ros::Subscriber navigation_speed_sub;
+  ros::Subscriber wii_speed_sub;
+  ros::Subscriber warhorse_state_sub;
   ros::Subscriber left_odo_sub;
   ros::Subscriber right_odo_sub;
 
   ros::Publisher motor_power_pub;
 
+  fmMsgs::warhorse_state warhorse_state;
+
   MotorController(double p_left, double i_left, double d_left, double p_right, double i_right, double d_right);
 
-  void desiredSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg);
   void leftMotorHandler(const fmMsgs::odometryConstPtr& msg);
   void rightMotorHandler(const fmMsgs::odometryConstPtr& msg);
+
+  void navigationSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg);
+  void wiiSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg);
+  void stateHandler(const fmMsgs::warhorse_stateConstPtr& msg);
 
   void setMaxSpeed(double speed) { max_speed = speed; };
   void setMaxAcceleration(double acceleration) { max_acceleration = acceleration; };
@@ -71,6 +81,9 @@ public:
   double getPright(void) { return pid_regulator_right.getP(); };
   double getIright(void) { return pid_regulator_right.getI(); };
   double getDright(void) { return pid_regulator_right.getD(); };
+
+  void setIWindupLimitLeft(double limit) {pid_regulator_left.setIWindupLimit(limit);};
+  void setIWindupLimitRight(double limit) {pid_regulator_right.setIWindupLimit(limit);};
 };
 
 #endif

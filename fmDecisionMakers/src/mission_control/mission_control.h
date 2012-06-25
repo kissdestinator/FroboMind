@@ -28,6 +28,7 @@ private:
 	double path[3][30];
 	double in_path[30];
 	char in_turns[30];
+	double smoothed_path[3][30];
 	double my_position_x, my_position_y, my_position_th;
 	int current_path;
 	bool blocked;
@@ -52,6 +53,8 @@ private:
 	void get_pos_from_sim();
 	void calcAndPublishSpeedSim(double turn_angle, double velocity);
 	double get_new_headnig_quat();
+
+	void make_smoothed_path(double x, double y, double p_thresh);
 
 public:
 	std::string map_sub_top;

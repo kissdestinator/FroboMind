@@ -97,7 +97,7 @@ void CorobotWheelFeedback::callbackHandlerEncoder2(const fmMsgs::encoderConstPtr
 		  if (enc2_id < enc1_id)
 		  {			  
 			  double temp = msg->encoderticks - _PreviousLeftEncoderCounts;
-			  double temp_window = calcTicksRight(msg->encoderticks - _PreviousLeftEncoderCounts);
+			  double temp_window = calcTicksLeft(msg->encoderticks - _PreviousLeftEncoderCounts);
 			  odo_msg_window.position = -1 * (msg->encoderticks  * DistancePerCount);
 			  odo_msg_window.speed = -1 * ((temp_window) * DistancePerCount)/ (msg->header.stamp - _PreviousTimeLeftEncoder).toSec();
 			  left_odometry_pub_window.publish(odo_msg_window);

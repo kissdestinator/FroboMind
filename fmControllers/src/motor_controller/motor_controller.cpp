@@ -13,9 +13,44 @@ MotorController::MotorController(double p_left, double i_left, double d_left, do
 	max_speed = 1;
 	max_acceleration = 0;
 	max_deceleration = 0;
+
+	warhorse_state.drive_state = warhorse_state.STOP;
+	warhorse_state.task_state = warhorse_state.MANUAL_DRIVE;
 }
 
-void MotorController::desiredSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg)
+void MotorController::stateHandler(const fmMsgs::warhorse_stateConstPtr& msg)
+{
+	warhorse_state.drive_state = msg->drive_state;
+	warhorse_state.task_state = msg->task_state;
+}
+
+void MotorController::navigationSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg)
+{
+	if (warhorse_state.task_state != warhorse_state.MANUAL_DRIVE)
+		if (warhorse_state.drive_state == warhorse_state.DRIVE)
+			calcSpeed(msg);
+		else
+			zeroSpeed();
+}
+
+void MotorController::wiiSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg)
+{
+	if (warhorse_state.task_state == warhorse_state.MANUAL_DRIVE)
+	{
+		if (warhorse_state.drive_state == warhorse_state.DRIVE)
+			calcSpeed(msg);
+		else
+			zeroSpeed();
+	}
+}
+
+void MotorController::zeroSpeed()
+{
+	target_speed_left = 0;
+	target_speed_right = 0;
+}
+
+void MotorController::calcSpeed(const geometry_msgs::TwistStampedConstPtr& msg)
 {
 
 	double W = 0.24; //length from center to meter
@@ -81,7 +116,8 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	last_target_speed_left = maxAcceleration(target_speed_left,last_target_speed_left,last_time_left);
 
 	// Calculate the motor power: PID update and directly forwarding the target speed and in the end normalizing by the max_speed
-	motor_power_left = (pid_regulator_left.update(msg->speed,last_target_speed_left) + last_target_speed_left) / max_speed;
+	double pid_error = pid_regulator_left.update(msg->speed,last_target_speed_left);
+	motor_power_left = (pid_error + last_target_speed_left) / max_speed;
 
 	// making sure the motor power does not exceed 1 or -1
 	if (motor_power_left > 1)
@@ -92,6 +128,7 @@ void MotorController::leftMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	// publish the motor power
 	power_msg.power_left = motor_power_left;
 	motor_power_pub.publish(power_msg);
+
 }
 
 void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
@@ -100,7 +137,8 @@ void MotorController::rightMotorHandler(const fmMsgs::odometryConstPtr& msg)
 	last_target_speed_right = maxAcceleration(target_speed_right,last_target_speed_right,last_time_right);
 
 	// Calculate the motor power: PID update and directly forwarding the target speed and in the end normalizing by the max_speed
-	motor_power_right = (pid_regulator_right.update(msg->speed,last_target_speed_right) + last_target_speed_right) / max_speed;
+	double pid_error = pid_regulator_right.update(msg->speed,last_target_speed_right);
+	motor_power_right = (pid_error + last_target_speed_right) / max_speed;
 
 	// making sure the motor power does not exceed 1 or -1
 	if (motor_power_right > 1)
