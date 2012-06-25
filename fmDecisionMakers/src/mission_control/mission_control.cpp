@@ -603,7 +603,7 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 
 
 
- 	i = 0;
+ 	i = current_smoothed_path;
 	while(smoothed_path[0][i] != -1){
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/map";
