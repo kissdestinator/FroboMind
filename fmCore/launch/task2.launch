@@ -1,6 +1,9 @@
 <launch>
 
+	<node respawn="true" pkg="wiimote"  type="wiimote_node.py" name="wiimote" output="screen"/>
 	<group ns="fmSensors">
+
+
 		<node pkg="fmSensors" name="Encoder1" type="phidget_encoder_node">
 			<param name="publisher_topic" value="encoder1" />
 			<param name="update_frequency" value="20" />		 
@@ -56,7 +59,7 @@
 			<param name="map_resolution" value="0.025" />
 			<param name="row_width" value="0.2" />
 			<param name="row_length" value="3" />
-			<param name="no_of_rows" value="4" />
+			<param name="no_of_rows" value="5" />
 			<param name="row_spacing" value="0.75" />
 			<param name="start_x" value="10" />
 			<param name="start_y" value="10" />
@@ -102,6 +105,13 @@
 
 		<node pkg="fmHMI" name="joy_node" type="joy_node" >
 		</node>
+
+		<node pkg="fmHMI" name="wii_state" type="wii_state" output="screen">
+			<param name="wiimote_sub_topic" value="/wiimote/state"/>
+ 			<param name="led_pub_topic" value="/wiimote/leds" />
+  			<param name="rumble_pub_topic" value="/wiimote/rumble" />
+  			<param name="state_pub_topic" value="/state" />		
+		</node>
 	</group>
 
  	<group ns="fmDecisionMakers">
@@ -113,7 +123,7 @@
 
 			<param name="Length_of_rows" value="3" /> 
 			<param name="Width_of_rows" value="0.75" /> 
-			<param name="No_of_rows" value="4" /> 
+			<param name="No_of_rows" value="5" /> 
 			<param name="Map_offset_x" value="10" /> 
 			<param name="Map_offset_y" value="10" /> 
 			<param name="Point_proximity_treshold" value="0.30" /> 
@@ -132,7 +142,7 @@
 		<node pkg="fmControllers" name="motor_controller" type="motor_controller_node" >
 			<param name="left_odo_subscriber_topic" value="/fmSensors/left_odometry_window" /> 
 			<param name="right_odo_subscriber_topic" value="/fmSensors/right_odometry_window" /> 
-			<param name="desired_speed_subscriber_topic" value="/speed_from_joystick" /> 
+			<param name="navigation_speed_subscriber_topic" value="/speed_from_joystick" /> 
 			<param name="motor_power_topic" value="/fmControllers/motor_power" /> 
 			<param name="maximum_speed" value="0.6" /> 
 			<param name="maximum_acceleration" value="0" /> 
