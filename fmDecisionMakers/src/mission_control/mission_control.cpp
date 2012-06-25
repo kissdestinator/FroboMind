@@ -122,6 +122,7 @@ void MISSION_CONTROL::p_filter_callback(fmMsgs::vehicle_position msg){
 void MISSION_CONTROL::check_current_marker(){
 	if((fabs(my_position_x - path[0][current_path] ) < path[2][current_path] )&&( fabs(my_position_y - path[1][current_path]) < path[2][current_path])){
 		current_path++;
+		current_smoothed_path = 0;
 		make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
 	}
 
@@ -558,7 +559,6 @@ void MISSION_CONTROL::calcAndPublishSpeedSim(double turn_angle, double velocity)
 }
 
 void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
-	current_smoothed_path = 0;
 	double distance_x = fabs(path[0][current_path-1] - path[0][current_path]);
 	double distance_y = fabs(path[1][current_path-1] - path[1][current_path]);
 	double direction = -1;
