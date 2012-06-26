@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
 	n.param<std::string> ("orders_string_task2", mc.filename_task_2, "direction.txt");
 	n.param<std::string> ("state_sub", mc.state_sub_top, "/state");
 	n.param<std::string> ("nav_spec_sub_top", mc.nav_spec_top, "/fmDecisionMakers/nav_spec");
+	n.param<std::string> ("blocked_sub_top", mc.blocked_sub_top, "/fmExtractors/blocked_row");
 
 	n.param<std::string> ("viz_pub_top_marker", mc.viz_pub_top_marker, "/fmDecisionMakers/viz_route_smooth");
 	
@@ -61,6 +62,7 @@ int main(int argc, char **argv) {
 	mc.heading_pub = nh.advertise<fmMsgs::heading_order>(mc.heading_pub_top.c_str(),1);
 	mc.state_sub = nh.subscribe<fmMsgs::warhorse_state>(mc.state_sub_top.c_str(),1, &MISSION_CONTROL::state_callback, &mc);
 	mc.nav_spec_pub = nh.advertise<fmMsgs::navigation_specifications>(mc.nav_spec_top.c_str(), 1);
+	mc.blocked_sub = nh.subscribe(mc.blocked_sub_top.c_str(), 1, &MISSION_CONTROL::blocked_callback, &mc);
 
 	//Go into mainloop
 	mc.main_loop();
