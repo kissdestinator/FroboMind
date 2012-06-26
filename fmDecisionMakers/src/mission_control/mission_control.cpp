@@ -141,6 +141,11 @@ void MISSION_CONTROL::blocked_callback(fmMsgs::blocked_row msg){
 }
 
 void MISSION_CONTROL::invert_path(){
+	if(path[0][current_path] > path[0][current_path-1])
+		way_turn = 1;
+	else
+		way_turn = -1;
+
 	path[0][current_path] = path[0][current_path-1];
 	path[1][current_path] = path[1][current_path-1];
 	path[2][current_path] = path[2][current_path-1];
@@ -566,7 +571,6 @@ void MISSION_CONTROL::make_path_from_orders(){
 		}
 		
 		else if(in_turns[i/2] == 'F'){
-			ROS_INFO("%d", i);
 			path[0][i] = -1;
 			ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
 			break;
@@ -729,7 +733,7 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 
 
  	i = current_smoothed_path;
-	while(smoothed_path[0][i] != -1){
+	while(smoothed_path[0][i] != 0){
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/map";
 		marker.header.stamp = ros::Time();
