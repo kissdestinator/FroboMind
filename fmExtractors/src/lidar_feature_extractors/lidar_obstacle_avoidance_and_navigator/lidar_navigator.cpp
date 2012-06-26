@@ -95,74 +95,76 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 
 void LidarNavigator::update()
 {
-	int LRS_size = ranges.size();
-	double temp = 2 * M_PI - desired_heading;
-	if (temp > M_PI)
-		temp -= 2 * M_PI;
-	int temp_heading = (int)(temp * (double)LRS_size / (2 * M_PI));
-
 	int hole_found = 0;
-
-	for (double test_range = nav_range; test_range >= safety_range && !hole_found; test_range -= (nav_range - safety_range)/3)
+	if (desired_heading != -1)
 	{
-		int index = temp_heading;
+		int LRS_size = ranges.size();
+		double temp = 2 * M_PI - desired_heading;
+		if (temp > M_PI)
+			temp -= 2 * M_PI;
+		int temp_heading = (int)(temp * (double)LRS_size / (2 * M_PI));
 
-		int step_size = 2;
-		int step = step_size;
+		for (double test_range = nav_range; test_range >= safety_range && !hole_found; test_range -= (nav_range - safety_range)/3)
+		{
+			int index = temp_heading;
 
-		for (int i = 0; i < (LRS_size/step_size); i++)
-			{
-				int left_line(0), right_line(0);
-				double center(0.0);
+			int step_size = 2;
+			int step = step_size;
 
-				while((ranges[mMod(left_line+index,LRS_size)] > test_range || ranges[mMod(left_line+index,LRS_size)] < min_range) && abs(left_line) < (int)LRS_size/4)
-					left_line--;
-
-				while((ranges[mMod(right_line+index,LRS_size)] > test_range || ranges[mMod(right_line+index,LRS_size)] < min_range) && abs(right_line) < (int)LRS_size/4)
-					right_line++;
-
-				double left_clearing_angle = left_line + 20;//(double)left_line + (asin((min_clearance_width/2.0)/ranges[mMod(left_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
-				double right_clearing_angle = right_line - 20;//(double)right_line - (asin((min_clearance_width/2.0)/ranges[mMod(right_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
-
-				if (left_clearing_angle < right_clearing_angle)
+			for (int i = 0; i < (LRS_size/step_size); i++)
 				{
+					int left_line(0), right_line(0);
+					double center(0.0);
 
-					if (temp_heading > index+(double)(left_clearing_angle) && temp_heading < index+(double)(right_clearing_angle))
-						center = temp_heading;
-					else if (temp_heading-index < left_clearing_angle)
-						center = (int)index+left_clearing_angle;
-					else if (temp_heading-index > right_clearing_angle)
-						center = (int)index+right_clearing_angle;
+					while((ranges[mMod(left_line+index,LRS_size)] > test_range || ranges[mMod(left_line+index,LRS_size)] < min_range) && abs(left_line) < (int)LRS_size/4)
+						left_line--;
 
-					turn_angle = center * 2*M_PI/LRS_size;
+					while((ranges[mMod(right_line+index,LRS_size)] > test_range || ranges[mMod(right_line+index,LRS_size)] < min_range) && abs(right_line) < (int)LRS_size/4)
+						right_line++;
 
-					if (turn_angle > M_PI)
-						turn_angle -= 2*M_PI;
-					else if (turn_angle < -M_PI)
-						turn_angle += 2*M_PI;
+					double left_clearing_angle = left_line + 20;//(double)left_line + (asin((min_clearance_width/2.0)/ranges[mMod(left_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
+					double right_clearing_angle = right_line - 20;//(double)right_line - (asin((min_clearance_width/2.0)/ranges[mMod(right_line+index,LRS_size)]) * LRS_size / (2 * M_PI));
 
-					// Calculate and publish the vehicle speed
-					current_velocity = max_velocity * safetyCheck(ranges);
-					ROS_INFO("L: %d, L: %.3f, R: %d, R: %.3f, turn angle: %.3f, desired_heading: %.3f, index: %d, temp_h: %d",mMod(left_line+index,LRS_size),ranges[mMod(left_line+index,LRS_size)],mMod(right_line+index,LRS_size), ranges[mMod(right_line+index,LRS_size)], turn_angle, desired_heading, index, temp_heading);
-					calcAndPublishSpeed(turn_angle,current_velocity);
+					if (left_clearing_angle < right_clearing_angle)
+					{
 
-					i = (LRS_size/step_size);
-					hole_found = 1;
-				}
-				else
-				{
-					if (mMod(i,2))
-						index += step;
+						if (temp_heading > index+(double)(left_clearing_angle) && temp_heading < index+(double)(right_clearing_angle))
+							center = temp_heading;
+						else if (temp_heading-index < left_clearing_angle)
+							center = (int)index+left_clearing_angle;
+						else if (temp_heading-index > right_clearing_angle)
+							center = (int)index+right_clearing_angle;
+
+						turn_angle = center * 2*M_PI/LRS_size;
+
+						if (turn_angle > M_PI)
+							turn_angle -= 2*M_PI;
+						else if (turn_angle < -M_PI)
+							turn_angle += 2*M_PI;
+
+						// Calculate and publish the vehicle speed
+						current_velocity = max_velocity * safetyCheck(ranges);
+						ROS_INFO("L: %d, L: %.3f, R: %d, R: %.3f, turn angle: %.3f, desired_heading: %.3f, index: %d, temp_h: %d",mMod(left_line+index,LRS_size),ranges[mMod(left_line+index,LRS_size)],mMod(right_line+index,LRS_size), ranges[mMod(right_line+index,LRS_size)], turn_angle, desired_heading, index, temp_heading);
+						calcAndPublishSpeed(turn_angle,current_velocity);
+
+						i = (LRS_size/step_size);
+						hole_found = 1;
+					}
 					else
-						index -= step;
-					step += step_size;
+					{
+						if (mMod(i,2))
+							index += step;
+						else
+							index -= step;
+						step += step_size;
+					}
 				}
-			}
-	}
 
+		}
+	}
 	if (!hole_found)
 	{
-		ROS_INFO("No holes wide enough found..! - setting speed to zero");
+		ROS_INFO("No holes wide enough found or end of navigation reached..! - setting speed to zero");
 		calcAndPublishSpeed(0,0);
 	}
 }
