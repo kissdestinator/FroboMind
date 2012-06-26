@@ -37,7 +37,7 @@
 		<node pkg="fmExtractors" name="odometry_position_extractor" type="odometry_position_node">
 		</node>
 
-		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector" output="screen">
+		<node pkg="fmExtractors" name="lidar_inrow_vehicle_detector" type="lidar_inrow_vehicle_detector" >
 			<param name="lidar_sub_topic" value="/fmSensors/lidar_scan_data" />
 			<param name="visualization_marker_pub_topic" value="/fmExtractors/viz_marker_particle" />
 			<param name="point_cloud_pub_topic" value="/fmExtractors/point_cloud" />
@@ -88,7 +88,7 @@
 
 	<group ns="fmHMI">
 
-		<node pkg="fmHMI" name="wiimote_to_twist" type="wiimote_to_twist" output="screen">	 
+		<node pkg="fmHMI" name="wiimote_to_twist" type="wiimote_to_twist" >	 
 			<param name="max_angular_velocity" value="4.0"/>
  			<param name="max_linear_velocity" value="1.0" />
   			<param name="normal_movement_button" value="3" />
@@ -115,7 +115,7 @@
 	</group>
 
  	<group ns="fmDecisionMakers">
-		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL" >
+		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL" output="screen" >
 			<param name="Heading_Pub_Top" value="/fmDecisionMakers/Heading" /> 
 			<param name="update" value="10" /> 
 			<param name="Map_Sub_Top" value="/fmExtractors/map" /> 
