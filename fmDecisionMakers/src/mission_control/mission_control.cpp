@@ -598,6 +598,9 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 	smoothed_path[1][i+1] = path[1][current_path];
 	smoothed_path[2][i+1] = path[2][current_path];
 
+	smoothed_path[0][i+2] = -1;
+	smoothed_path[1][i+2] = -1;
+	smoothed_path[2][i+2] = -1;
 
 	visualization_msgs::MarkerArray markerarray;
 
