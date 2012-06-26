@@ -46,6 +46,8 @@ private:
   double start_x;
   double start_y;
 
+  fmMsgs::vehicle_position vehicle_position;
+
   int numberOfParticles;
   double len_x,off_x,len_y,off_y,max_ang, measurements_noise, movement_noise, turning_noise;
 
