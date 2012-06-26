@@ -6,6 +6,7 @@ MISSION_CONTROL::MISSION_CONTROL(){
 	row_number = 1;
 	blocked = false;
 	start_smooth = 0;
+	last_i = 0;
 
 }
 
@@ -724,10 +725,11 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 	smoothed_path[0][i+1] = -1;
 	smoothed_path[1][i+1] = -1;
 	smoothed_path[2][i+1] = -1;
+	i = last_i;
+	while(smoothed_path[0][i] != -1)
+		markerarray.pop();
 
-	visualization_msgs::MarkerArray markerarray;
-
-
+	viz_pub_marker.publish(markerarray);
 
  	i = current_smoothed_path;
 	while(smoothed_path[0][i] != -1){
@@ -736,7 +738,7 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		marker.header.stamp = ros::Time();
 		marker.ns = "my_namespace";
 		marker.id = i;
-		marker.type = visualization_msgs::Marker::CUBE;
+		marker.type = visualization_msgs::Marker::CYLINDER;
 		marker.action = visualization_msgs::Marker::ADD;
 		marker.pose.position.x = smoothed_path[1][i];
 		marker.pose.position.y = smoothed_path[0][i];
@@ -749,11 +751,10 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		marker.color.g = 0.0;
 		marker.color.b = 1.0;
 		markerarray.markers.push_back(marker);
-		ROS_INFO("x: %f, y: %f", smoothed_path[1][i],smoothed_path[0][i] );
+		ROS_INFO("x: %f, y: %f", smoothed_path[0][i],smoothed_path[1][i] );
 		i++;
-
 	}
-
+	last_i = i;
 
 	viz_pub_marker.publish(markerarray);
 
