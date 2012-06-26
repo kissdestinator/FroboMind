@@ -50,6 +50,11 @@ InRowVehicleDetector::InRowVehicleDetector(int NumberOfParticles,double Len_x,do
 	last_position.x = 0;
 	last_position.y = 0;
 	last_position.th = 0;
+
+	vehicle_position.position.x = len_x;
+	vehicle_position.position.y = len_y;
+	vehicle_position.position.th = 0;
+
 }
 
 void InRowVehicleDetector::createMap(double MAP_SIZE_X, double MAP_SIZE_Y, double MAP_RESOLUTION, double ROW_WIDTH, double ROW_LENGTH, double ROW_SPACING, double NO_OF_ROWS, double START_X,double START_Y)
@@ -155,23 +160,22 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
 
     if (warhorse_state.drive_state == warhorse_state.DRIVE)
     {
-        fmMsgs::vehicle_position vp = particlefilter.update(cloud,delta_position,map);
+        vehicle_position = particlefilter.update(cloud,delta_position,map);
 
-    	ROS_INFO("Position in map: x: %.3f y: %.3f th: %.3f",vp.position.x ,vp.position.y,vp.position.th);
+        ROS_INFO("Position in map: x: %.3f y: %.3f th: %.3f",vehicle_position.position.x ,vehicle_position.position.y,vehicle_position.position.th);
     	ROS_INFO("Odom: x: %.3f y: %.3f th: %.3f",position.x ,position.y,position.th);
 
-    	publishMap();
-
-        particlefilter.updateParticlesMarker();
+    	particlefilter.updateParticlesMarker();
 
     	visualization_msgs::MarkerArray markerArray = particlefilter.getParticlesMarker();
 
     	marker_pub.publish(markerArray);
-
-    	sendMapTransform(vp);
-
-    	vehicle_position_pub.publish(vp);
     }
+
+	publishMap();
+	sendMapTransform(vehicle_position);
+
+	vehicle_position_pub.publish(vehicle_position);
 }
 
 void InRowVehicleDetector::publishMap()
