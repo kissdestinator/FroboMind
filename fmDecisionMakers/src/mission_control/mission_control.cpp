@@ -6,6 +6,7 @@ MISSION_CONTROL::MISSION_CONTROL(){
 	row_number = 1;
 	blocked = false;
 	start_smooth = 0;
+	last_i = 0;
 
 }
 
@@ -16,8 +17,8 @@ MISSION_CONTROL::~MISSION_CONTROL(){
 void MISSION_CONTROL::main_loop(){
 	ros::Rate loop_rate(update_frequency);
 	fmMsgs::heading_order heading_msg;
-	my_position_y = 0;
-	my_position_x = 0;
+	my_position_y = 10;
+	my_position_x = 10;
 	my_position_th = 0;
 	current_state = IN_ROW;
 	current_y_placement = TOP;
@@ -30,6 +31,8 @@ void MISSION_CONTROL::main_loop(){
 	nav_msg.row_offset_y = map_offset_y;
 	nav_msg.row_spacing = width_of_rows;
 	nav_msg.row_width = width_of_pots;
+	start_x = 10;
+	start_y = 10;
 
 	get_file_path();
 	make_path_from_orders();
@@ -572,7 +575,7 @@ void MISSION_CONTROL::make_path_from_orders(){
 		
 		else if(in_turns[i/2] == 'F'){
 			path[0][i] = -1;
-			ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
+			//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
 			break;
 		}
 		
@@ -633,8 +636,8 @@ void MISSION_CONTROL::make_path_from_orders(){
 		}
 		
 
-		ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
-		ROS_INFO("x: %f, y: %f, p: %f", path[0][i+1],path[1][i+1],path[2][i+1]);
+		//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
+		//ROS_INFO("x: %f, y: %f, p: %f", path[0][i+1],path[1][i+1],path[2][i+1]);
 
 	}
 
@@ -727,10 +730,11 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 	smoothed_path[0][i+1] = -1;
 	smoothed_path[1][i+1] = -1;
 	smoothed_path[2][i+1] = -1;
+	i = last_i;
+	while(smoothed_path[0][i] != -1)
+		markerarray.pop();
 
-	visualization_msgs::MarkerArray markerarray;
-
-
+	viz_pub_marker.publish(markerarray);
 
  	i = current_smoothed_path;
 	while(smoothed_path[0][i] != 0){
@@ -739,7 +743,7 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		marker.header.stamp = ros::Time();
 		marker.ns = "my_namespace";
 		marker.id = i;
-		marker.type = visualization_msgs::Marker::CUBE;
+		marker.type = visualization_msgs::Marker::CYLINDER;
 		marker.action = visualization_msgs::Marker::ADD;
 		marker.pose.position.x = smoothed_path[1][i];
 		marker.pose.position.y = smoothed_path[0][i];
@@ -752,10 +756,10 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		marker.color.g = 0.0;
 		marker.color.b = 1.0;
 		markerarray.markers.push_back(marker);
+		ROS_INFO("x: %f, y: %f", smoothed_path[0][i],smoothed_path[1][i] );
 		i++;
-
 	}
-
+	last_i = i;
 
 	viz_pub_marker.publish(markerarray);
 

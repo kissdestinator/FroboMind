@@ -35,7 +35,10 @@ private:
 	double in_path[30];
 	double start_x;
 	double start_y;
+	int last_i;
 	fmMsgs::warhorse_state warhorse_state;
+
+	visualization_msgs::MarkerArray markerarray;
 
 	char in_turns[30];
 	double smoothed_path[3][30];
