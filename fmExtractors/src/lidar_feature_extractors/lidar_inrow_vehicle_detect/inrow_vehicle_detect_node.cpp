@@ -50,6 +50,7 @@ int main(int argc, char **argv)
   std::string map_pub_topic;
   std::string warhorse_state_topic;
   std::string nav_spec_sub_topic;
+  std::string blocked_row_pub_topic;
 
 
   int numberOfParticles;
@@ -78,22 +79,21 @@ int main(int argc, char **argv)
   nh.param<std::string>("position_sub_topic", position_sub_topic, "/fmExtractors/vehicle_coordinate");
   nh.param<std::string>("vehicle_position_pub_topic", vehicle_position_pub_topic, "/fmExtractors/vehicle_position");
   nh.param<std::string>("map_pub_topic", map_pub_topic, "/fmExtractors/map");
-  nh.param<std::string> ("warhorse_state_topic", warhorse_state_topic, "/state"); //Specify the publisher name
+  nh.param<std::string>("warhorse_state_topic", warhorse_state_topic, "/state"); //Specify the publisher name
   nh.param<std::string>("nav_spec_sub_topic", nav_spec_sub_topic, "/fmDecisionMakers/nav_spec");
-
+  nh.param<std::string>("blocked_row_pub_topic", blocked_row_pub_topic, "/fmExtractors/blocked_row");
 
   InRowVehicleDetector rd(numberOfParticles, len_x, len_y, max_ang, measurements_noise, movement_noise, turning_noise, map_resolution);
 
   rd.laser_scan_sub = nh.subscribe<sensor_msgs::LaserScan> (lidar_sub_topic.c_str(), 2, &InRowVehicleDetector::processLaserScan, &rd);
-
   rd.position_sub = nh.subscribe<fmMsgs::vehicle_coordinate> (position_sub_topic.c_str(), 2, &InRowVehicleDetector::positionCallback, &rd);
-
   rd.marker_pub = n.advertise<visualization_msgs::MarkerArray>(viz_marker_pub_topic.c_str(), 1);
   rd.point_cloud_pub = n.advertise<sensor_msgs::PointCloud>(point_cloud_pub_topic.c_str(), 1);
   rd.vehicle_position_pub = n.advertise<fmMsgs::vehicle_position>(vehicle_position_pub_topic.c_str(), 1);
   rd.map_pub = n.advertise<nav_msgs::OccupancyGrid>(map_pub_topic.c_str(),1);
   rd.warhorse_state_sub = n.subscribe<fmMsgs::warhorse_state>(warhorse_state_topic.c_str(),1,&InRowVehicleDetector::stateHandler,&rd);
   rd.nav_spec_sub = n.subscribe<fmMsgs::navigation_specifications>(nav_spec_sub_topic.c_str(),1,&InRowVehicleDetector::navSpecHandler,&rd);
+  rd.blocked_row_pub = n.advertise<fmMsgs::blocked_row>(blocked_row_pub_topic.c_str(),1);
 
   ros::spin();
 
