@@ -18,6 +18,7 @@
 #include "nav_msgs/MapMetaData.h"
 #include "nav_msgs/Odometry.h"
 #include "fmMsgs/warhorse_state.h"
+#include "fmMsgs/navigation_specifications.h"
 
 #include "particle_filter.h"
 
@@ -74,20 +75,23 @@ public:
 
   ros::Subscriber warhorse_state_sub;
 
+  ros::Subscriber nav_spec_sub;
+
   laser_geometry::LaserProjection projector;
 
   nav_msgs::OccupancyGrid map;
 
   fmMsgs::warhorse_state warhorse_state;
 
-  InRowVehicleDetector(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise);
+  InRowVehicleDetector(int NumberOfParticles,double Len_x,double Len_y,double Max_ang, double Measurements_noise, double Movement_noise, double Turning_noise, double map_res);
   void processLaserScan(sensor_msgs::LaserScan laser_scan);
   void positionCallback(const fmMsgs::vehicle_coordinate::ConstPtr& pos);
   void stateHandler(const fmMsgs::warhorse_stateConstPtr& msg);
+  void navSpecHandler(const fmMsgs::navigation_specificationsConstPtr& msg);
   nav_msgs::OccupancyGrid buildMap();
   nav_msgs::OccupancyGrid buildHollowMap();
   void publishMap();
-  void createMap(double MAP_SIZE_X, double MAP_SIZE_Y, double MAP_RESOLUTION, double ROW_WIDTH, double ROW_LENGTH, double ROW_SPACING, double NO_OF_ROWS, double START_X,double START_Y);
+  void createMap();
   void sendMapTransform(fmMsgs::vehicle_position vp);
 
 };

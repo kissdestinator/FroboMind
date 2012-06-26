@@ -30,19 +30,17 @@
 
 #include "inrow_vehicle_detector.h"
 
-InRowVehicleDetector::InRowVehicleDetector(int NumberOfParticles,double Len_x,double Off_x,double Len_y,double Off_y,double Max_ang, double Measurements_noise, double Movement_noise, double Turning_noise)
+InRowVehicleDetector::InRowVehicleDetector(int NumberOfParticles,double Len_x,double Len_y,double Max_ang, double Measurements_noise, double Movement_noise, double Turning_noise, double map_res)
 {
 	numberOfParticles = NumberOfParticles;
 	len_x = Len_x;
-	off_x = Off_x;
 	len_y = Len_y;
-	off_y = Off_y;
 	max_ang = Max_ang;
 	measurements_noise = Measurements_noise;
 	movement_noise = Movement_noise;
 	turning_noise = Turning_noise;
 
-	particlefilter = ParticleFilter(numberOfParticles,len_x,off_x,len_y,off_y,max_ang, measurements_noise, movement_noise, turning_noise);
+	map_resolution = map_res;
 
 	first_position.x = 0;
 	first_position.y = 0;
@@ -51,24 +49,14 @@ InRowVehicleDetector::InRowVehicleDetector(int NumberOfParticles,double Len_x,do
 	last_position.y = 0;
 	last_position.th = 0;
 
-	vehicle_position.position.x = len_x;
-	vehicle_position.position.y = len_y;
+	vehicle_position.position.x = 0;
+	vehicle_position.position.y = 0;
 	vehicle_position.position.th = 0;
 
 }
 
-void InRowVehicleDetector::createMap(double MAP_SIZE_X, double MAP_SIZE_Y, double MAP_RESOLUTION, double ROW_WIDTH, double ROW_LENGTH, double ROW_SPACING, double NO_OF_ROWS, double START_X,double START_Y)
+void InRowVehicleDetector::createMap()
 {
-	map_size_x = MAP_SIZE_X;
-	map_size_y = MAP_SIZE_Y;
-	map_resolution = MAP_RESOLUTION;
-	row_width = ROW_WIDTH;
-	row_length = ROW_LENGTH;
-	row_spacing = ROW_SPACING;
-	no_of_rows = NO_OF_ROWS;
-	start_x = START_X;
-	start_y = START_Y;
-
 	map = buildHollowMap();
 	publishMap();
 }
@@ -87,10 +75,31 @@ void InRowVehicleDetector::positionCallback(const fmMsgs::vehicle_coordinate::Co
 	position.th = pos->th;
 }
 
+void InRowVehicleDetector::navSpecHandler(const fmMsgs::navigation_specificationsConstPtr& msg)
+{
+	off_x = msg->start_x;
+	off_y = msg->start_y;
+	start_x = msg->row_offset_x;
+	start_y = msg->row_offset_y;
+	no_of_rows = msg->no_of_rows;
+	row_length = msg->row_length;
+	row_spacing = msg->row_spacing;
+	row_width = msg->row_width;
+	map_size_x = (double)(int)(2 * start_x + (no_of_rows * (row_width + row_spacing)));
+	map_size_y = (double)(int)(2 * start_y + row_length);
+	if (map_size_x > map_size_y)
+		map_size_y = map_size_x;
+	if (map_size_y > map_size_x)
+		map_size_x = map_size_y;
+
+}
+
 void InRowVehicleDetector::stateHandler(const fmMsgs::warhorse_stateConstPtr& msg)
 {
 	if (msg->drive_state == warhorse_state.DRIVE && warhorse_state.drive_state == warhorse_state.STOP)
 	{
+		createMap();
+		ROS_INFO("Start_x, %f start_y %f", off_x, off_y);
 		particlefilter = ParticleFilter(numberOfParticles,len_x,off_x,len_y,off_y,max_ang, measurements_noise, movement_noise, turning_noise);
 	}
 	warhorse_state.drive_state = msg->drive_state;

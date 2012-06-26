@@ -17,7 +17,11 @@ int main(int argc, char **argv) {
 	n.param<std::string> ("P_Filter_Sub_Top", mc.p_filter_sub_top, "/fmExtractors/vehicle_position");
 	n.param<std::string> ("viz_pub_top", mc.viz_pub_top, "/fmDecisionMakers/viz_route");
 	n.param<std::string> ("orders_string", mc.filename, "direction.txt");
-	n.param<std::string> ("orders_string_task1", mc.filename_task_1, "direction.txt");
+	n.param<std::string> ("orders_string_task1_right", mc.filename_task_1_right, "direction.txt");
+	n.param<std::string> ("orders_string_task1_left", mc.filename_task_1_left, "direction.txt");
+	n.param<std::string> ("orders_string_task2", mc.filename_task_2, "direction.txt");
+	n.param<std::string> ("state_sub", mc.state_sub_top, "/state");
+	n.param<std::string> ("nav_spec_sub_top", mc.nav_spec_top, "/fmDecisionMakers/nav_spec");
 
 	n.param<std::string> ("viz_pub_top_marker", mc.viz_pub_top_marker, "/fmDecisionMakers/viz_route_smooth");
 	
@@ -55,7 +59,8 @@ int main(int argc, char **argv) {
 	mc.viz_pub = nh.advertise<visualization_msgs::Marker>(mc.viz_pub_top.c_str(),1);
 	mc.viz_pub_marker = nh.advertise<visualization_msgs::MarkerArray>(mc.viz_pub_top_marker.c_str(),1);
 	mc.heading_pub = nh.advertise<fmMsgs::heading_order>(mc.heading_pub_top.c_str(),1);
-
+	mc.state_sub = nh.subscribe<fmMsgs::warhorse_state>(mc.state_sub_top.c_str(),1, &MISSION_CONTROL::state_callback, &mc);
+	mc.nav_spec_pub = nh.advertise<fmMsgs::navigation_specifications>(mc.nav_spec_top.c_str(), 1);
 
 	//Go into mainloop
 	mc.main_loop();

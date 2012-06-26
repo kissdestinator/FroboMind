@@ -49,47 +49,28 @@ int main(int argc, char **argv)
   std::string vehicle_position_pub_topic;
   std::string map_pub_topic;
   std::string warhorse_state_topic;
+  std::string nav_spec_sub_topic;
 
 
   int numberOfParticles;
   double len_x;
-  double off_x;
   double len_y;
-  double off_y;
   double max_ang;
   double measurements_noise;
   double movement_noise;
   double turning_noise;
 
-  double map_size_x;
-  double map_size_y;
   double map_resolution;
-  double row_width;
-  double row_length;
-  double row_spacing;
-  double no_of_rows;
-  double start_x;
-  double start_y;
 
   nh.param<int>("particles", numberOfParticles, 1000);
-  nh.param<double>("offset_x", off_x, 10.35);
   nh.param<double>("length_x", len_x, 0.5);
-  nh.param<double>("offset_y", off_y, 11.2);
-  nh.param<double>("length_y", len_y, 6);
+  nh.param<double>("length_y", len_y, 0.5);
   nh.param<double>("max_ang", max_ang, M_PI/4);
   nh.param<double>("measurement_noise", measurements_noise, 0.05);
   nh.param<double>("movement_noise", movement_noise, 0.01);
   nh.param<double>("turning_noise", turning_noise, M_PI/16);
 
-  nh.param<double>("map_size_x",map_size_x,40);
-  nh.param<double>("map_size_y",map_size_y,40);
-  nh.param<double>("map_resolution",map_resolution,0.05);
-  nh.param<double>("row_width",row_width,0.75);
-  nh.param<double>("row_length",row_length,20);
-  nh.param<double>("row_spacing",row_spacing,0.35);
-  nh.param<double>("no_of_rows",no_of_rows,10);
-  nh.param<double>("start_x",start_x,10);
-  nh.param<double>("start_y",start_y,10);
+  nh.param<double>("map_resolution",map_resolution,0.025);
 
   nh.param<std::string>("lidar_sub_topic", lidar_sub_topic, "/fmSensors/lidar_scan_data");
   nh.param<std::string>("visualization_marker_pub_topic", viz_marker_pub_topic, "/fmExtractors/viz_marker_particle");
@@ -98,9 +79,10 @@ int main(int argc, char **argv)
   nh.param<std::string>("vehicle_position_pub_topic", vehicle_position_pub_topic, "/fmExtractors/vehicle_position");
   nh.param<std::string>("map_pub_topic", map_pub_topic, "/fmExtractors/map");
   nh.param<std::string> ("warhorse_state_topic", warhorse_state_topic, "/state"); //Specify the publisher name
+  nh.param<std::string>("nav_spec_sub_topic", nav_spec_sub_topic, "/fmDecisionMakers/nav_spec");
 
 
-  InRowVehicleDetector rd(numberOfParticles, len_x, off_x, len_y, off_y, max_ang, measurements_noise, movement_noise, turning_noise);
+  InRowVehicleDetector rd(numberOfParticles, len_x, len_y, max_ang, measurements_noise, movement_noise, turning_noise, map_resolution);
 
   rd.laser_scan_sub = nh.subscribe<sensor_msgs::LaserScan> (lidar_sub_topic.c_str(), 2, &InRowVehicleDetector::processLaserScan, &rd);
 
@@ -111,8 +93,7 @@ int main(int argc, char **argv)
   rd.vehicle_position_pub = n.advertise<fmMsgs::vehicle_position>(vehicle_position_pub_topic.c_str(), 1);
   rd.map_pub = n.advertise<nav_msgs::OccupancyGrid>(map_pub_topic.c_str(),1);
   rd.warhorse_state_sub = n.subscribe<fmMsgs::warhorse_state>(warhorse_state_topic.c_str(),1,&InRowVehicleDetector::stateHandler,&rd);
-
-  rd.createMap(map_size_x,map_size_y,map_resolution,row_width,row_length,row_spacing,no_of_rows,start_x,start_y);
+  rd.nav_spec_sub = n.subscribe<fmMsgs::navigation_specifications>(nav_spec_sub_topic.c_str(),1,&InRowVehicleDetector::navSpecHandler,&rd);
 
   ros::spin();
 

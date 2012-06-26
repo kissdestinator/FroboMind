@@ -6,6 +6,7 @@ MISSION_CONTROL::MISSION_CONTROL(){
 	row_number = 1;
 	blocked = false;
 	start_smooth = 0;
+
 }
 
 MISSION_CONTROL::~MISSION_CONTROL(){
@@ -23,53 +24,39 @@ void MISSION_CONTROL::main_loop(){
 	current_turn_direction = RIGHT;
 	row_number = 1;
 
+	nav_msg.no_of_rows = no_of_rows;
+	nav_msg.row_length = length_of_rows;
+	nav_msg.row_offset_x = map_offset_x;
+	nav_msg.row_offset_y = map_offset_y;
+	nav_msg.row_spacing = width_of_rows;
+	nav_msg.row_width = width_of_pots;
 
 	while(ros::ok()){
 		if(simulation == true){
 			get_pos_from_sim();
 		}
-		if(task==1){/*
-			switch(current_state){
-				case IN_ROW:
-					generate_path_in_row();
-					check_end_row();
-					break;
-				case EXIT_ROW:
-					if(current_turn_direction == UNKNOWN)
-						current_state = EXPLORER_MODE;
-					else if(current_turn_direction == LEFT)
-						generate_path_left_exit();
-					else if(current_turn_direction == RIGHT)
-						generate_path_right_exit();
-					get_current_path();
-					break;
-				case FIND_ROW:
-					if(current_turn_direction == LEFT)
-						generate_path_left_enter();
-					else if(current_turn_direction == RIGHT)
-						generate_path_right_enter();
-					get_current_path();
-					break;
-				case BLOCKED_ROW:
-					break;
-				case EXPLORER_MODE:
-					break;
-			}*/
-			filename = filename_task_1;
-			get_file_path();
-			make_path_from_orders();
-			check_current_marker();
-			make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
-			heading_msg.orientation = get_new_heading_smooth();
+		if(warhorse_state.task_state == warhorse_state.TASK1LEFT){
+			start_x = map_offset_x + width_of_pots + 0.5 * width_of_rows;
+			start_y = map_offset_y;
+			row_number = 1;
+			filename = filename_task_1_left;
 		}
-		else if(task == 2){
-			get_file_path();
-			make_path_from_orders();
-			check_current_marker();
-			make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
-			heading_msg.orientation = get_new_heading_smooth();
+		else if(warhorse_state.task_state == warhorse_state.TASK1RIGHT){
+			start_x = map_offset_x + ((no_of_rows - 1) * (width_of_pots + width_of_rows)) - 0.5 * width_of_rows;
+			start_y = map_offset_y;
+			row_number = no_of_rows -1;
+			filename = filename_task_1_right;
+		}
+		else if(warhorse_state.task_state == warhorse_state.TASK2){
+			filename = filename_task_2;
+		}
 
-		}
+		get_file_path();
+		make_path_from_orders();
+		check_current_marker();
+		make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
+		heading_msg.orientation = get_new_heading_smooth();
+
 
 		ROS_INFO("x: %f, y: %f, ppt: %f, current_smoothed_path: %d, my_pos_x: %f, my_pos_y: %f", smoothed_path[0][current_smoothed_path],smoothed_path[1][current_smoothed_path],smoothed_path[2][current_smoothed_path], current_smoothed_path, my_position_x, my_position_y);
 
@@ -102,6 +89,11 @@ void MISSION_CONTROL::main_loop(){
 
 		viz_pub.publish(marker);
 
+
+		nav_msg.start_x = start_x;
+		nav_msg.start_y = start_y;
+		nav_spec_pub.publish(nav_msg);
+
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
@@ -117,6 +109,16 @@ void MISSION_CONTROL::p_filter_callback(fmMsgs::vehicle_position msg){
 		my_position_x = msg.position.x;
 		my_position_y = msg.position.y;
 		my_position_th = msg.position.th;
+}
+
+void MISSION_CONTROL::state_callback(fmMsgs::warhorse_state msg){
+	if(msg.drive_state == msg.STOP){
+		current_smoothed_path = 0;
+		current_path = 0;
+	}
+
+	task_state = msg.task_state;
+	warhorse_state = msg;
 }
 
 void MISSION_CONTROL::check_current_marker(){
@@ -136,6 +138,8 @@ double MISSION_CONTROL::get_new_heading_smooth(){
 	 * find the delta heading from the robot's own heading, to the heading of the line from the robot to the point.
 	 */
 
+	if(smoothed_path[0][current_smoothed_path] == -1)
+		return -1;
 
 	double a(0), b(0);
 	a = smoothed_path[0][current_smoothed_path] - my_position_x;
@@ -445,12 +449,13 @@ void MISSION_CONTROL::make_path_from_orders(){
 			path[0][i+1] = path[0][i];
 			path[1][i+1] = path[1][i];
 			path[2][i+1] = path[2][i];
-			path[0][0] = 10;
-			path[1][0] = 10 + marker_distance;
+			path[0][0] = start_x;
+			path[1][0] = start_y;
 			path[2][0] = 10;
 		}
 		
 		else if(in_turns[i/2] == 'F'){
+
 			break;
 		}
 		

@@ -5,6 +5,8 @@
 #include "fmMsgs/heading_order.h"
 #include "fmMsgs/Vector3.h"
 #include "fmMsgs/vehicle_position.h"
+#include "fmMsgs/warhorse_state.h"
+#include "fmMsgs/navigation_specifications.h"
 #include "nav_msgs/OccupancyGrid.h"
 #include "cmath"
 #include "visualization_msgs/Marker.h"
@@ -29,6 +31,9 @@ private:
 	int start_smooth;
 	double path[3][30];
 	double in_path[30];
+	double start_x;
+	double start_y;
+	fmMsgs::warhorse_state warhorse_state;
 
 	char in_turns[30];
 	double smoothed_path[3][30];
@@ -45,6 +50,7 @@ private:
 	double row_number;
 	btQuaternion q;
 	btQuaternion q_path;
+	fmMsgs::navigation_specifications nav_msg;
 	void check_end_row();
 	void generate_path_in_row();
 	void generate_path_right_exit();
@@ -63,15 +69,21 @@ private:
 
 public:
 	std::string map_sub_top;
+	std::string state_sub_top;
 	std::string p_filter_sub_top;
 	std::string heading_pub_top;
 	std::string viz_pub_top;
+	std::string nav_spec_top;
 	std::string viz_pub_top_marker;
 	int task;
 	std::string filename;
-	std::string filename_task_1;
+	std::string filename_task_1_right;
+	std::string filename_task_1_left;
+	std::string filename_task_2;
 	bool simulation;
 	double marker_distance;
+	int task_state;
+	double drive_state;
 	
 	enum turn_direction {RIGHT, LEFT, UNKNOWN};
 	state current_state;
@@ -87,6 +99,8 @@ public:
 	ros::Publisher viz_pub_marker;
 	ros::ServiceClient client;
 	ros::Publisher pub_;
+	ros::Subscriber state_sub;
+	ros::Publisher nav_spec_pub;
 	
 	double update_frequency;
 
@@ -96,7 +110,7 @@ public:
 	void main_loop();
 	void map_callback(nav_msgs::OccupancyGrid msg);
 	void p_filter_callback(fmMsgs::vehicle_position msg);
-	
+	void state_callback(fmMsgs::warhorse_state msg);
 };
 
 #endif /* MISSION_CONTROL_H_ */
