@@ -83,6 +83,10 @@ ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,d
 
 }
 
+ParticleFilter::~ParticleFilter()
+{
+}
+
 Car* ParticleFilter::getRandomParticle(double seed)
 {
 	time_t sec;
@@ -225,6 +229,14 @@ void ParticleFilter::motionUpdate(const fmMsgs::vehicle_coordinate& delta_positi
 	}
 }
 
+void ParticleFilter::clearParticles()
+{
+	for (int i = 0; i < particles.size(); i++)
+		delete particles[i];
+
+	particles.clear();
+}
+
 void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud, const nav_msgs::OccupancyGrid& map)
 {
 	double prob;
@@ -302,7 +314,7 @@ void ParticleFilter::resampling()
 		Car* c = new Car(particles[index]->x,particles[index]->y,particles[index]->theta,particles[index]->w);
 		temp_particles.push_back(c);
 	}
-	particles.clear();
+	clearParticles();
 	for (int i = 0; i<noParticles; i++)
 		particles.push_back(temp_particles[i]);
 }
@@ -363,6 +375,8 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 	r.probability = max_prob;
 	r.header.stamp = ros::Time::now();
 
+	delete c;
+
 	return r;
 
 }
@@ -392,7 +406,7 @@ void ParticleFilter::newParticles(double ratio)
 		else
 			temp.push_back(particles[i]);
 	}
-	particles.clear();
+	clearParticles();
 	for (int i = 0; i < noParticles; i++)
 		particles.push_back(temp[i]);
 

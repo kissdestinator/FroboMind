@@ -35,6 +35,12 @@ void MISSION_CONTROL::main_loop(){
 		if(simulation == true){
 			get_pos_from_sim();
 		}
+		if(warhorse_state.task_state == warhorse_state.MANUAL_DRIVE){
+			start_x = map_offset_x + width_of_pots + 0.5 * width_of_rows;
+			start_y = map_offset_y;
+			row_number = 1;
+			filename = filename_task_1_left;
+		}
 		if(warhorse_state.task_state == warhorse_state.TASK1LEFT){
 			start_x = map_offset_x + width_of_pots + 0.5 * width_of_rows;
 			start_y = map_offset_y;
@@ -49,6 +55,9 @@ void MISSION_CONTROL::main_loop(){
 		}
 		else if(warhorse_state.task_state == warhorse_state.TASK2){
 			filename = filename_task_2;
+			start_x = map_offset_x + ((int)((no_of_rows - 1) / 2) * (width_of_pots + width_of_rows)) - 0.5 * width_of_rows;
+			start_y = map_offset_y;
+			row_number = (int)(no_of_rows / 2);
 		}
 
 		get_file_path();
@@ -58,7 +67,7 @@ void MISSION_CONTROL::main_loop(){
 		heading_msg.orientation = get_new_heading_smooth();
 
 
-		ROS_INFO("x: %f, y: %f, ppt: %f, current_smoothed_path: %d, my_pos_x: %f, my_pos_y: %f", smoothed_path[0][current_smoothed_path],smoothed_path[1][current_smoothed_path],smoothed_path[2][current_smoothed_path], current_smoothed_path, my_position_x, my_position_y);
+		//ROS_INFO("x: %f, y: %f, ppt: %f, current_smoothed_path: %d, my_pos_x: %f, my_pos_y: %f", smoothed_path[0][current_smoothed_path],smoothed_path[1][current_smoothed_path],smoothed_path[2][current_smoothed_path], current_smoothed_path, my_position_x, my_position_y);
 
 		if(simulation == true){
 			//calcAndPublishSpeedSim(heading_msg.orientation, 0.5);
@@ -138,7 +147,7 @@ double MISSION_CONTROL::get_new_heading_smooth(){
 	 * find the delta heading from the robot's own heading, to the heading of the line from the robot to the point.
 	 */
 
-	if(smoothed_path[0][current_smoothed_path] == -1)
+	if(path[0][current_path] == -1)
 		return -1;
 
 	double a(0), b(0);
@@ -376,7 +385,7 @@ void MISSION_CONTROL::get_file_path(){
 				break;
 				
 			case 'F':
-				file >> c;
+				in_turns[temp_count];
 				break;
 				
 			case '0':
@@ -396,6 +405,7 @@ void MISSION_CONTROL::get_file_path(){
 	        }
 	       file >> c;
 	  }  
+	in_turns[temp_count] = c;
 	/*
 	for(int i = 0; i < 29; i++)
 		ROS_INFO("turn: %c", in_turns[i]); */
@@ -441,8 +451,11 @@ void MISSION_CONTROL::make_path_from_orders(){
 	path[0][0] = 1;
 	path[1][0] = 1;
 	path[2][0] = 1;
-	for(int i = 0; i < 2*sizeof(in_turns)-1 ; i+=2){
+	ROS_INFO("Start");
+
+	for(int i = 0; i < 2*sizeof(in_turns) ; i+=2){
 		temp = temp * -1;
+		ROS_INFO("%c", in_turns[i/2]);
 		
 		if(in_turns[i/2] == 'S'){
 			generate_path_in_row();
@@ -455,7 +468,9 @@ void MISSION_CONTROL::make_path_from_orders(){
 		}
 		
 		else if(in_turns[i/2] == 'F'){
-
+			ROS_INFO("%d", i);
+			path[0][i] = -1;
+			ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
 			break;
 		}
 		
@@ -515,6 +530,10 @@ void MISSION_CONTROL::make_path_from_orders(){
 			path[2][i+1] = point_proximity_treshold;
 		}
 		
+
+		ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
+		ROS_INFO("x: %f, y: %f, p: %f", path[0][i+1],path[1][i+1],path[2][i+1]);
+
 	}
 
 	if(start_smooth == 0){
@@ -577,7 +596,7 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 			smoothed_path[0][i] = path[0][current_path-1] + i*direction;
 			smoothed_path[1][i] = y;
 			smoothed_path[2][i] = p_thresh;
-			ROS_INFO("X_direction. Point: x: %f, y: %f",smoothed_path[0][i], smoothed_path[1][i] );
+			//ROS_INFO("X_direction. Point: x: %f, y: %f",smoothed_path[0][i], smoothed_path[1][i] );
 			i_count++;
 		}
 	}
@@ -588,7 +607,7 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 			smoothed_path[0][i] = x;
 			smoothed_path[1][i] = path[1][current_path-1] + i*direction;
 			smoothed_path[2][i] = p_thresh;
-			ROS_INFO("Y_direction. Point: x: %f, y: %f",smoothed_path[0][i], smoothed_path[1][i] );
+			//ROS_INFO("Y_direction. Point: x: %f, y: %f",smoothed_path[0][i], smoothed_path[1][i] );
 			i_count++;
 		}
 	}
@@ -597,7 +616,7 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		smoothed_path[0][0] = x;
 		smoothed_path[1][0] = y;
 		smoothed_path[2][0] = p_thresh;
-		ROS_INFO("CLose enough. Point: x: %f, y: %f, distance_x: %f, distance_y: %f, my_posx: %f, my_posy: %f:",smoothed_path[0][0], smoothed_path[1][0], distance_x, distance_y,my_position_x, my_position_y );
+		//ROS_INFO("CLose enough. Point: x: %f, y: %f, distance_x: %f, distance_y: %f, my_posx: %f, my_posy: %f:",smoothed_path[0][0], smoothed_path[1][0], distance_x, distance_y,my_position_x, my_position_y );
 	}
 	smoothed_path[0][i] = path[0][current_path];
 	smoothed_path[1][i] = path[1][current_path];

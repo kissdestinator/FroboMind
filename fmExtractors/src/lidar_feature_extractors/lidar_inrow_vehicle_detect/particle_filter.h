@@ -75,11 +75,13 @@ private:
   double gaussian(double mu, double sigma, double x);
   void addRandomGaussianNoise();
   fmMsgs::vehicle_position findVehicle();
+  void clearParticles();
 
 public:
 
   ParticleFilter();
   ParticleFilter(int numberOfParticles,double len_x,double off_x,double len_y,double off_y,double max_ang, double measurements_noise, double movement_noise, double turning_noise);
+  ~ParticleFilter();
 
   void updateParticlesMarker(void);
   fmMsgs::vehicle_position update(const sensor_msgs::PointCloud& pointCloud, const fmMsgs::vehicle_coordinate& delta_position, const nav_msgs::OccupancyGrid& map);

@@ -88,8 +88,7 @@ public:
   void positionCallback(const fmMsgs::vehicle_coordinate::ConstPtr& pos);
   void stateHandler(const fmMsgs::warhorse_stateConstPtr& msg);
   void navSpecHandler(const fmMsgs::navigation_specificationsConstPtr& msg);
-  nav_msgs::OccupancyGrid buildMap();
-  nav_msgs::OccupancyGrid buildHollowMap();
+  void buildMap();
   void publishMap();
   void createMap();
   void sendMapTransform(fmMsgs::vehicle_position vp);

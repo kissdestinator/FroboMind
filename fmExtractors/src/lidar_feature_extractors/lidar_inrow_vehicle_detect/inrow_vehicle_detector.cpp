@@ -57,8 +57,7 @@ InRowVehicleDetector::InRowVehicleDetector(int NumberOfParticles,double Len_x,do
 
 void InRowVehicleDetector::createMap()
 {
-	map = buildHollowMap();
-	publishMap();
+	buildMap();
 }
 
 
@@ -192,58 +191,24 @@ void InRowVehicleDetector::publishMap()
 	map_pub.publish(map);
 }
 
-nav_msgs::OccupancyGrid InRowVehicleDetector::buildMap()
+void InRowVehicleDetector::buildMap()
 {
-	nav_msgs::OccupancyGrid r;
 
-	r.info.height = (uint32_t)(map_size_y / map_resolution);
-	r.info.width = (uint32_t)(map_size_x / map_resolution);
-	r.info.resolution = map_resolution;
-	r.info.map_load_time = ros::Time::now();
-	r.header.frame_id = "/map";
-	r.header.stamp = ros::Time::now();
+	map.info.height = (uint32_t)(map_size_y / map_resolution);
+	map.info.width = (uint32_t)(map_size_x / map_resolution);
+	map.info.resolution = map_resolution;
+	map.info.map_load_time = ros::Time::now();
+	map.header.frame_id = "/map";
+	map.header.stamp = ros::Time::now();
 
-	int range_x = r.info.width;
-	int range_y = r.info.height;
+	int range_x = map.info.width;
+	int range_y = map.info.height;
+
+	map.data.clear();
 
 	for (int y = 0; y < range_y; y++)
 		for (int x = 0; x < range_x; x++)
-			r.data.push_back(0);
-
-	for (int i = 0; i < no_of_rows; i++)
-	{
-		int offset_x = (start_x + i*(row_spacing+row_width)) / map_resolution;
-		int offset_y = start_y / map_resolution;
-
-		for (int y = offset_y; y < offset_y+(row_length/map_resolution); y++)
-		{
-			for (int x = offset_x; x < offset_x+(row_width/map_resolution); x++)
-			{
-				r.data[range_y*x+y] = 100;
-			}
-		}
-	}
-
-	return r;
-}
-
-nav_msgs::OccupancyGrid InRowVehicleDetector::buildHollowMap()
-{
-	nav_msgs::OccupancyGrid r;
-
-	r.info.height = (uint32_t)(map_size_y / map_resolution);
-	r.info.width = (uint32_t)(map_size_x / map_resolution);
-	r.info.resolution = map_resolution;
-	r.info.map_load_time = ros::Time::now();
-	r.header.frame_id = "/map";
-	r.header.stamp = ros::Time::now();
-
-	int range_x = r.info.width;
-	int range_y = r.info.height;
-
-	for (int y = 0; y < range_y; y++)
-		for (int x = 0; x < range_x; x++)
-			r.data.push_back(0);
+			map.data.push_back(0);
 
 	int smooth = 0.05 / map_resolution;
 
@@ -262,22 +227,22 @@ nav_msgs::OccupancyGrid InRowVehicleDetector::buildHollowMap()
 				bool updated = false;
 				if (y == offset_y)
 				{
-					r.data[range_y*x+y] = 100;
+					map.data[range_y*x+y] = 100;
 					updated = true;
 				}
 				if (y == end_y)
 				{
-					r.data[range_y*x+y] = 100;
+					map.data[range_y*x+y] = 100;
 					updated = true;
 				}
 				if (x == offset_x)
 				{
-					r.data[range_y*x+y] = 100;
+					map.data[range_y*x+y] = 100;
 					updated = true;
 				}
 				if (x == end_x)
 				{
-					r.data[range_y*x+y] = 100;
+					map.data[range_y*x+y] = 100;
 					updated = true;
 				}
 				if (updated)
@@ -295,14 +260,12 @@ nav_msgs::OccupancyGrid InRowVehicleDetector::buildHollowMap()
 								update_value = 100 / abs(x - x1);
 							else
 								update_value = 100 / sqrt(pow(y - y1,2) + pow(x - x1,2));
-							if (update_value > r.data[range_y*x1+y1])
-								r.data[range_y*x1+y1] = update_value;
+							if (update_value > map.data[range_y*x1+y1])
+								map.data[range_y*x1+y1] = update_value;
 						}
 					}
 				}
 			}
 		}
 	}
-
-	return r;
 }
