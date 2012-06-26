@@ -19,6 +19,7 @@
 #include "nav_msgs/Odometry.h"
 #include "fmMsgs/warhorse_state.h"
 #include "fmMsgs/navigation_specifications.h"
+#include "fmMsgs/blocked_row.h"
 
 #include "particle_filter.h"
 
@@ -59,6 +60,8 @@ private:
 
   tf::TransformBroadcaster map_broadcaster;
 
+  void detectBlockedRow(const sensor_msgs::PointCloud& pointCloud, const fmMsgs::vehicle_position& position);
+
 public:
 
   ros::Publisher point_cloud_pub;
@@ -76,6 +79,8 @@ public:
   ros::Subscriber warhorse_state_sub;
 
   ros::Subscriber nav_spec_sub;
+
+  ros::Publisher blocked_row_pub;
 
   laser_geometry::LaserProjection projector;
 

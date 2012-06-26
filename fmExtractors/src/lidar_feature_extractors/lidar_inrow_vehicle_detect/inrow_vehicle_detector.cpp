@@ -139,6 +139,84 @@ void InRowVehicleDetector::sendMapTransform(fmMsgs::vehicle_position vp)
 	map_broadcaster.sendTransform(map_trans);
 }
 
+void InRowVehicleDetector::detectBlockedRow(const sensor_msgs::PointCloud& pointCloud, const fmMsgs::vehicle_position& position)
+{
+	int hits = 0;
+	int row = 1;
+	bool row_found = false;
+	double row_left_border;
+	double row_right_border;
+
+	double y_lower;
+	double y_upper;
+	double x_lower;
+	double x_upper;
+
+	while(!row_found && row != 20)
+	{
+		row_left_border = start_x + (row * row_width) + (row - 1 * row_spacing);
+		row_right_border = row_left_border + (row * row_spacing);
+		if (position.position.x > row_left_border && position.position.x < row_right_border)
+			row_found = true;
+		else
+			row++;
+	}
+
+	// robotten peger opad
+	if (position.position.th > 1.75*M_PI || position.position.th < 0.25*M_PI)
+	{
+		if (position.position.y > start_y && position.position.y < start_y + row_length - 1)
+		{
+			double y_lower = position.position.y + 0.25;
+			double y_upper = position.position.y + 1;
+			double x_lower = row_left_border + 0.15;
+			double x_upper = row_right_border - 0.15;
+			for (int j = 0; j < pointCloud.points.size(); j++)
+			{
+				// transponer laser målingerne ind omkring (0,0) for at muliggøre sortering
+				geometry_msgs::Point32 t;
+				t.x = position.position.x + pointCloud.points[j].x * cos(position.position.th) - pointCloud.points[j].y * sin(position.position.th);
+				t.y = position.position.y + pointCloud.points[j].x * sin(position.position.th) + pointCloud.points[j].y * cos(position.position.th);
+
+				// Beregn fejl hvis målingen er gyldig
+				if ((t.x > x_lower && t.x < x_upper) && (t.y > y_lower && t.y < y_upper))
+					hits++;
+			}
+		}
+	}
+	// Robotten peger nedad
+	else if (position.position.th > 0.75*M_PI && position.position.th < 1.25*M_PI)
+	{
+		if (position.position.y > start_y + 1 && position.position.y < start_y + row_length)
+		{
+			double y_lower = position.position.y - 1;
+			double y_upper = position.position.y - 0.25;
+			double x_lower = row_left_border + 0.15;
+			double x_upper = row_right_border - 0.15;
+			for (int j = 0; j < pointCloud.points.size(); j++)
+			{
+				// transponer laser målingerne ind omkring (0,0) for at muliggøre sortering
+				geometry_msgs::Point32 t;
+				t.x = position.position.x + pointCloud.points[j].x * cos(position.position.th) - pointCloud.points[j].y * sin(position.position.th);
+				t.y = position.position.y + pointCloud.points[j].x * sin(position.position.th) + pointCloud.points[j].y * cos(position.position.th);
+
+				// Beregn fejl hvis målingen er gyldig
+				if ((t.x > x_lower && t.x < x_upper) && (t.y > y_lower && t.y < y_upper))
+					hits++;
+			}
+		}
+	}
+	if (hits > 5)
+	{
+		fmMsgs::blocked_row br;
+		br.blocked = true;
+		br.position.x = (x_lower + x_upper) / 2;
+		br.position.y = (y_lower + x_upper) / 2;
+
+		blocked_row_pub.publish(br);
+	}
+}
+
 void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
 {
 	sensor_msgs::PointCloud cloud;
@@ -178,6 +256,8 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
     	visualization_msgs::MarkerArray markerArray = particlefilter.getParticlesMarker();
 
     	marker_pub.publish(markerArray);
+
+    	detectBlockedRow(cloud,vehicle_position);
     }
 
 	publishMap();
