@@ -256,7 +256,6 @@ void MISSION_CONTROL::check_current_marker(){
 	}
 
 	if((fabs(my_position_x - smoothed_path[0][current_smoothed_path] ) < smoothed_path[2][current_smoothed_path] )&&( fabs(my_position_y - smoothed_path[1][current_smoothed_path]) < smoothed_path[2][current_smoothed_path])){
-		ROS_INFO("Cur: %d", current_smoothed_path);
 		current_smoothed_path++;
 	}
 
@@ -300,6 +299,8 @@ double MISSION_CONTROL::get_new_heading_smooth(){
 		if(path_heading < 0)
 			path_heading =  path_heading + (2 * M_PI);
 	}
+
+
 	return path_heading;
 }
 
@@ -362,8 +363,6 @@ double MISSION_CONTROL::get_new_headnig_quat(){
 		path_heading -= (2* M_PI);
 
 	//q_path.setEulerZYX(path_heading,0,0);
-
-	//ROS_INFO("turn_angle: %f, path_heading: %f, q_angle: %f",q.angle(q_path), path_heading, q.getAngle());
 
 	return q.angle(q_path);
 }
@@ -527,9 +526,6 @@ void MISSION_CONTROL::get_file_path(){
 	       file >> c;
 	  }  
 	in_turns[temp_count] = c;
-	/*
-	for(int i = 0; i < 29; i++)
-		ROS_INFO("turn: %c", in_turns[i]); */
 }
 
 void MISSION_CONTROL::get_pos_from_sim(){
@@ -544,7 +540,6 @@ void MISSION_CONTROL::get_pos_from_sim(){
 	q.setY(q1);
 	q.setZ(q2);
 	q.setW(q3);
-	//ROS_INFO("angle: %f, x: %f, y: %f, z: %f, w: %f", (double)q.getAngle(), q0,q1,q2,q3);
 	/*my_position_th = (double)q.getAngle() ; //+ M_PI/2;
 	if(my_position_th > 2*M_PI)
 		my_position_th-= 2*M_PI;
@@ -560,10 +555,8 @@ void MISSION_CONTROL::get_pos_from_sim(){
 	double roll, pitch, yaw;
 	tf::quaternionMsgToTF(getmodelstate.response.pose.orientation, q);
 	btMatrix3x3(q).getRPY(roll, pitch, yaw);
-	ROS_INFO("RPY = (%lf, %lf, %lf)", roll, pitch, yaw);
 	*/
 
-	//ROS_INFO("My pos th: %f", my_position_th);
 
 }
 
@@ -573,11 +566,9 @@ void MISSION_CONTROL::make_path_from_orders(){
 	path[0][0] = 1;
 	path[1][0] = 1;
 	path[2][0] = 1;
-	//ROS_INFO("Start");
 
 	for(int i = 0; i < 2*sizeof(in_turns) ; i+=2){
 		way_turn = way_turn * -1;
-		//ROS_INFO("%c", in_turns[i/2]);
 		
 		if(in_turns[i/2] == 'S'){
 			generate_path_in_row();
@@ -591,7 +582,6 @@ void MISSION_CONTROL::make_path_from_orders(){
 		
 		else if(in_turns[i/2] == 'F'){
 			path[0][i] = -1;
-			//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
 			break;
 		}
 		
@@ -698,8 +688,6 @@ void MISSION_CONTROL::calcAndPublishSpeedSim(double turn_angle, double velocity)
 	twistSim.angular.z = ang_vel;
 	//if (twist.twist.linear.x != 0 && twist.twist.angular.z != 0)
 	pub_.publish(twistSim);
-
-	//ROS_INFO("Turn Angle: %.3f, Velocity: %.3f, Angular Velocity: %.3f",turn_angle,vel,ang_vel);
 }
 
 void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){

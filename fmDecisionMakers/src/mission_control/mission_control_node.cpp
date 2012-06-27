@@ -26,15 +26,15 @@ int main(int argc, char **argv) {
 
 	n.param<std::string> ("viz_pub_top_marker", mc.viz_pub_top_marker, "/fmDecisionMakers/viz_route_smooth");
 	
-	n.param<double> ("Length_of_rows", mc.length_of_rows, 3);
+	n.param<double> ("Length_of_rows", mc.length_of_rows, 2.5);
 	n.param<double> ("Width_of_rows", mc.width_of_rows, 0.75);
-	n.param<double> ("No_of_rows", mc.no_of_rows, 3);
+	n.param<double> ("No_of_rows", mc.no_of_rows, 5);
 	n.param<double> ("Map_offset_x", mc.map_offset_x, 10);
 	n.param<double> ("Map_offset_y", mc.map_offset_y, 10);
-	n.param<double> ("Point_proximity_treshold", mc.point_proximity_treshold, 0.1);
-	n.param<double> ("Width_of_pots", mc.width_of_pots, 0.18);
+	n.param<double> ("Point_proximity_treshold", mc.point_proximity_treshold, 0.4);
+	n.param<double> ("Width_of_pots", mc.width_of_pots, 0.40);
 	n.param<double> ("row_exit_length", mc.row_exit_length, 0.5);
-	n.param<double> ("End_row_limit", mc.end_row_limit, 0.5);
+	n.param<double> ("End_row_limit", mc.end_row_limit, 0);
 	n.param<double> ("Marker_distance", mc.marker_distance, 1);
 	n.param<int> ("start_turn_direction", mc.direction, 0);
 	n.param<int> ("Task_no", mc.task, 2);
