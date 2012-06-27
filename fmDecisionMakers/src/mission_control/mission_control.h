@@ -37,6 +37,7 @@ private:
 	double start_y;
 	int last_i;
 	fmMsgs::warhorse_state warhorse_state;
+	fmMsgs::blocked_row blocked_row_msg;
 
 	visualization_msgs::MarkerArray markerarray;
 

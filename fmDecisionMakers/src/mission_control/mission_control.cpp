@@ -34,8 +34,10 @@ void MISSION_CONTROL::main_loop(){
 	start_x = 10;
 	start_y = 10;
 
+	filename = filename_task_2;
 	get_file_path();
-	//make_path_from_orders();
+	make_path_from_orders();
+	current_path = 0;
 
 	while(ros::ok()){
 		if(simulation == true){
@@ -130,20 +132,26 @@ void MISSION_CONTROL::state_callback(fmMsgs::warhorse_state msg){
 		current_smoothed_path = 0;
 		current_path = 0;
 	}
+	if(msg.drive_state != warhorse_state.drive_state){
+		make_path_from_orders();
+	}
 
 	task_state = msg.task_state;
 	warhorse_state = msg;
-	make_path_from_orders();
 }
 
 void MISSION_CONTROL::blocked_callback(fmMsgs::blocked_row msg){
-	if(msg.blocked == true && warhorse_state.task_state == warhorse_state.TASK2){
+	if(msg.blocked == true && warhorse_state.task_state == warhorse_state.TASK2 && msg.blocked != blocked_row_msg.blocked){
 		blocked_row = current_path;
 		invert_path();
 	}
+
+	blocked_row_msg = msg;
 }
 
 void MISSION_CONTROL::invert_path(){
+
+	ROS_INFO("INVERT");
 	if(path[0][current_path] > path[0][current_path-1])
 		way_turn = 1;
 	else
@@ -153,85 +161,88 @@ void MISSION_CONTROL::invert_path(){
 	path[1][current_path] = path[1][current_path-1];
 	path[2][current_path] = path[2][current_path-1];
 
-	for(int i = (blocked_row + 1)*2; i < 2*sizeof(in_turns) ; i+=2){
+	ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][current_path-1],path[1][current_path-1],path[2][current_path-1],current_path-1);
+	ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][current_path],path[1][current_path],path[2][current_path],current_path);
+
+	for(int k = (current_path + 6)/2; k < 2*sizeof(in_turns) ; k+=2){
 		way_turn = way_turn * -1;
 		//ROS_INFO("%c", in_turns[i/2]);
 
-		if(in_turns[i/2] == 'S'){
+		if(in_turns[k/2] == 'S'){
 			generate_path_in_row();
-			path[0][i+1] = path[0][i];
-			path[1][i+1] = path[1][i];
-			path[2][i+1] = path[2][i];
+			path[0][k+1] = path[0][k];
+			path[1][k+1] = path[1][k];
+			path[2][k+1] = path[2][k];
 			path[0][0] = start_x;
 			path[1][0] = start_y;
 			path[2][0] = 10;
 		}
 
-		else if(in_turns[i/2] == 'F'){
-			path[0][i] = -1;
+		else if(in_turns[k/2] == 'F'){
+			path[0][k] = -1;
 			//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
 			break;
 		}
 
-		else if(in_turns[i/2] == '0'){
-			path[0][i] = path[0][i-1];
+		else if(in_turns[k/2] == '0'){
+			path[0][k] = path[0][k-1];
 			if(way_turn < 0)
-				path[1][i] = map_offset_y - row_exit_length;
+				path[1][k] = map_offset_y - row_exit_length;
 			else
-				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
-			path[2][i] = point_proximity_treshold;
+				path[1][k] = map_offset_y + length_of_rows + row_exit_length;
+			path[2][k] = point_proximity_treshold;
 
-			path[0][i+1] = path[0][i];
+			path[0][k+1] = path[0][k];
 			if(way_turn > 0)
-				path[1][i+1] = map_offset_y - row_exit_length;
+				path[1][k+1] = map_offset_y - row_exit_length;
 			else
-				path[1][i+1] = map_offset_y + length_of_rows + row_exit_length;
-			path[2][i+1] = point_proximity_treshold;
+				path[1][k+1] = map_offset_y + length_of_rows + row_exit_length;
+			path[2][k+1] = point_proximity_treshold;
 
 		}
 
-		else if(in_turns[i/2] == 'R'){
+		else if(in_turns[k/2] == 'R'){
 
-			path[0][i] = path[0][i-1] + (double)in_path[i/2] * (width_of_rows + width_of_pots) * way_turn;
+			path[0][k] = path[0][k-1] + (double)in_path[k/2] * (width_of_rows + width_of_pots) * way_turn;
 			if(way_turn < 0)
-				path[1][i] = map_offset_y - row_exit_length;
+				path[1][k] = map_offset_y - row_exit_length;
 			else
-				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
+				path[1][k] = map_offset_y + length_of_rows + row_exit_length;
 
-			path[2][i] = point_proximity_treshold;
+			path[2][k] = point_proximity_treshold;
 
 
-			path[0][i+1] = path[0][i];
+			path[0][k+1] = path[0][k];
 			if(way_turn > 0)
-				path[1][i+1] = map_offset_y - row_exit_length;
+				path[1][k+1] = map_offset_y - row_exit_length;
 			else
-				path[1][i+1] = map_offset_y + length_of_rows + row_exit_length;
-			path[2][i+1] = point_proximity_treshold;
+				path[1][k+1] = map_offset_y + length_of_rows + row_exit_length;
+			path[2][k+1] = point_proximity_treshold;
 
 		}
 
-		else if(in_turns[i/2] == 'L'){
+		else if(in_turns[k/2] == 'L'){
 
-			path[0][i] = path[0][i-1] - (double)in_path[i/2] * (width_of_rows + width_of_pots) * way_turn;
+			path[0][k] = path[0][k-1] - (double)in_path[k/2] * (width_of_rows + width_of_pots) * way_turn;
 			if(way_turn < 0)
-				path[1][i] = map_offset_y - row_exit_length;
+				path[1][k] = map_offset_y - row_exit_length;
 			else
-				path[1][i] = map_offset_y + length_of_rows + row_exit_length;
+				path[1][k] = map_offset_y + length_of_rows + row_exit_length;
 
-			path[2][i] = point_proximity_treshold;
+			path[2][k] = point_proximity_treshold;
 
 
-			path[0][i+1] = path[0][i];
+			path[0][k+1] = path[0][k];
 			if(way_turn > 0 )
-				path[1][i+1] = map_offset_y - row_exit_length;
+				path[1][k+1] = map_offset_y - row_exit_length;
 			else
-				path[1][i+1] = map_offset_y + length_of_rows + row_exit_length;
-			path[2][i+1] = point_proximity_treshold;
+				path[1][k+1] = map_offset_y + length_of_rows + row_exit_length;
+			path[2][k+1] = point_proximity_treshold;
 		}
 
 
-		//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
-		//ROS_INFO("x: %f, y: %f, p: %f", path[0][i+1],path[1][i+1],path[2][i+1]);
+		ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][k],path[1][k],path[2][k],k);
+		ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][k+1],path[1][k+1],path[2][k+1],k+1);
 
 	}
 }
@@ -239,12 +250,15 @@ void MISSION_CONTROL::invert_path(){
 void MISSION_CONTROL::check_current_marker(){
 	if((fabs(my_position_x - path[0][current_path] ) < path[2][current_path] )&&( fabs(my_position_y - path[1][current_path]) < path[2][current_path])){
 		current_path++;
+		ROS_INFO("Cur: %d", current_path);
 		current_smoothed_path = 0;
 		make_smoothed_path(path[0][current_path], path[1][current_path],path[2][current_path]);
 	}
 
-	if((fabs(my_position_x - smoothed_path[0][current_smoothed_path] ) < smoothed_path[2][current_smoothed_path] )&&( fabs(my_position_y - smoothed_path[1][current_smoothed_path]) < smoothed_path[2][current_smoothed_path]))
+	if((fabs(my_position_x - smoothed_path[0][current_smoothed_path] ) < smoothed_path[2][current_smoothed_path] )&&( fabs(my_position_y - smoothed_path[1][current_smoothed_path]) < smoothed_path[2][current_smoothed_path])){
 		current_smoothed_path++;
+	}
+
 
 }
 
@@ -285,6 +299,8 @@ double MISSION_CONTROL::get_new_heading_smooth(){
 		if(path_heading < 0)
 			path_heading =  path_heading + (2 * M_PI);
 	}
+
+
 	return path_heading;
 }
 
@@ -347,8 +363,6 @@ double MISSION_CONTROL::get_new_headnig_quat(){
 		path_heading -= (2* M_PI);
 
 	//q_path.setEulerZYX(path_heading,0,0);
-
-	//ROS_INFO("turn_angle: %f, path_heading: %f, q_angle: %f",q.angle(q_path), path_heading, q.getAngle());
 
 	return q.angle(q_path);
 }
@@ -512,9 +526,6 @@ void MISSION_CONTROL::get_file_path(){
 	       file >> c;
 	  }  
 	in_turns[temp_count] = c;
-	/*
-	for(int i = 0; i < 29; i++)
-		ROS_INFO("turn: %c", in_turns[i]); */
 }
 
 void MISSION_CONTROL::get_pos_from_sim(){
@@ -529,7 +540,6 @@ void MISSION_CONTROL::get_pos_from_sim(){
 	q.setY(q1);
 	q.setZ(q2);
 	q.setW(q3);
-	//ROS_INFO("angle: %f, x: %f, y: %f, z: %f, w: %f", (double)q.getAngle(), q0,q1,q2,q3);
 	/*my_position_th = (double)q.getAngle() ; //+ M_PI/2;
 	if(my_position_th > 2*M_PI)
 		my_position_th-= 2*M_PI;
@@ -545,23 +555,20 @@ void MISSION_CONTROL::get_pos_from_sim(){
 	double roll, pitch, yaw;
 	tf::quaternionMsgToTF(getmodelstate.response.pose.orientation, q);
 	btMatrix3x3(q).getRPY(roll, pitch, yaw);
-	ROS_INFO("RPY = (%lf, %lf, %lf)", roll, pitch, yaw);
 	*/
 
-	//ROS_INFO("My pos th: %f", my_position_th);
 
 }
 
 void MISSION_CONTROL::make_path_from_orders(){
+	ROS_INFO("START");
 	way_turn = 1;
 	path[0][0] = 1;
 	path[1][0] = 1;
 	path[2][0] = 1;
-	//ROS_INFO("Start");
 
 	for(int i = 0; i < 2*sizeof(in_turns) ; i+=2){
 		way_turn = way_turn * -1;
-		//ROS_INFO("%c", in_turns[i/2]);
 		
 		if(in_turns[i/2] == 'S'){
 			generate_path_in_row();
@@ -575,7 +582,6 @@ void MISSION_CONTROL::make_path_from_orders(){
 		
 		else if(in_turns[i/2] == 'F'){
 			path[0][i] = -1;
-			//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
 			break;
 		}
 		
@@ -635,9 +641,8 @@ void MISSION_CONTROL::make_path_from_orders(){
 			path[2][i+1] = point_proximity_treshold;
 		}
 		
-
-		//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
-		//ROS_INFO("x: %f, y: %f, p: %f", path[0][i+1],path[1][i+1],path[2][i+1]);
+		ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][i],path[1][i],path[2][i],i);
+		ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][i+1],path[1][i+1],path[2][i+1],i+1);
 
 	}
 
@@ -683,8 +688,6 @@ void MISSION_CONTROL::calcAndPublishSpeedSim(double turn_angle, double velocity)
 	twistSim.angular.z = ang_vel;
 	//if (twist.twist.linear.x != 0 && twist.twist.angular.z != 0)
 	pub_.publish(twistSim);
-
-	//ROS_INFO("Turn Angle: %.3f, Velocity: %.3f, Angular Velocity: %.3f",turn_angle,vel,ang_vel);
 }
 
 void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){

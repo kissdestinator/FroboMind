@@ -19,22 +19,22 @@ int main(int argc, char **argv) {
 	n.param<std::string> ("orders_string", mc.filename, "direction.txt");
 	n.param<std::string> ("orders_string_task1_right", mc.filename_task_1_right, "direction.txt");
 	n.param<std::string> ("orders_string_task1_left", mc.filename_task_1_left, "direction.txt");
-	n.param<std::string> ("orders_string_task2", mc.filename_task_2, "direction.txt");
+	n.param<std::string> ("orders_string_task2", mc.filename_task_2, "/home/superthomz/ros_workspace/FroboMind/task2.txt");
 	n.param<std::string> ("state_sub", mc.state_sub_top, "/state");
 	n.param<std::string> ("nav_spec_sub_top", mc.nav_spec_top, "/fmDecisionMakers/nav_spec");
 	n.param<std::string> ("blocked_sub_top", mc.blocked_sub_top, "/fmExtractors/blocked_row");
 
 	n.param<std::string> ("viz_pub_top_marker", mc.viz_pub_top_marker, "/fmDecisionMakers/viz_route_smooth");
 	
-	n.param<double> ("Length_of_rows", mc.length_of_rows, 3);
+	n.param<double> ("Length_of_rows", mc.length_of_rows, 2.5);
 	n.param<double> ("Width_of_rows", mc.width_of_rows, 0.75);
-	n.param<double> ("No_of_rows", mc.no_of_rows, 3);
+	n.param<double> ("No_of_rows", mc.no_of_rows, 5);
 	n.param<double> ("Map_offset_x", mc.map_offset_x, 10);
 	n.param<double> ("Map_offset_y", mc.map_offset_y, 10);
-	n.param<double> ("Point_proximity_treshold", mc.point_proximity_treshold, 0.1);
-	n.param<double> ("Width_of_pots", mc.width_of_pots, 0.18);
+	n.param<double> ("Point_proximity_treshold", mc.point_proximity_treshold, 0.4);
+	n.param<double> ("Width_of_pots", mc.width_of_pots, 0.40);
 	n.param<double> ("row_exit_length", mc.row_exit_length, 0.5);
-	n.param<double> ("End_row_limit", mc.end_row_limit, 0.5);
+	n.param<double> ("End_row_limit", mc.end_row_limit, 0);
 	n.param<double> ("Marker_distance", mc.marker_distance, 1);
 	n.param<int> ("start_turn_direction", mc.direction, 0);
 	n.param<int> ("Task_no", mc.task, 2);
