@@ -41,7 +41,7 @@ private:
 	visualization_msgs::MarkerArray markerarray;
 
 	char in_turns[30];
-	double smoothed_path[3][30];
+	double smoothed_path[3][500];
 	double my_position_x, my_position_y, my_position_th;
 	int current_path;
 	int current_smoothed_path;

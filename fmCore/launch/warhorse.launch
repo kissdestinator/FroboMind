@@ -115,7 +115,7 @@
 	</group>
 
  	<group ns="fmDecisionMakers">
-		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL" output="screen" >
+		<node pkg="fmDecisionMakers" name="mission_control" type="MISSION_CONTROL" >
 			<param name="Heading_Pub_Top" value="/fmDecisionMakers/Heading" /> 
 			<param name="update" value="10" /> 
 			<param name="Map_Sub_Top" value="/fmExtractors/map" /> 

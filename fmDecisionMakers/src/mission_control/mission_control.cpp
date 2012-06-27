@@ -35,7 +35,7 @@ void MISSION_CONTROL::main_loop(){
 	start_y = 10;
 
 	get_file_path();
-	make_path_from_orders();
+	//make_path_from_orders();
 
 	while(ros::ok()){
 		if(simulation == true){
@@ -155,7 +155,7 @@ void MISSION_CONTROL::invert_path(){
 
 	for(int i = (blocked_row + 1)*2; i < 2*sizeof(in_turns) ; i+=2){
 		way_turn = way_turn * -1;
-		ROS_INFO("%c", in_turns[i/2]);
+		//ROS_INFO("%c", in_turns[i/2]);
 
 		if(in_turns[i/2] == 'S'){
 			generate_path_in_row();
@@ -169,7 +169,7 @@ void MISSION_CONTROL::invert_path(){
 
 		else if(in_turns[i/2] == 'F'){
 			path[0][i] = -1;
-			ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
+			//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
 			break;
 		}
 
@@ -230,8 +230,8 @@ void MISSION_CONTROL::invert_path(){
 		}
 
 
-		ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
-		ROS_INFO("x: %f, y: %f, p: %f", path[0][i+1],path[1][i+1],path[2][i+1]);
+		//ROS_INFO("x: %f, y: %f, p: %f", path[0][i],path[1][i],path[2][i]);
+		//ROS_INFO("x: %f, y: %f, p: %f", path[0][i+1],path[1][i+1],path[2][i+1]);
 
 	}
 }
@@ -557,11 +557,11 @@ void MISSION_CONTROL::make_path_from_orders(){
 	path[0][0] = 1;
 	path[1][0] = 1;
 	path[2][0] = 1;
-	ROS_INFO("Start");
+	//ROS_INFO("Start");
 
 	for(int i = 0; i < 2*sizeof(in_turns) ; i+=2){
 		way_turn = way_turn * -1;
-		ROS_INFO("%c", in_turns[i/2]);
+		//ROS_INFO("%c", in_turns[i/2]);
 		
 		if(in_turns[i/2] == 'S'){
 			generate_path_in_row();
@@ -694,6 +694,8 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 	int i = 0;
 	int i_count = 0;
 
+
+
 	if(distance_x > 1){
 		if(path[0][current_path-1] < path[0][current_path])
 			direction = 1;
@@ -723,6 +725,12 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		smoothed_path[2][0] = p_thresh;
 		//ROS_INFO("CLose enough. Point: x: %f, y: %f, distance_x: %f, distance_y: %f, my_posx: %f, my_posy: %f:",smoothed_path[0][0], smoothed_path[1][0], distance_x, distance_y,my_position_x, my_position_y );
 	}
+
+	for(int j = i; j < 500; j++ ){
+		smoothed_path[0][j] = -1;
+		smoothed_path[1][j] = -1;
+		smoothed_path[2][j] = -1;
+	}
 	smoothed_path[0][i] = path[0][current_path];
 	smoothed_path[1][i] = path[1][current_path];
 	smoothed_path[2][i] = path[2][current_path];
@@ -730,13 +738,13 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 	smoothed_path[0][i+1] = -1;
 	smoothed_path[1][i+1] = -1;
 	smoothed_path[2][i+1] = -1;
-	i = last_i;
+
 	markerarray.markers.clear();
 
 	viz_pub_marker.publish(markerarray);
 
  	i = current_smoothed_path;
-	while(smoothed_path[0][i] != 0){
+	while(smoothed_path[0][i] != -1){
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/map";
 		marker.header.stamp = ros::Time();
@@ -755,10 +763,9 @@ void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
 		marker.color.g = 0.0;
 		marker.color.b = 1.0;
 		markerarray.markers.push_back(marker);
-		ROS_INFO("x: %f, y: %f", smoothed_path[0][i],smoothed_path[1][i] );
+		//ROS_INFO("x: %f, y: %f, i: %d", smoothed_path[0][i],smoothed_path[1][i] , i);
 		i++;
 	}
-	last_i = i;
 
 	viz_pub_marker.publish(markerarray);
 
