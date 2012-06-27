@@ -211,8 +211,8 @@ void InRowVehicleDetector::detectBlockedRow(const sensor_msgs::PointCloud& point
 			{
 				// transponer laser målingerne ind omkring (0,0) for at muliggøre sortering
 				geometry_msgs::Point32 t;
-				t.x = x + pointCloud.points[j].x * cos(th) - pointCloud.points[j].y * sin(th);
-				t.y = y + pointCloud.points[j].x * sin(th) + pointCloud.points[j].y * cos(th);
+				t.x = x + pointCloud.points[j].y * cos(th) - pointCloud.points[j].x * sin(th);
+				t.y = y + pointCloud.points[j].y * sin(th) + pointCloud.points[j].x * cos(th);
 
 				// Beregn fejl hvis målingen er gyldig
 				if ((t.x > x_lower && t.x < x_upper) && (t.y > y_lower && t.y < y_upper))
@@ -261,7 +261,7 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
     cloud.header.stamp = ros::Time::now();
     point_cloud_pub.publish(cloud);
 
-    if (warhorse_state.drive_state == warhorse_state.DRIVE)
+    if (warhorse_state.drive_state == warhorse_state.DRIVE && warhorse_state.task_state != warhorse_state.MANUAL_DRIVE)
     {
         vehicle_position = particlefilter.update(cloud,delta_position,map);
 

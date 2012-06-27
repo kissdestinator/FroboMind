@@ -1,6 +1,7 @@
 <launch>
 
 	<node respawn="true" pkg="wiimote"  type="wiimote_node.py" name="wiimote" />
+	<node pkg="rviz" type="rviz" name="Rviz" />
 	<group ns="fmSensors">
 
 
@@ -123,7 +124,7 @@
 			<param name="orders_string" value="/home/warhorse/ros_workspace/FroboMind/task2.txt"/>
 			<param name="orders_string_task1_left" value="/home/warhorse/ros_workspace/FroboMind/task1_left.txt"/>
 			<param name="orders_string_task1_right" value="/home/warhorse/ros_workspace/FroboMind/task1_right.txt"/>
-			<param name="orders_string_task2" value="/home/superthomz/ros_workspace/FroboMind/task2.txt"/>
+			<param name="orders_string_task2" value="/home/warhorse/ros_workspace/FroboMind/task2.txt"/>
 			<param name="state_sub" value="/state" />
 
 			<param name="Marker_distance" value="1" />

@@ -314,7 +314,7 @@ void ParticleFilter::resampling()
 		Car* c = new Car(particles[index]->x,particles[index]->y,particles[index]->theta,particles[index]->w);
 		temp_particles.push_back(c);
 	}
-	clearParticles();
+	particles.clear();
 	for (int i = 0; i<noParticles; i++)
 		particles.push_back(temp_particles[i]);
 }
@@ -374,8 +374,6 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 
 	r.probability = max_prob;
 	r.header.stamp = ros::Time::now();
-
-	delete c;
 
 	return r;
 
@@ -441,7 +439,7 @@ void ParticleFilter::newParticles(double ratio)
 		else
 			temp.push_back(particles[i]);
 	}
-	clearParticles();
+	particles.clear();
 	for (int i = 0; i < noParticles; i++)
 		particles.push_back(temp[i]);
 
