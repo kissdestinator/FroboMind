@@ -261,9 +261,17 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
     cloud.header.stamp = ros::Time::now();
     point_cloud_pub.publish(cloud);
 
+
     if (warhorse_state.drive_state == warhorse_state.DRIVE && warhorse_state.task_state != warhorse_state.MANUAL_DRIVE)
     {
-        vehicle_position = particlefilter.update(cloud,delta_position,map);
+    	try
+    	{
+    		vehicle_position = particlefilter.update(cloud,delta_position,map);
+    	}
+    	catch (int e)
+    	{
+    		ROS_INFO("Exception code: %d", e);
+    	}
 
         ROS_INFO("Position in map: x: %.3f y: %.3f th: %.3f",vehicle_position.position.x ,vehicle_position.position.y,vehicle_position.position.th);
     	//ROS_INFO("Odom: x: %.3f y: %.3f th: %.3f",position.x ,position.y,position.th);
