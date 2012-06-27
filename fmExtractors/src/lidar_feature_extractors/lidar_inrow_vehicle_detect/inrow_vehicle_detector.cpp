@@ -223,13 +223,20 @@ void InRowVehicleDetector::detectBlockedRow(const sensor_msgs::PointCloud& point
 			}
 		}
 	}
-	if (hits > 5)
+	if (hits > 10)
 	{
 		fmMsgs::blocked_row br;
 		br.blocked = true;
 		br.position.x = (x_lower + x_upper) / 2.0;
 		br.position.y = (y_lower + y_upper) / 2.0;
 
+		for(int y = br.position.y/map_resolution; y < br.position.y/map_resolution + 3; y++)
+		{
+			for(int x = (x_lower-0.15)/map_resolution; x <= (x_upper+0.15)/map_resolution; x++)
+			{
+				map.data[map.info.width*x+y] = 100;
+			}
+		}
 		blocked_row_pub.publish(br);
 	}
 }
@@ -238,14 +245,10 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
 {
 	sensor_msgs::PointCloud cloud;
 
-	delta_position = calcPositionChange(position,last_position);
-
 	laser_scan.angle_increment = -laser_scan.angle_increment;
 	double temp = laser_scan.angle_max;
 	laser_scan.angle_max = laser_scan.angle_min;
 	laser_scan.angle_min = temp;
-
-	last_position = position;
 
 	try
     {
@@ -262,16 +265,13 @@ void InRowVehicleDetector::processLaserScan(sensor_msgs::LaserScan laser_scan)
     point_cloud_pub.publish(cloud);
 
 
+	delta_position = calcPositionChange(position,last_position);
+
+	last_position = position;
+
     if (warhorse_state.drive_state == warhorse_state.DRIVE && warhorse_state.task_state != warhorse_state.MANUAL_DRIVE)
     {
-    	try
-    	{
-    		vehicle_position = particlefilter.update(cloud,delta_position,map);
-    	}
-    	catch (int e)
-    	{
-    		ROS_INFO("Exception code: %d", e);
-    	}
+    	vehicle_position = particlefilter.update(cloud,delta_position,map);
 
         ROS_INFO("Position in map: x: %.3f y: %.3f th: %.3f",vehicle_position.position.x ,vehicle_position.position.y,vehicle_position.position.th);
     	//ROS_INFO("Odom: x: %.3f y: %.3f th: %.3f",position.x ,position.y,position.th);

@@ -72,7 +72,7 @@ ParticleFilter::ParticleFilter(int numberOfParticles,double len_x,double off_x,d
 			theta += 2*M_PI;
 		srand(uint(theta*1000.0+i*3000));
 
-		particles.push_back(new Car(x,y,theta));
+		particles.push_back(Car(x,y,theta));
 	}
 
 	std::cout << "ParticleFilter created:" << std::endl;
@@ -87,24 +87,6 @@ ParticleFilter::~ParticleFilter()
 {
 }
 
-Car* ParticleFilter::getRandomParticle(double seed)
-{
-	time_t sec;
-	time(&sec);
-	srand(uint(sec));
-
-	double x = (double)rand()/double(RAND_MAX) * length_x + offset_x - 0.5 * length_x;
-	srand(uint(x*1000.0+seed*1000));
-	double y = (double)rand()/double(RAND_MAX) * length_y + offset_y - 0.5 * length_y;
-	srand(uint(y*1000.0+seed*2000));
-	double theta = (double)rand()/double(RAND_MAX) * max_angle - 0.5 * max_angle;
-	if (theta < 0)
-		theta += 2*M_PI;
-	srand(uint(theta*1000.0+seed*3000));
-
-	return new Car(x,y,theta);
-}
-
 visualization_msgs::MarkerArray ParticleFilter::getParticlesMarker(void)
 {
 	return particlesMarker;
@@ -116,8 +98,8 @@ void ParticleFilter::updateParticlesMarker(void)
 
 	for (int i = 0; i < noParticles; i++)
 	{
-		double prob = (particles[i]->w / max_prob);
-		geometry_msgs::Quaternion pose =  tf::createQuaternionMsgFromYaw(particles[i]->theta);
+		double prob = (particles[i].w / max_prob);
+		geometry_msgs::Quaternion pose =  tf::createQuaternionMsgFromYaw(particles[i].theta);
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/map";
 		marker.header.stamp = ros::Time();
@@ -125,8 +107,8 @@ void ParticleFilter::updateParticlesMarker(void)
 		marker.id = i;
 		marker.type = visualization_msgs::Marker::ARROW;
 		marker.action = visualization_msgs::Marker::ADD;
-		marker.pose.position.x = particles[i]->x;
-		marker.pose.position.y = particles[i]->y;
+		marker.pose.position.x = particles[i].x;
+		marker.pose.position.y = particles[i].y;
 		marker.pose.position.z = 0;
 		marker.pose.orientation = pose;
 		marker.scale.x = 0.2;
@@ -183,9 +165,9 @@ void ParticleFilter::addRandomGaussianNoise()
 
 	  for (int i = 0; i < noParticles; ++i)
 	  {
-		particles[i]->x += var_x();
-	    particles[i]->y += var_y();
-	    particles[i]->theta += var_theta();
+		particles[i].x += var_x();
+	    particles[i].y += var_y();
+	    particles[i].theta += var_theta();
 	  }
 }
 
@@ -196,7 +178,7 @@ void ParticleFilter::printParticles()
 		std::cout << "Particles:" << std::endl;
 
 		for (int i = 0; i < noParticles; i++)
-			std::cout << "x: " << particles[i]->x << " y: " << particles[i]->y << " Theta: " << particles[i]->theta << " W: " << particles[i]->w << std::endl;
+			std::cout << "x: " << particles[i].x << " y: " << particles[i].y << " Theta: " << particles[i].theta << " W: " << particles[i].w << std::endl;
 
 		std::cout << "End" << std::endl;
 	}
@@ -217,24 +199,16 @@ void ParticleFilter::motionUpdate(const fmMsgs::vehicle_coordinate& delta_positi
 	for (int i = 0; i < noParticles; i++)
 	{
 
-		particles[i]->y += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*sin(particles[i]->theta) + var_y();
-		particles[i]->x += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*cos(particles[i]->theta) + var_x();
+		particles[i].y += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*sin(particles[i].theta) + var_y();
+		particles[i].x += sqrt(pow(delta_position.x,2.0)+pow(delta_position.y,2.0))*cos(particles[i].theta) + var_x();
 
-		particles[i]->theta -= delta_position.th + var_theta();
-		if (particles[i]->theta < 0)
-			particles[i]->theta += 2*M_PI;
-		else if (particles[i]->theta > 2*M_PI)
-			particles[i]->theta -= 2*M_PI;
+		particles[i].theta -= delta_position.th + var_theta();
+		if (particles[i].theta < 0)
+			particles[i].theta += 2*M_PI;
+		else if (particles[i].theta > 2*M_PI)
+			particles[i].theta -= 2*M_PI;
 
 	}
-}
-
-void ParticleFilter::clearParticles()
-{
-	for (int i = 0; i < particles.size(); i++)
-		delete particles[i];
-
-	particles.clear();
 }
 
 void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud, const nav_msgs::OccupancyGrid& map)
@@ -253,14 +227,14 @@ void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud
 		{
 			// transponer laser målingerne ind omkring (0,0) for at muliggøre sortering
 			geometry_msgs::Point32 t;
-			t.x = pointCloud.points[j].x * cos(particles[i]->theta) - pointCloud.points[j].y * sin(particles[i]->theta);
-			t.y = pointCloud.points[j].x * sin(particles[i]->theta) + pointCloud.points[j].y * cos(particles[i]->theta);
+			t.x = pointCloud.points[j].x * cos(particles[i].theta) - pointCloud.points[j].y * sin(particles[i].theta);
+			t.y = pointCloud.points[j].x * sin(particles[i].theta) + pointCloud.points[j].y * cos(particles[i].theta);
 
 			// Beregn fejl hvis målingen er gyldig
 			if ((t.x < X_RANGE/2 && t.x > -X_RANGE/2) && (t.y < Y_RANGE/2 && t.y > -Y_RANGE/2))
 			{
-				t.y += particles[i]->y;
-				t.x += particles[i]->x;
+				t.y += particles[i].y;
+				t.x += particles[i].x;
 
 				valid_measurements++;
 
@@ -279,16 +253,16 @@ void ParticleFilter::measurementUpdate(const sensor_msgs::PointCloud& pointCloud
 		}
 		// Kontroller at der har været nok målinger
 		if (valid_measurements > MIN_VALID_MEASUREMENTS)
-			particles[i]->w = prob;
+			particles[i].w = prob;
 		else
-			particles[i]->w = 0;
+			particles[i].w = 0;
 	}
 }
 
 void ParticleFilter::resampling()
 {
 	srand(time(0));
-	std::vector<Car*> temp_particles;
+	std::vector<Car> temp_particles;
 
 	// initialize the start index to a random particle
 	int index = (double)rand()/double(RAND_MAX)*noParticles;
@@ -296,8 +270,8 @@ void ParticleFilter::resampling()
 	max_prob = 0;
 	// Find the highest weight
 	for (int i = 0; i < noParticles; i++)
-		if (particles[i]->w > max_prob)
-			max_prob = particles[i]->w;
+		if (particles[i].w > max_prob)
+			max_prob = particles[i].w;
 
 	double beta = 0;
 	// Perform the selection
@@ -306,12 +280,12 @@ void ParticleFilter::resampling()
 		srand(uint(beta+i));
 		// Increase beta with a random number between 0 and 2 * max_prob
 		beta += (double)rand()/double(RAND_MAX) * 2.0 * max_prob;
-		while (beta > particles[index]->w)
+		while (beta > particles[index].w)
 		{
-			beta -= particles[index]->w;
+			beta -= particles[index].w;
 			index = (index + 1) % noParticles;
 		}
-		Car* c = new Car(particles[index]->x,particles[index]->y,particles[index]->theta,particles[index]->w);
+		Car c = Car(particles[index].x,particles[index].y,particles[index].theta,particles[index].w);
 		temp_particles.push_back(c);
 	}
 	particles.clear();
@@ -327,33 +301,33 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 	max_prob = 0;
 	int index;
 	for (int i = 0; i < noParticles; i++)
-		if (particles[i]->w > max_prob)
+		if (particles[i].w > max_prob)
 		{
-			max_prob = particles[i]->w;
+			max_prob = particles[i].w;
 			index = i;
 		}
-	Car* c = new Car(particles[index]->x,particles[index]->y,particles[index]->theta,particles[index]->w);
+	Car c = Car(particles[index].x,particles[index].y,particles[index].theta,particles[index].w);
 
 	for (int i = 0; i < noParticles; i++)
 	{
-		if (sqrt(pow(c->x-particles[i]->x,2.0) + pow(c->y-particles[i]->y,2.0)) < MAX_DISTANCE && (abs(c->theta - particles[i]->theta < MAX_ANGLE) || abs(c->theta + 2*M_PI - particles[i]->theta) < MAX_ANGLE || abs(c->theta - 2*M_PI - particles[i]->theta) < MAX_ANGLE))
+		if (sqrt(pow(c.x-particles[i].x,2.0) + pow(c.y-particles[i].y,2.0)) < MAX_DISTANCE && (abs(c.theta - particles[i].theta < MAX_ANGLE) || abs(c.theta + 2*M_PI - particles[i].theta) < MAX_ANGLE || abs(c.theta - 2*M_PI - particles[i].theta) < MAX_ANGLE))
 		{
-			x += particles[i]->x * particles[i]->w;
-			y += particles[i]->y * particles[i]->w;
+			x += particles[i].x * particles[i].w;
+			y += particles[i].y * particles[i].w;
 
 			// orientation is tricky because it is cyclic. By normalizing
 			// around the first particle we are somewhat more robust to
 			// the 0=2pi problem
-			double temp_theta = (particles[i]->theta - particles[0]->theta + M_PI);
+			double temp_theta = (particles[i].theta - particles[0].theta + M_PI);
 			if (temp_theta < 0)
 				temp_theta += 2*M_PI;
 			else if (temp_theta > 2*M_PI)
 				temp_theta -= 2*M_PI;
-			temp_theta += particles[0]->theta - M_PI;
+			temp_theta += particles[0].theta - M_PI;
 
-			theta += temp_theta * particles[i]->w;
+			theta += temp_theta * particles[i].w;
 
-			norm += particles[i]->w;
+			norm += particles[i].w;
 		}
 	}
 	last_pos.position.x = x / norm;
@@ -397,7 +371,7 @@ void ParticleFilter::resetParticleFilter(double off_x, double off_y)
 	time(&sec);
 	srand(uint(sec));
 
-	clearParticles();
+	particles.clear();
 
 	for (int i = 0; i < noParticles; i++)
 	{
@@ -410,20 +384,20 @@ void ParticleFilter::resetParticleFilter(double off_x, double off_y)
 			theta += 2*M_PI;
 		srand(uint(theta*1000.0+i*3000));
 
-		particles.push_back(new Car(x,y,theta));
+		particles.push_back(Car(x,y,theta));
 	}
 }
 
 void ParticleFilter::newParticles(double ratio)
 {
-	std::vector<Car*> temp;
+	std::vector<Car> temp;
 	time_t sec;
 	time(&sec);
 	srand(uint(sec));
 
 	for (int i = 0; i < noParticles; i++)
 	{
-		if (particles[i]->w < max_prob * ratio)
+		if (particles[i].w < max_prob * ratio)
 		{
 			double x = (double)rand()/double(RAND_MAX) * length_x + offset_x - 0.5 * length_x;
 			srand(uint(x*1000.0+i*1000));
@@ -434,7 +408,7 @@ void ParticleFilter::newParticles(double ratio)
 				theta += 2*M_PI;
 			srand(uint(theta*1000.0+i*3000));
 
-			temp.push_back(new Car(x,y,theta));
+			temp.push_back(Car(x,y,theta));
 		}
 		else
 			temp.push_back(particles[i]);

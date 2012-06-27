@@ -150,6 +150,7 @@ void MISSION_CONTROL::blocked_callback(fmMsgs::blocked_row msg){
 }
 
 void MISSION_CONTROL::invert_path(){
+	current_smoothed_path = 0;
 
 	ROS_INFO("INVERT");
 	if(path[0][current_path] > path[0][current_path-1])
@@ -160,6 +161,8 @@ void MISSION_CONTROL::invert_path(){
 	path[0][current_path] = path[0][current_path-1];
 	path[1][current_path] = path[1][current_path-1];
 	path[2][current_path] = path[2][current_path-1];
+
+
 
 	ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][current_path-1],path[1][current_path-1],path[2][current_path-1],current_path-1);
 	ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][current_path],path[1][current_path],path[2][current_path],current_path);
@@ -240,11 +243,16 @@ void MISSION_CONTROL::invert_path(){
 			path[2][k+1] = point_proximity_treshold;
 		}
 
+		make_smoothed_path(1,2,3);
+
 
 		ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][k],path[1][k],path[2][k],k);
 		ROS_INFO("x: %f, y: %f, p: %f, i: %d", path[0][k+1],path[1][k+1],path[2][k+1],k+1);
 
 	}
+	make_smoothed_path(1,2,3);
+	ROS_INFO("YOURMAMAISSOFAT: %f, y: %f", smoothed_path[0][current_smoothed_path], smoothed_path[1][current_smoothed_path]);
+
 }
 
 void MISSION_CONTROL::check_current_marker(){
@@ -691,6 +699,10 @@ void MISSION_CONTROL::calcAndPublishSpeedSim(double turn_angle, double velocity)
 }
 
 void MISSION_CONTROL::make_smoothed_path(double x, double y, double p_thresh){
+	y = path[1][current_path];
+	x = path[0][current_path];
+	p_thresh = path[2][current_path];
+
 	double distance_x = fabs(path[0][current_path-1] - path[0][current_path]);
 	double distance_y = fabs(path[1][current_path-1] - path[1][current_path]);
 	double direction = -1;

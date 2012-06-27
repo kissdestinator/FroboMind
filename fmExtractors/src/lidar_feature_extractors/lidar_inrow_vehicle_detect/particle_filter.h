@@ -44,7 +44,7 @@ class ParticleFilter
 {
 private:
 
-  std::vector<Car*> particles;
+  std::vector<Car> particles;
 
   int noParticles;
 
@@ -67,7 +67,6 @@ private:
   int print;
 
   void newParticles(double ratio);
-  Car* getRandomParticle(double seed);
   void printParticles();
   void motionUpdate(const fmMsgs::vehicle_coordinate& delta_position);
   void measurementUpdate(const sensor_msgs::PointCloud& pointCloud, const nav_msgs::OccupancyGrid& map);
@@ -75,7 +74,6 @@ private:
   double gaussian(double mu, double sigma, double x);
   void addRandomGaussianNoise();
   fmMsgs::vehicle_position findVehicle();
-  void clearParticles();
 
 public:
 

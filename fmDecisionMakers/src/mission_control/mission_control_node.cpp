@@ -17,9 +17,9 @@ int main(int argc, char **argv) {
 	n.param<std::string> ("P_Filter_Sub_Top", mc.p_filter_sub_top, "/fmExtractors/vehicle_position");
 	n.param<std::string> ("viz_pub_top", mc.viz_pub_top, "/fmDecisionMakers/viz_route");
 	n.param<std::string> ("orders_string", mc.filename, "direction.txt");
-	n.param<std::string> ("orders_string_task1_right", mc.filename_task_1_right, "direction.txt");
-	n.param<std::string> ("orders_string_task1_left", mc.filename_task_1_left, "direction.txt");
-	n.param<std::string> ("orders_string_task2", mc.filename_task_2, "/home/superthomz/ros_workspace/FroboMind/task2.txt");
+	n.param<std::string> ("orders_string_task1_right", mc.filename_task_1_right, "/home/warhorse/ros_workspace/FroboMind/task1_right.txt");
+	n.param<std::string> ("orders_string_task1_left", mc.filename_task_1_left, "/home/warhorse/ros_workspace/FroboMind/task1_left.txt");
+	n.param<std::string> ("orders_string_task2", mc.filename_task_2, "/home/warhorse/ros_workspace/FroboMind/task2.txt");
 	n.param<std::string> ("state_sub", mc.state_sub_top, "/state");
 	n.param<std::string> ("nav_spec_sub_top", mc.nav_spec_top, "/fmDecisionMakers/nav_spec");
 	n.param<std::string> ("blocked_sub_top", mc.blocked_sub_top, "/fmExtractors/blocked_row");
