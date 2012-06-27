@@ -143,7 +143,7 @@ void InRowVehicleDetector::detectBlockedRow(const sensor_msgs::PointCloud& point
 {
 	double x = vehicle_position.position.x;
 	double y = vehicle_position.position.y;
-	double th = vehicle_position.position.th + 0.5 * M_PI;
+	double th = vehicle_position.position.th;
 
 	int hits = 0;
 	int row = 1;
@@ -167,20 +167,20 @@ void InRowVehicleDetector::detectBlockedRow(const sensor_msgs::PointCloud& point
 	}
 
 	// robotten peger opad
-	if (th > 1.75*M_PI || th < 0.25*M_PI)
+	if (vehicle_position.position.th > 1.75*M_PI || vehicle_position.position.th < 0.25*M_PI)
 	{
 		if (y > start_y && y < start_y + row_length - 1)
 		{
-			double y_lower = y + 0.25;
-			double y_upper = y + 1;
-			double x_lower = row_left_border + 0.15;
-			double x_upper = row_right_border - 0.15;
+			y_lower = y + 0.25;
+			y_upper = y + 1;
+			x_lower = row_left_border + 0.15;
+			x_upper = row_right_border - 0.15;
 			ROS_INFO("OPAD, y_lower: %f, y_upper: %f, x_lower: %f, x_upper: %f", y_lower, y_upper, x_lower, x_upper);
 			for (int j = 0; j < pointCloud.points.size(); j++)
 			{
 				// transponer laser målingerne ind omkring (0,0) for at muliggøre sortering
 				geometry_msgs::Point32 t;
-				t.x = x + pointCloud.points[j].x * cos(th) - pointCloud.points[j].y * sin(th);
+				t.x = x - pointCloud.points[j].x * cos(th) + pointCloud.points[j].y * sin(th);
 				t.y = y + pointCloud.points[j].x * sin(th) + pointCloud.points[j].y * cos(th);
 
 				// Beregn fejl hvis målingen er gyldig
@@ -193,14 +193,14 @@ void InRowVehicleDetector::detectBlockedRow(const sensor_msgs::PointCloud& point
 		}
 	}
 	// Robotten peger nedad
-	else if (th > 0.75*M_PI && th < 1.25*M_PI)
+	else if (vehicle_position.position.th > 0.75*M_PI && vehicle_position.position.th < 1.25*M_PI)
 	{
 		if (y > start_y + 1 && y < start_y + row_length)
 		{
-			double y_lower = y - 1;
-			double y_upper = y - 0.25;
-			double x_lower = row_left_border + 0.15;
-			double x_upper = row_right_border - 0.15;
+			y_lower = y - 1;
+			y_upper = y - 0.25;
+			x_lower = row_left_border + 0.15;
+			x_upper = row_right_border - 0.15;
 			ROS_INFO("NEDAD, y_lower: %f, y_upper: %f, x_lower: %f, x_upper: %f", y_lower, y_upper, x_lower, x_upper);
 			for (int j = 0; j < pointCloud.points.size(); j++)
 			{
