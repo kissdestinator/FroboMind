@@ -381,6 +381,41 @@ fmMsgs::vehicle_position ParticleFilter::findVehicle()
 
 }
 
+void ParticleFilter::resetParticleFilter(double off_x, double off_y)
+{
+
+	max_prob = 1;
+
+	offset_y = off_x;
+	offset_x = off_y;
+
+	last_pos.position.x = off_x;
+	last_pos.position.y = off_y;
+	last_pos.position.th = 0;
+	last_pos.probability = max_prob;
+	last_pos.header.stamp = ros::Time::now();
+
+	time_t sec;
+	time(&sec);
+	srand(uint(sec));
+
+	clearParticles();
+
+	for (int i = 0; i < noParticles; i++)
+	{
+		double x = (double)rand()/double(RAND_MAX) * length_x + offset_x - 0.5 * length_x;
+		srand(uint(x*1000.0+i*1000));
+		double y = (double)rand()/double(RAND_MAX) * length_y + offset_y - 0.5 * length_y;
+		srand(uint(y*1000.0+i*2000));
+		double theta = (double)rand()/double(RAND_MAX) * max_angle - 0.5 * max_angle;
+		if (theta < 0)
+			theta += 2*M_PI;
+		srand(uint(theta*1000.0+i*3000));
+
+		particles.push_back(new Car(x,y,theta));
+	}
+}
+
 void ParticleFilter::newParticles(double ratio)
 {
 	std::vector<Car*> temp;

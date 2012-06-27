@@ -98,6 +98,7 @@ public:
   void createMap();
   void sendMapTransform(fmMsgs::vehicle_position vp);
 
+
 };
 
 #endif /* INROW_VEHICLE_DETECTOR_H_ */

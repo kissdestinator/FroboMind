@@ -49,9 +49,14 @@ InRowVehicleDetector::InRowVehicleDetector(int NumberOfParticles,double Len_x,do
 	last_position.y = 0;
 	last_position.th = 0;
 
+	off_x = 10;
+	off_y = 10;
+
 	vehicle_position.position.x = 0;
 	vehicle_position.position.y = 0;
 	vehicle_position.position.th = 0;
+
+	particlefilter = ParticleFilter(numberOfParticles,len_x,off_x,len_y,off_y,max_ang, measurements_noise, movement_noise, turning_noise);
 
 }
 
@@ -99,7 +104,7 @@ void InRowVehicleDetector::stateHandler(const fmMsgs::warhorse_stateConstPtr& ms
 	{
 		createMap();
 		ROS_INFO("Start_x, %f start_y %f", off_x, off_y);
-		particlefilter = ParticleFilter(numberOfParticles,len_x,off_x,len_y,off_y,max_ang, measurements_noise, movement_noise, turning_noise);
+		particlefilter.resetParticleFilter(off_x,off_y);
 	}
 	warhorse_state.drive_state = msg->drive_state;
 	warhorse_state.task_state = msg->task_state;

@@ -86,6 +86,7 @@ public:
   void updateParticlesMarker(void);
   fmMsgs::vehicle_position update(const sensor_msgs::PointCloud& pointCloud, const fmMsgs::vehicle_coordinate& delta_position, const nav_msgs::OccupancyGrid& map);
   visualization_msgs::MarkerArray getParticlesMarker(void);
+  void resetParticleFilter(double off_x, double off_y);
 
 };
 
