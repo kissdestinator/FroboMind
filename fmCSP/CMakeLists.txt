@@ -10,6 +10,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #set(ROS_BUILD_TYPE RelWithDebInfo)
 
 rosbuild_init()
+rosbuild_add_boost_directories()
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -21,16 +22,16 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_boost_directories()
-
 
 rosbuild_add_executable(serial_string src/Serial_Port/serial_string/serial_string.cpp)
 rosbuild_add_executable(serial_string src/Serial_Port/serial_string/serialInterface.cpp)
 rosbuild_link_boost(serial_string system)
+rosbuild_link_boost(serial_string thread)
 
 rosbuild_add_executable(serial_binary src/Serial_Port/serial_binary/serial_binary.cpp)
 rosbuild_add_executable(serial_binary src/Serial_Port/serial_binary/serial_binary_interface.cpp)
 rosbuild_link_boost(serial_binary system)
+rosbuild_link_boost(serial_binary thread)
 
 #Pololu Motor Controller
 rosbuild_add_executable(pololu_motor_controller_node src/pololu_motor_controller/pololu_motor_controller_node.cpp)

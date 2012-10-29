@@ -17,8 +17,8 @@
 #include "cctype"
 #include "iostream"
 #include "gazebo_msgs/GetModelState.h"
-#include "/opt/ros/electric/stacks/geometry_experimental/tf2/include/LinearMath/btQuaternion.h"
-#include "/opt/ros/electric/stacks/geometry_experimental/tf2/include/LinearMath/btMatrix3x3.h"
+#include "/opt/ros/fuerte/stacks/geometry_experimental/tf2/include/LinearMath/btQuaternion.h"
+#include "/opt/ros/fuerte/stacks/geometry_experimental/tf2/include/LinearMath/btMatrix3x3.h"
 
 #define DEG2RAD M_PI/180
 #define RAD2DEG 180/M_PI

@@ -80,7 +80,7 @@ void LidarNavigator::processLaserScan(const sensor_msgs::LaserScanConstPtr& lase
 {
 	ranges.clear();
 
-	int LRS_size = laser_scan->get_ranges_size();
+	int LRS_size = laser_scan->ranges.size();
 
 	if (laser_inverted)
 		for (int i = LRS_size-1; i >= 0; i--)
