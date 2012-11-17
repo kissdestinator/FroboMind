@@ -20,7 +20,7 @@ class GTPClient:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect( (host, port) )
-        except socket.error(errorno, string):
+        except socket.error, (errorno, string):
             rospy.logerr("%s: %s" % (errorno, string))
             return
 
