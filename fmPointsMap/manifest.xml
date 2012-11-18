@@ -1,0 +1,17 @@
+<package>
+  <description brief="fmPointsMap">
+
+     fmPointsMap
+
+  </description>
+  <author>Constantina</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fmPointsMap</url>
+  <depend package="std_msgs"/>
+  <depend package="fmSensors"/>
+  <depend package="roscpp"/>
+
+</package>
+
+
