@@ -1,0 +1,41 @@
+<launch>
+
+  <node name="gtps" pkg="fmSensors" type="gtps.py" respawn="true">
+  	<param name="sender_id" value="10522" />
+    <!--<param name="host" value="192.168.0.253" />-->
+  </node> 
+  
+  <node name="gtps_extractor" pkg="fmExtractors" type="gtps_extractor.py" respawn="true">
+    <param name="sender_id" value="10522" />
+  </node> 
+
+  <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+    <param name="output_frame" value="odom"/>
+    <param name="freq" value="50.0"/>
+    <param name="sensor_timeout" value="1.0"/>
+    <param name="odom_used" value="true"/>
+    <param name="imu_used" value="false"/>
+    <param name="vo_used" value="false"/>
+    <param name="debug" value="false"/>
+    <param name="self_diagnose" value="false"/>
+  </node>
+  
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find fmCore)/maps/testmap.yaml" />
+
+  <!--<node name="rviz" pkg="rviz" type="rviz" />-->
+
+  <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 1000"/>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find fmCore)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find fmCore)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find fmCore)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find fmCore)/config/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find fmCore)/config/base_local_planner_params.yaml" command="load" />
+  </node>
+
+  <node name="rosbridge" pkg="rosbridge_server" type="rosbridge.py" />
+  <node name="rosapi" pkg="rosapi" type="rosapi.py" />
+  <node name="roswww" pkg="roswww" type="webserver.py" />
+  <node name="tf_smart_throttle" pkg="tf_smart_throttle" type="tf_smart_throttle" />
+</launch>

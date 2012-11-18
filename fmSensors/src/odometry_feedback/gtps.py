@@ -28,7 +28,7 @@ class GTPClient:
 
         while not rospy.is_shutdown():
             data = s.recv(8192).strip().replace(';', '')
-            rospy.loginfo(data)
+            rospy.logdebug(data)
             data = data.split(',')
 
             # Need to have at least 2 receivers
