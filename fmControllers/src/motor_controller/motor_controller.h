@@ -34,29 +34,23 @@ private:
    PIDRegulator pid_regulator_right;
 
    double maxAcceleration(const double& target_speed, const double& last_target_speed, ros::Time& last_time);
-   void calcSpeed(const geometry_msgs::TwistStampedConstPtr& msg);
+   void calcSpeed(const geometry_msgs::TwistConstPtr& msg);
    void zeroSpeed();
 
 public:
 
   ros::Subscriber navigation_speed_sub;
-  ros::Subscriber wii_speed_sub;
-  ros::Subscriber warhorse_state_sub;
   ros::Subscriber left_odo_sub;
   ros::Subscriber right_odo_sub;
 
   ros::Publisher motor_power_pub;
-
-  fmMsgs::warhorse_state warhorse_state;
 
   MotorController(double p_left, double i_left, double d_left, double p_right, double i_right, double d_right);
 
   void leftMotorHandler(const fmMsgs::odometryConstPtr& msg);
   void rightMotorHandler(const fmMsgs::odometryConstPtr& msg);
 
-  void navigationSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg);
-  void wiiSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg);
-  void stateHandler(const fmMsgs::warhorse_stateConstPtr& msg);
+  void navigationSpeedHandler(const geometry_msgs::TwistConstPtr& msg);
 
   void setMaxSpeed(double speed) { max_speed = speed; };
   void setMaxAcceleration(double acceleration) { max_acceleration = acceleration; };

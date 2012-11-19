@@ -13,38 +13,11 @@ MotorController::MotorController(double p_left, double i_left, double d_left, do
 	max_speed = 1;
 	max_acceleration = 0;
 	max_deceleration = 0;
-
-	warhorse_state.drive_state = warhorse_state.TASK1LEFT;
-	warhorse_state.task_state = warhorse_state.DRIVE;
-
-ROS_DEBUG("motor controll init");
 }
 
-void MotorController::stateHandler(const fmMsgs::warhorse_stateConstPtr& msg)
+void MotorController::navigationSpeedHandler(const geometry_msgs::TwistConstPtr& msg)
 {
-	warhorse_state.drive_state = msg->drive_state;
-	warhorse_state.task_state = msg->task_state;
-}
-
-void MotorController::navigationSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg)
-{
-ROS_DEBUG("speed handler");
-	if (warhorse_state.task_state != warhorse_state.MANUAL_DRIVE)
-		if (warhorse_state.drive_state == warhorse_state.DRIVE)
-			calcSpeed(msg);
-		else
-			zeroSpeed();
-}
-
-void MotorController::wiiSpeedHandler(const geometry_msgs::TwistStampedConstPtr& msg)
-{
-	if (warhorse_state.task_state == warhorse_state.MANUAL_DRIVE)
-	{
-		if (warhorse_state.drive_state == warhorse_state.DRIVE)
-			calcSpeed(msg);
-		else
-			zeroSpeed();
-	}
+	calcSpeed(msg);
 }
 
 void MotorController::zeroSpeed()
@@ -53,12 +26,12 @@ void MotorController::zeroSpeed()
 	target_speed_right = 0;
 }
 
-void MotorController::calcSpeed(const geometry_msgs::TwistStampedConstPtr& msg)
+void MotorController::calcSpeed(const geometry_msgs::TwistConstPtr& msg)
 {
 
 	double W = 0.24; //length from center to meter
-	double vel_right = msg->twist.linear.x - ( W * msg->twist.angular.z );
-	double vel_left =  msg->twist.linear.x + ( W * msg->twist.angular.z );
+	double vel_right = msg->linear.x - ( W * msg->angular.z );
+	double vel_left =  msg->linear.x + ( W * msg->angular.z );
 
 	// Normalize velocities
 	if (vel_right > 1)
