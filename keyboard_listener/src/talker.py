@@ -25,7 +25,8 @@ def talker():
 	pub = rospy.Publisher('key_pressed', String)
 	rospy.init_node('talker')
 	command_active=False
-	command='STOP'
+	#command='STOP'
+	command=0
 	publish=False
 	try:
 		while not rospy.is_shutdown():
@@ -34,21 +35,26 @@ def talker():
 				if len(str)>0 and command_active:
 					#print "aaa"
 					command_active=False
-					command='STOP'
+					#command='STOP'
+					command=0
 					publish=True
 				else:
 					command_active=True
 					if str == 'w':
-						command='FORWARD'
+						#command='FORWARD'
+						command=1
 						publish=True
 					if str == 's':
-						command='BACKWARD'
+						#command='BACKWARD'
+						command=2
 						publish=True
 					if str == 'a':
-						command='LEFT'
+						#command='LEFT'
+						command=3
 						publish=True
 					if str == 'd':
-						command='RIGHT'
+						#command='RIGHT'
+						command=4
 						publish=True
 				if publish:
 					rospy.loginfo(command)
@@ -58,7 +64,7 @@ def talker():
 				# escape'\x1b' :
 
 			
-				print "Got character", repr(str)
+				#print "Got character", repr(str)
 			except IOError: pass
 	finally:
 		termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
