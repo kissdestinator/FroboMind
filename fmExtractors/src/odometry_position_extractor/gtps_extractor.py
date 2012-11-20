@@ -39,7 +39,7 @@ def handle_gtps_position(msg, senderID):
         prev_msg_for_angle = msg
         previous_angle = angle
     else:
-        distance += deltax + deltay
+        distance += math.fabs(deltay) + math.fabs(deltax)
         angle = previous_angle
 
     rotationQuaternion = tf.transformations.quaternion_from_euler(0, 0, angle)
