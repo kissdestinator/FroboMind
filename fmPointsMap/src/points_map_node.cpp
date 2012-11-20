@@ -11,13 +11,13 @@ int main(int argc, char **argv)
 	ros::NodeHandle nh;
 
 	/* Declaration of the topic to publish */
-	ros::Publisher motor_power_pub = nh.advertise<fmMsgs::motor_power>("motor_power", _MAX_MESSAGES_);
+	ros::Publisher motor_power_pub = nh.advertise<fmMsgs::motor_power>("/fmControllers/motor_power", _MAX_MESSAGES_);
 	fmMsgs::motor_power motor_power_msg;
 
 	/* Motor msg filling (without header): */
 	motor_power_msg.power_right = 1;
 	motor_power_msg.power_left = 1;
-	
+
 
 	ros::Rate loop_rate(_FREQUENCE_);
 
