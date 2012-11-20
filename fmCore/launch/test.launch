@@ -2,60 +2,14 @@
 
   <node name="gtps" pkg="fmSensors" type="gtps.py" respawn="true">
   	<param name="sender_id" value="10522" />
-    <param name="host" value="192.168.0.100" />
+    <!--<param name="host" value="192.168.0.100" />-->
   </node> 
   
   <node name="gtps_extractor" pkg="fmExtractors" type="gtps_extractor.py" respawn="true">
     <param name="sender_id" value="10522" />
   </node> 
 
-<node pkg="fmSensors" name="Encoder1" type="phidget_encoder_node">
-			<param name="publisher_topic" value="encoder1" />
-			<param name="update_frequency" value="20" />		 
-		</node>
-		<node pkg="fmSensors" name="Encoder2" type="phidget_encoder_node">
-			<param name="publisher_topic" value="encoder2" /> 
-			<param name="update_frequency" value="20" />
-		</node>
-		<node pkg="fmSensors" name="Odometry" type="corobot_wheel_feedback_node">
-			<param name="left_odo_pub_topic" value="left_odometry" /> 
-			<param name="right_odo_pub_topic" value="right_odometry" /> 
-			<param name="encoder1" value="/fmSensors/encoder1" /> 
-			<param name="encoder2" value="/fmSensors/encoder2" /> 
-		</node>
 
-  <node pkg="fmControllers" name="motor_controller" type="motor_controller_node" >
-			
-<param name="left_odo_subscriber_topic" value="/fmSensors/left_odometry_window" /> 
-			<param name="right_odo_subscriber_topic" value="/fmSensors/right_odometry_window" /> 
-<param name="navigation_speed_subscriber_topic" value="/navigation_vel" /> 
-			<param name="wii_speed_subscriber_topic" value="/fmHMI/wii_cmd_vel" /> 
-			<param name="warhorse_state_topic" value="/state" /> 
-			<param name="motor_power_topic" value="/fmControllers/motor_power" /> 
-			<param name="maximum_speed" value="0.6" /> 
-			<param name="maximum_acceleration" value="0" /> 
-			<param name="maximum_deacceleration" value="0" /> 
-			<param name="p_left" value="1.1" /> 
-			<param name="i_left" value="1.2" />
-			<param name="d_left" value="50" /> 
-			<param name="p_right" value="1.1" /> 
-			<param name="i_right" value="1.2" /> 
-			<param name="d_right" value="50" /> 
-			<param name="windup_left" value="2" /> 
-			<param name="windup_right" value="2" /> 
-		</node>
-
-  <node pkg="fmCSP" name="MotorController" type="pololu_motor_controller_node" output="screen" >
-			<param name="serial_publisher_topic" value="/fmCSP/target_velocity" /> 
-			<param name="desired_speed_subscriber_topic" value="/fmControllers/motor_power" />
-		</node>
-		<node pkg="fmCSP" name="MotorControllerSerial" type="serial_string" output="screen" >
-			<param name="device" value="/dev/ttyACM0" /> 
-			<param name="baudrate" value="115200" />
-			<param name="subscriber_topic" value="/fmCSP/target_velocity" /> 
-		</node>
-
-  <node name="twiststamped_to_twist" pkg="fmExtractors" type="twiststamped_to_twist.py" respawn="true" />
   <node name="map_server" pkg="map_server" type="map_server" args="$(find fmCore)/maps/testmap2.yaml" />
 
   <!--<node name="rviz" pkg="rviz" type="rviz" />-->

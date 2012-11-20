@@ -8,7 +8,6 @@ from nav_msgs.msg import Odometry
 previous_message = None
 previous_angle = 0
 previous_time = None
-distance = 0
 prev_msg_for_angle = None
 
 
@@ -16,7 +15,7 @@ def handle_gtps_position(msg, senderID):
     global previous_message
     global previous_angle
     global previous_time
-    global distance
+    global prev_msg_for_angle
     currentTime = rospy.Time.now()
 
     if previous_message:
@@ -32,14 +31,14 @@ def handle_gtps_position(msg, senderID):
     previous_time = currentTime
     previous_message = msg
 
+    distance = math.fabs(msg.x - prev_msg_for_angle.x) + math.fabs(msg.y - prev_msg_for_angle.y)
+
     if distance > 30:
-        distance = 0
         angle = math.atan2(msg.x - prev_msg_for_angle.x, msg.y - prev_msg_for_angle.y)
         
         prev_msg_for_angle = msg
         previous_angle = angle
     else:
-        distance += math.fabs(deltay) + math.fabs(deltax)
         angle = previous_angle
 
     rotationQuaternion = tf.transformations.quaternion_from_euler(0, 0, angle)
