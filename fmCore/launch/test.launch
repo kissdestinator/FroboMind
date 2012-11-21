@@ -2,7 +2,7 @@
 
   <node name="gtps" pkg="fmSensors" type="gtps.py" respawn="true">
   	<param name="sender_id" value="10522" />
-    <param name="host" value="192.168.0.100" />
+    <param name="host" value="192.168.0.253" />
   </node> 
   
   <node name="gtps_extractor" pkg="fmExtractors" type="gtps_extractor.py" respawn="true">
