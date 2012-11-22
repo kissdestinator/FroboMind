@@ -1,4 +1,5 @@
 #include "ros/ros.h"
+#include "navigation/Navigation.h"
 #include "../../fmControllers/src/motor_controller/motor_controller.h"
 #include "fmMsgs/motor_power.h"
 #define _FREQUENCE_ 500
