@@ -16,7 +16,6 @@
 #define _POINT_H_
 
 #include <iostream>
-#include <list>
 
 using namespace std;
 
@@ -28,39 +27,29 @@ using namespace std;
  */
 class Point
 {
-private:
+protected:
   int _x;  //!< x coordinate
   int _y; //!< y coordinates
-  int _id; //!< id of the point
-  list<int> _destinations; //!< Reachable point from this one
 
 public:
   // Constructors
   //! Regular constructor.
-  Point(int x = -1, int y = -1, int id = -1)
-    : _x(x), _y(y), _id(id) { }
+  Point(int x = -1, int y = -1)
+    : _x(x), _y(y) { }
 
   // Accessors
   //! Get this x coordinate.
   int x() const {return _x;}
   //! Get this y coordinates.
   int y() const {return _y;}
-  //! Get this id.
-  int id() const {return _id;}
-  //! Get this reachable points destinations.
-  list<int> destinations() const {return _destinations;}
 
   // Mutators
   //! Set a new x coordinate
   void setX(int x) {_x = x;}
   //! Set a new y coordinate
   void setY(int y) {_y = y;}
-  //! Set a new y id
-  void set_id(int id) {_id = id;}
-  //! Set a new destinations list
-  void set_destinations(list<int> destinations) {_destinations = destinations;}
-  //! Add a new destination if this one does not exist
-  void add_destination(int p);
+  //! Set x and y coordinate
+  void set(int x, int y) {_x = x; _y = y;}
 
   // Relational operators
   //! Equality operator on Point
@@ -71,8 +60,6 @@ public:
   // IO operations
   //! Print out a Point.
   friend ostream& operator<<(ostream& os, Point p);
-  
-  void print(void);
 };
 
 #endif

@@ -13,6 +13,9 @@
  */
 
 #include "Navigation.h"
+#define X_HOME 400
+#define Y_HOME 1200
+
 using namespace std;
 
 //-----------------------------------------------------------------------
@@ -21,11 +24,10 @@ using namespace std;
 /*!
  * Return a default point (go Home) for now.
  */
-Point Navigation::goal() const
+Destination Navigation::goal() const
 {
-  Point home;
-  home.setX(400);
-  home.setX(1200);
+  Destinations home;
+  home.set(X_HOME, Y_HOME);
   return home;
   //update the description of the function
   //return _map.getPoint(_destination);

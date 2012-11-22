@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "navigation/Navigation.h"
+#include "navigation/Destination.h"
 #include "../../fmControllers/src/motor_controller/motor_controller.h"
 #include "fmMsgs/motor_power.h"
 #include "fmMsgs/gtps.h"

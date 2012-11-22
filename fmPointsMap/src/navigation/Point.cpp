@@ -14,16 +14,6 @@
 
 #include "Point.h"
 using namespace std;
-
-//-----------------------------------------------------------------------
-// Mutators
-//-----------------------------------------------------------------------
-
-void Point::add_destination(int p)
-{
-  _destinations.push_back(p);
-}
-
 //-----------------------------------------------------------------------
 // Relational operators (implemented as friend functions)
 //-----------------------------------------------------------------------
@@ -38,7 +28,6 @@ bool operator==(Point p1, Point p2)
 {
     return p1._x == p2._x
         && p1._y == p2._y
-        && p1._destinations == p2._destinations;
 }
 
 //-----------------------------------------------------------------------
@@ -53,11 +42,6 @@ bool operator==(Point p1, Point p2)
  */
 ostream& operator<<(ostream& os, Point p)
 {
-  os << '#' << p._id << " (" << p._x << ',' << p._y << "); destinations:";
-  list<int>::iterator i = p._destinations.begin();
-  os << "#" << *(i++);
-  for(; i != p._destinations.end(); ++i)
-    os << ", #" << *i;
-  os << '.';
+  os << '(' << p._x << ',' << p._y << ')';
   return os;
 }
