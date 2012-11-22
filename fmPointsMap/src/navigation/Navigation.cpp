@@ -41,8 +41,7 @@ Point Navigation::goal() const
  * the initialisation date
  * *This function will make the robot move*
  */
-void Navigation::initiation()
-{
+void Navigation::initiation() {
   update_angle();
 }
 
@@ -50,11 +49,24 @@ void Navigation::initiation()
  * Update the angle value.
  * *This function will make the robot move*
  */
-void Navigation::update_angle()
-{
+void Navigation::update_angle() {
   Point current_position;
   current_position.setX(2000);
   current_position.setY(500);
-
 }
 
+/*!
+  * Calculate the angle between two points.
+  * If 1st parameter is NULL, it takes the current position
+  */
+static double Navigation::angle(Point p1, Point p2) {
+  return 0.0;
+}
+
+/*!
+ * Calculate the angle between two points.
+ * If 1st parameter is NULL, it takes the current position
+*/
+static int Navigation::distance(Point p1,Point p2) {
+ return 0; 
+}

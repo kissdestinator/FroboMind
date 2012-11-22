@@ -28,10 +28,9 @@ using namespace std;
 class Navigation
 {
 private:
-  Map _map;//!< the map with the points, and the roads
+  Map _map; //!< the map with the points, and the roads
   double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
   int _destination; //!< current destination. We use the ID of the destination from the Map
-
   
 public:
   // Constructors
@@ -53,13 +52,18 @@ public:
   //! Set a new destination. If destination not reachable from the current position find the shortest path.
   void set_destinations(int destinations) {_destination = destinations;}
 
-  //Initiate the Navigation class, calculting the angle...
+  //!Initiate the Navigation class, calculting the angle...
   void initiation();
-  //Update the current angle, will make the robot move!
+  //!Update the current angle, will make the robot move!
   void update_angle();
 
-  //! Check if the distance between current position and destination is fair enough.
+   //! Check if the distance between current position and destination is fair enough.
   bool is_area_reached();
+
+  
+  // Static methods
+  //! Calculate the angle.
+  static double angle(Point p1, Point p2);  
   //! calculate the distance between the points paramaters.
   static int distance(Point p0, Point p1);
 };
