@@ -8,7 +8,6 @@
 
 void printPosition(const fmMsgs::gtpsConstPtr& msg)
 {
-//  ROS_INFO("I heard: [%s]", msg->data.c_str());
   cout << "x: " << msg->x  << ", y: " << msg->y << endl;
 }
 

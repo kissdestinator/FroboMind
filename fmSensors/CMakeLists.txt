@@ -19,14 +19,13 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined messages
 #rosbuild_genmsg()
 #uncomment if you have defined services
-#rosbuild_gensrv()
+rosbuild_gensrv()
 
 rosbuild_add_executable(sduimu_node src/global_sensors/sduimu_node.cpp)
-
 rosbuild_add_executable(gps_node src/global_sensors/gps_node.cpp)
-
 rosbuild_add_executable(sparkfun_razor_node src/global_sensors/SparkFun9DOF.cpp)
 rosbuild_add_executable(sparkfun_razor_node src/global_sensors/sparkfun_razor_node.cpp)
+rosbuild_add_executable(gtps_srv_node src/odometry_feedback/gtps_service.cpp)
 
 include(CheckIncludeFiles)
 check_include_files(/usr/lib/libLMS1xx.so HAVE_LMS111_LIB)
