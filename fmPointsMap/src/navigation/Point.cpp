@@ -29,14 +29,6 @@ void Point::add_destination(int p)
 //-----------------------------------------------------------------------
 
 /*!
- * Return true if the point in parameter is close enough from this one.
- */
-bool is_area_reached(Point p)
-{
-  return false;
-}
-
-/*!
  * All members must be equal except.
  *
  * \note We give a direct definition here because it is simple, but a
