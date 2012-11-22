@@ -41,6 +41,9 @@ def handle_gtps_position(msg, senderID):
     else:
         angle = previous_angle
 
+    angle *= -1 #it works!
+    rospy.loginfo(angle)
+
     rotationQuaternion = tf.transformations.quaternion_from_euler(0, 0, angle)
     
 
