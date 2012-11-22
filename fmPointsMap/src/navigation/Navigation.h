@@ -32,6 +32,7 @@ private:
   double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
   int _destination; //!< current destination. We use the ID of the destination from the Map
 
+  
 public:
   // Constructors
   //! Regular constructor.

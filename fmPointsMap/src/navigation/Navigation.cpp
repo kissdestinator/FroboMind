@@ -39,6 +39,7 @@ Point Navigation::goal() const
  * Make the initialisation with the angle of the robot and so on
  * Do not make it in the constructor to allow the user to choose
  * the initialisation date
+ * *This function will make the robot move*
  */
 void Navigation::initiation()
 {
@@ -46,9 +47,8 @@ void Navigation::initiation()
 }
 
 /*!
- * Make the initialisation with the angle of the robot and so on
- * Do not make it in the constructor to allow the user to choose
- * the initialisation date
+ * Update the angle value.
+ * *This function will make the robot move*
  */
 void Navigation::update_angle()
 {

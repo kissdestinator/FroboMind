@@ -62,11 +62,6 @@ public:
   //! Add a new destination if this one does not exist
   void add_destination(int p);
 
-  //! Check if the distance between the paramater and the point is low enough.
-  friend bool is_area_reached(Point p);
-  //! calculate the distance between the points paramaters.
-  friend float distance(Point p0, Point p1);
-
   // Relational operators
   //! Equality operator on Point
   friend bool operator==(Point p1, Point p2);
