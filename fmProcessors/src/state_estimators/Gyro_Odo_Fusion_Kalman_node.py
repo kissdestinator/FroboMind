@@ -4,6 +4,7 @@ import rospy
 from fmMsgs.msg import gyroscope
 from fmMsgs.msg import Vector3
 from fmMsgs.msg import kalman_output
+from nav_msgs.msg import Odometry
 from math import *
 
 odoAngVel = 0.
@@ -12,6 +13,7 @@ initial_xy = [0., 0.,0.]
 lastInterruptTime = 0
 dt = 0.02
 gyroOffset = -0.01492
+odo2 = None
 
 
 
@@ -310,10 +312,18 @@ def kalman_calc(event):
     pub_msg.header.stamp = rospy.get_rostime()
     pub_msg.yaw = x.value[0][0] % (pi * 2)
     pub_msg.ang_vel = x.value[1][0]
-    pub_msg.ang_vel2 = x.value[2][0]	
-    global pub
-    pub.publish(pub_msg)
-    lastInterruptTime = event.current_real.to_sec()
+    pub_msg.ang_vel2 = x.value[2][0]
+
+    if odo2:
+        global pub, odo2
+        pub_msg = odo2
+        pub_msg.pose.pose.orientation = tf.transformations.quaternion_from_euler(0, 0, x.value[0][0] % (pi * 2))
+
+        pub.publish(pub_msg)
+        lastInterruptTime = event.current_real.to_sec()
+
+
+    
 
 def update_Believes():
     global gyroAngVel,odoAngVel,gyroBelieve,odoBelieve
@@ -342,14 +352,19 @@ def odo_callback(data):
     odoAngVel = sum(speedCount)
     odoAngVel = odoAngVel/len(speedCount)
 
+def odo2_callback(data):
+    global odo2
+    odo2 = data
+
 def Gyro_odo_fusion():
     rospy.init_node('Razor_Kalman')
     rospy.Subscriber("/fmSensors/Gyroscope", gyroscope , gyro_callback)
     rospy.Subscriber("/fmExtractors/xyz_position", Vector3 , odo_callback)
+    rospy.Subscriber("/odom", Odometry , odo2_callback)
     rospy.Timer(rospy.Duration(0.02), kalman_calc, oneshot = False)
     rospy.spin()
 
 if __name__ == '__main__':
-    pub = rospy.Publisher('Kalman_AngularVelocity', kalman_output)
+    pub = rospy.Publisher('/odom/kalman', Odometry)
 
     Gyro_odo_fusion()
