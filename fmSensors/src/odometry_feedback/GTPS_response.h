@@ -15,10 +15,7 @@
 #ifndef _RESPONSE_H_
 #define _RESPONSE_H_
 
-#include "fmMsgs/gtps.h"
 #include "../../../fmPointsMap/src/navigation/Point.h"
-
-using namespace std;
 
 /*!
  * \brief Class GTPS_response.
@@ -40,11 +37,21 @@ public:
 
   // Mutators
   //! Method called at each message publish from gtps topic.
-  void update(boost::shared_ptr<fmMsgs::gtps_<std::allocator<void> > const> const& msg);
+  void update(const fmMsgs::gtps::ConstPtr& msg)
+  {
+    _position.set(msg->x, msg->y);
+    _last_update = msg->header.stamp;
+  }
 
   //! Send the response at the client of this service.
-  void response(fmSensors::GTPS::Request  &req,
-            	 fmSensors::GTPS::Response &res) const;
+  bool response(fmSensors::GTPS::Request  &req,
+            	 fmSensors::GTPS::Response &res)
+  {
+    res.x = _position.x();
+    res.y = _position.y();
+    res.date = _last_update;
+    return true;
+  }
 };
 
 #endif
