@@ -7,8 +7,6 @@
 #define _MAX_MESSAGES_ 1
 #define _GTPS_TOPIC_ "fmMsgs/gtps_position/10522"
 
-using namespace std;
-
 class Listener
 {
 public:
@@ -22,9 +20,9 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "gtps_service");
   ros::NodeHandle nh;
   
-  GTPS_response response();
+  GTPS_response response = GTPS_response();
   Listener listener;
-  ros::Subscriber sub = nh.subscribe("chatter", 1000, &Listener::callback, &listener);  
+  ros::Subscriber sub = nh.subscribe(_GTPS_TOPIC_, _MAX_MESSAGES_, &GTPS_response::update, &response);  
   /**
   GTPS_response response();
   
