@@ -57,7 +57,7 @@ public:
   //!Update the current angle, will make the robot move!
   void update_angle();
 
-   //! Check if the distance between current position and destination is fair enough.
+  //! Check if the distance between current position and destination is fair enough.
   bool is_area_reached();
 
   

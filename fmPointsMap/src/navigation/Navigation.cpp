@@ -53,8 +53,7 @@ void Navigation::initiation() {
  */
 void Navigation::update_angle() {
   Point current_position;
-  current_position.setX(2000);
-  current_position.setY(500);
+  current_position.set(2000,500);
 }
 
 /*!
