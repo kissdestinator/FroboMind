@@ -6,7 +6,7 @@ from fmMsgs.msg import gyroscope, accelerometer
 from sensor_msgs.msg import Imu
 
 class razorIMU():
-	filter = 0.1
+	filter = 0.05
 	gyro = None
 	accel = None
 	dt = 0
@@ -72,18 +72,8 @@ class razorIMU():
 			self.gyro.x -= self.offset_gyro_x
 			self.gyro.y -= self.offset_gyro_y
 			self.gyro.z -= self.offset_gyro_z
-		else:
-			self.callibrate_gyro()
 
-	def accel_callback(self, data):
-		self.accel = data
-
-		if self.accel_calibrated:
-			self.accel.x -= self.offset_accel_x
-			self.accel.y -= self.offset_accel_y
-			self.accel.z -= self.offset_accel_z
-
-			if self.gyro_calibrated:
+			if self.accel_calibrated:
 				self.roll = (1-self.filter)*(self.roll + self.gyro.x*self.dt) + self.filter*self.accel.x
 				self.pitch = (1-self.filter)*(self.pitch + self.gyro.y*self.dt) + self.filter*self.accel.y
 				self.yaw = (1-self.filter)*(self.yaw + self.gyro.z*self.dt) + self.filter*self.accel.z
@@ -102,6 +92,16 @@ class razorIMU():
 				msg.linear_acceleration.x = self.accel.x
 				msg.linear_acceleration.y = self.accel.y
 				msg.linear_acceleration.z = self.accel.z
+		else:
+			self.callibrate_gyro()
+
+	def accel_callback(self, data):
+		self.accel = data
+
+		if self.accel_calibrated:
+			self.accel.x -= self.offset_accel_x
+			self.accel.y -= self.offset_accel_y
+			self.accel.z -= self.offset_accel_z
 		else:
 			self.callibrate_accel()
 
