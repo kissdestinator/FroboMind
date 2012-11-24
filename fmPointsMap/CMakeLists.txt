@@ -27,8 +27,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 rosbuild_add_executable(points_map_node src/points_map_node.cpp)
-
-
+rosbuild_add_executable(points_map_node src/navigation/Navigation.cpp)
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)

@@ -28,7 +28,7 @@ using namespace std;
  * that has an id and list of destination's id
  * reachable to allow the representation of roads.
  */
-class Destination: protected Point
+class Destination: public Point
 {
 private:
   int _id; //!< id of the destination
@@ -36,9 +36,6 @@ private:
 
 public:
   // Constructors
-  //! Regular constructor.
-  Destination(int id = -1)
-    : _id(id) { }
   //! Regular constructor.
   Destination(int id = -1, list<int> destinations = list<int>())
     : _id(id), _destinations(destinations) { }
