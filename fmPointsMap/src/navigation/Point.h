@@ -54,7 +54,7 @@ public:
   // Relational operators
   //! Equality operator on Point
   friend bool operator==(Point p1, Point p2);
-  //! Unequality operator on Date
+  //! Unequality operator on Point
   friend bool operator!=(Point p1, Point p2) {return !(p1 == p2);}
 
   // IO operations

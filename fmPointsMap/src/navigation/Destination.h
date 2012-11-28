@@ -37,6 +37,9 @@ private:
 public:
   // Constructors
   //! Regular constructor.
+  Destination(int id = -1)
+    : _id(id) { }
+  //! Regular constructor.
   Destination(int id = -1, list<int> destinations = list<int>())
     : _id(id), _destinations(destinations) { }
 
@@ -52,14 +55,14 @@ public:
   //! Set a new destinations list
   void set_destinations(list<int> destinations) {_destinations = destinations;}
   //! Add a new destination if this one does not exist
-  void add_destination(int p);
+  void add_destination(int p) { _destinations.push_back(p); _destinations.unique(); }
   //! Remove a destination
-  void rm_destination(int p);
+  void rm_destination(int p) { _destinations.remove(p); }
 
   // Relational operators
   //! Equality operator on Destination
   friend bool operator==(Destination d1, Destination d2);
-  //! Unequality operator on Date
+  //! Unequality operator on Destination
   friend bool operator!=(Destination d1, Destination d2) {return !(d1 == d2);}
 
   // IO operations

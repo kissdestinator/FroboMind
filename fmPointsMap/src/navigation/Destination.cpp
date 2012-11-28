@@ -15,24 +15,6 @@
 #include "Destination.h"
 using namespace std;
 
-
-//-----------------------------------------------------------------------
-// Mutators
-//-----------------------------------------------------------------------
-
-//! Add a new destination if this one does not exist
-void add_destination(int p)
-{
-  _destinations.push_back(p);
-  
-}
-
-//! Remove a destination
-void rm_destination(int p)
-{
-  _destinations.remove(p);
-  
-}
 //-----------------------------------------------------------------------
 // Relational operators (implemented as friend functions)
 //-----------------------------------------------------------------------
@@ -54,14 +36,14 @@ bool operator==(Destination p1, Destination p2)
 //-----------------------------------------------------------------------
 
 /*!
- * We produce a printable form, with the name of the month.
+ * We produce a printable form of the Destination
  *
  * \param[in,out] os the output stream
  * \param[in] d the destination to print
  */
 ostream& operator<<(ostream& os, Destination d)
 {
-  os << '#' << d._id << (Point)d << "; destinations: ";
+  os << '#' << d._id << '(' << d._x << ',' << d._y << ')' << "; destinations: ";
   list<int>::iterator i = d._destinations.begin();
   os << "#" << *(i++);
   for(; i != d._destinations.end(); ++i)
