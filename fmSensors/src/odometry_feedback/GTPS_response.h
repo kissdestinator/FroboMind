@@ -38,7 +38,6 @@ public:
   //! Method called at each message publish from gtps topic.
   void update(const fmMsgs::gtps::ConstPtr& msg)
   {
-    cout << "GTPS_response.h says toto!" << endl;
     _position.set(msg->x, msg->y);
     _last_update = msg->header.stamp;
   }
