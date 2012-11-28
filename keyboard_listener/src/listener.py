@@ -12,28 +12,27 @@ def callback(data):
 		motor_power_msg.header = Header()
 		motor_power_msg.power_right = 0.2
 		motor_power_msg.power_left = 0.2
-		motorPub.publish(motor_power(motor_power_msg))
+		motorPub.publish(motor_power_msg)
 	if data.data == "BACKWARD":
 		motor_power_msg.header = Header()
 		motor_power_msg.power_right = -0.2
 		motor_power_msg.power_left = -0.2
-		motorPub.publish(motor_power(motor_power_msg))
+		motorPub.publish(motor_power_msg)
 	if data.data == "LEFT":
 		motor_power_msg.header = Header()
 		motor_power_msg.power_right = -0.2
 		motor_power_msg.power_left = 0.2
-		motorPub.publish(motor_power(motor_power_msg))
+		motorPub.publish(motor_power_msg)
 	if data.data == "RIGHT":
 		motor_power_msg.header = Header()
 		motor_power_msg.power_right = 0.2
 		motor_power_msg.power_left = -0.2
-		motorPub.publish(motor_power(motor_power_msg))
-
+		motorPub.publish(motor_power_msg)
 	if data.data == "STOP":
 		motor_power_msg.header = Header()
 		motor_power_msg.power_right = 0
 		motor_power_msg.power_left = 0
-		motorPub.publish(motor_power(motor_power_msg))
+		motorPub.publish(motor_power_msg)
 
 def listener():
 	
