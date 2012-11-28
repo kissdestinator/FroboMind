@@ -10,7 +10,9 @@
   <url>http://ros.org/wiki/keyboard_listener</url>
   <depend package="std_msgs"/>
   <depend package="rospy"/>
+  <depend package="tf"/>
   <depend package="roscpp"/>
+  <depend package="fmMsgs"/>
 
 </package>
 
