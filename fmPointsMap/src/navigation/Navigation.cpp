@@ -52,8 +52,6 @@ void Navigation::initiation() {
 * *This function will make the robot move*
 */
 void Navigation::update_angle() {
-  Point current_position;
-  current_position.set(2000,500);
 }
 
 /*!
@@ -83,6 +81,9 @@ double Navigation::angle(Point p1, Point p2) {
  * Calculate the angle between two points.
  * If 1st parameter is NULL, it takes the current position
 */
-int Navigation::distance(Point p1,Point p2) {
- return 0; 
+int Navigation::distance_to_destination()
+{
+  int disx = X_HOME - _current_position.x();
+  int disy = Y_HOME - _current_position.y();
+  return (int)((sqrt(pow(disx,2) + pow(disy,2))));  // absolute distance
 }

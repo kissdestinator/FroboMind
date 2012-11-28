@@ -78,9 +78,9 @@ public:
   
   // Static methods
   //! Calculate the angle.
-  static double angle(Point p1, Point p2);  
+  double angle(Point p1, Point p2);  
   //! calculate the distance between the points paramaters.
-  static int distance(Point p0, Point p1);
+  int distance_to_destination();
 };
 
 #endif
