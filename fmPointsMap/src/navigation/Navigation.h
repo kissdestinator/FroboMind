@@ -55,6 +55,8 @@ public:
   Map map() const {return _map;}
   //! Get the Destinator's faced direction in degree
   double orientation() const {return _current_angle;}
+  //! Get the Destinator's current position
+  Point position() const {return _current_position;}
   //! Get the current destination
   Destination goal() const;
 
@@ -75,10 +77,7 @@ public:
   //! Check if the distance between current position and destination is fair enough.
   bool is_area_reached();
 
-  
-  // Static methods
-  //! Calculate the angle.
-  double angle(Point p1, Point p2);  
+
   //! calculate the distance between the points paramaters.
   int distance_to_destination();
 };

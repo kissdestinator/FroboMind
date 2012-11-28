@@ -73,9 +73,9 @@ void Navigation::update_position() {
   * Calculate the angle between two points.
   * If 1st parameter is NULL, it takes the current position
   */
-double Navigation::angle(Point p1, Point p2) {
-  return 0.0;
-}
+//double Navigation::angle(Point p1, Point p2) {
+  //return 0.0;
+//}
 
 /*!
  * Calculate the angle between two points.
