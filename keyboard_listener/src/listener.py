@@ -9,14 +9,27 @@ def callback(data):
 	motor_power_msg = motor_power()
 	rospy.loginfo(rospy.get_name() + "Key pressed: %s", data.data)
 	if data.data == "FORWARD":
-		rospy.loginfo("Kurva")
 		motor_power_msg.header = Header()
 		motor_power_msg.power_right = 0.2
 		motor_power_msg.power_left = 0.2
 		motorPub.publish(motor_power(motor_power_msg))
+	if data.data == "BACKWARD":
+		motor_power_msg.header = Header()
+		motor_power_msg.power_right = -0.2
+		motor_power_msg.power_left = -0.2
+		motorPub.publish(motor_power(motor_power_msg))
+	if data.data == "LEFT":
+		motor_power_msg.header = Header()
+		motor_power_msg.power_right = -0.2
+		motor_power_msg.power_left = 0.2
+		motorPub.publish(motor_power(motor_power_msg))
+	if data.data == "RIGHT":
+		motor_power_msg.header = Header()
+		motor_power_msg.power_right = 0.2
+		motor_power_msg.power_left = -0.2
+		motorPub.publish(motor_power(motor_power_msg))
 
 	if data.data == "STOP":
-		rospy.loginfo("Kurva")
 		motor_power_msg.header = Header()
 		motor_power_msg.power_right = 0
 		motor_power_msg.power_left = 0
