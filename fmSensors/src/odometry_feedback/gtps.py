@@ -62,7 +62,7 @@ class GTPClient:
                 else:
                     rospy.logwarn("Received data was not valid.")
             else:
-                rospy.logerr("Received data was in wrong format!")
+                rospy.logwarn("Received data was in wrong format!")
 
         s.close()
 

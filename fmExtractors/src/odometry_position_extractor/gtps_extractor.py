@@ -41,12 +41,14 @@ def handle_gtps_position(msg, senderID):
     else:
         angle = previous_angle
 
-    angle *= -1 #it works!
-    rospy.loginfo(angle)
+    angle -= math.pi/2
+    angle *= -1
+    angle %= 2*math.pi
+    #rospy.loginfo(angle)
 
     rotationQuaternion = tf.transformations.quaternion_from_euler(0, 0, angle)
-    
-
+   
+    """
     tfbr = tf.TransformBroadcaster()
     tfbr.sendTransform(
         (float(msg.x)/1000.0, float(msg.y)/1000.0, 0),
@@ -54,11 +56,11 @@ def handle_gtps_position(msg, senderID):
         currentTime,
         'base_link',
         'odom')
-
-    pub = rospy.Publisher('odom', Odometry)
+    """
+    pub = rospy.Publisher('gtps_odom', Odometry)
     odom = Odometry()
     odom.header.stamp = currentTime 
-    odom.header.frame_id = 'odom'
+    odom.header.frame_id = 'gtps_odom'
     odom.child_frame_id = 'base_link'
 
     odom.pose.pose.position.x = float(msg.x)/1000.0
@@ -87,9 +89,9 @@ def handle_gtps_position(msg, senderID):
     
 
 if __name__ == '__main__':
-    rospy.init_node('gtps_tf_broadcaster')
+    rospy.init_node('gtps_odom')
     senderID = rospy.get_param('~sender_id')
-    topic = rospy.get_param('~publisher_topic', 'gtps_position')
+    topic = rospy.get_param('~publisher_topic', '/fmSensors/gtps_position')
     rospy.Subscriber(
         '%s/%d' % (topic, senderID),
         gtps,

@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 	nh.param<std::string> ("Left_encoder_sub_top", left_sub, "/fmSensors/left_odometry");
 	nh.param<std::string> ("Right_encoder_sub_top", right_sub, "/fmSensors/right_odometry");
 	nh.param<std::string> ("Kalman_sub_top", kalman_sub, "/fmProcessors/Kalman_AngularVelocity");
-	nh.param<std::string> ("Odom_pub_top", odom_pub_top, "xyz_position");
+	nh.param<std::string> ("Odom_pub_top", odom_pub_top, "/fmExtractors/xyz_position");
 	nh.param<std::string> ("Coordi_pub_top", coordi_pub_top, "vehicle_coordinate");
 	nh.param<std::string> ("Odom_th_pub_top", odom_th_pub_top, "/fmExtractors/odom_th");
 	
@@ -69,8 +69,8 @@ int main(int argc, char** argv)
 	ros::Subscriber sub_right = h.subscribe(right_sub, 1, right_callback);
 	ros::Subscriber sub_kalman = h.subscribe(kalman_sub, 1, kalman_callback);
 	
-	ros::Publisher odom_pub2 = h.advertise<nav_msgs::Odometry>("/odom", 50);
-	tf::TransformBroadcaster odom_broadcaster;
+	//ros::Publisher odom_pub2 = h.advertise<nav_msgs::Odometry>("/odom", 50);
+	//tf::TransformBroadcaster odom_broadcaster;
 
    	fmMsgs::Vector3 pub_msg;
    	fmMsgs::Vector3 odom_th_pub_msg;
@@ -79,8 +79,8 @@ int main(int argc, char** argv)
 	ros::Rate loop_rate(20);
 
         ros::Publisher odom_pub = h.advertise<fmMsgs::Vector3>(odom_pub_top, 1); 
-        ros::Publisher odom_th_pub = h.advertise<fmMsgs::Vector3>(odom_th_pub_top, 1); 
-        ros::Publisher coordi_pub = h.advertise<fmMsgs::vehicle_coordinate>(coordi_pub_top, 1); 
+        //ros::Publisher odom_th_pub = h.advertise<fmMsgs::Vector3>(odom_th_pub_top, 1); 
+        //ros::Publisher coordi_pub = h.advertise<fmMsgs::vehicle_coordinate>(coordi_pub_top, 1); 
 
 	while(h.ok()){
 
@@ -144,7 +144,7 @@ int main(int argc, char** argv)
 			odom_trans.transform.rotation = odom_quat;
 
 			//send the transform
-			odom_broadcaster.sendTransform(odom_trans);
+			//odom_broadcaster.sendTransform(odom_trans);
 
 			//next, we'll publish the odometry message over ROS
 			nav_msgs::Odometry odom;
@@ -164,13 +164,13 @@ int main(int argc, char** argv)
 			odom.twist.twist.angular.z = vth;
 
 			//publish the message
-			odom_pub2.publish(odom);
+			//odom_pub2.publish(odom);
 
-			coordi_pub.publish(coord_pub_msg);
+			//coordi_pub.publish(coord_pub_msg);
 
 			odom_pub.publish(pub_msg);
 
-			odom_th_pub.publish(odom_th_pub_msg);
+			//odom_th_pub.publish(odom_th_pub_msg);
 
 			last_time = current_time;
 			left_updated = false;

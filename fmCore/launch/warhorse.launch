@@ -1,5 +1,7 @@
 <launch>
 	<group ns="fmSensors">
+		<node pkg="fmSensors" name="gtps_service" type="gtps_srv">
+		</node>
 		<node pkg="fmSensors" name="Encoder1" type="phidget_encoder_node">
 			<param name="publisher_topic" value="encoder1" />
 			<param name="update_frequency" value="20" />		 

@@ -30,7 +30,6 @@ private:
   ros::Time _last_update;//!< ros-time of the last update
 
 public:
-
   // Constructors
   //! Regular constructor.
   GTPS_response() { }
@@ -39,6 +38,7 @@ public:
   //! Method called at each message publish from gtps topic.
   void update(const fmMsgs::gtps::ConstPtr& msg)
   {
+    cout << "GTPS_response.h says toto!" << endl;
     _position.set(msg->x, msg->y);
     _last_update = msg->header.stamp;
   }

@@ -31,6 +31,9 @@ rosbuild_add_executable(lidar_inrow_vehicle_detector src/lidar_feature_extractor
 #rosbuild_add_executable(gps_state src/global_pose_extractors/gps_state_node.cpp)
 rosbuild_add_executable(imu_ypr src/imu_data_extractors/imu_ypr_extractor.cpp)
 
+rosbuild_add_executable(simple_odom src/local_pose_extractors/simple_odom.cpp)
+rosbuild_add_executable(simple_imu_odom src/local_pose_extractors/simple_imu_odom.cpp)
+
 #Lidar obstacle avoidance and navigator node
 rosbuild_add_executable(lidar_navigator src/lidar_feature_extractors/lidar_obstacle_avoidance_and_navigator/lidar_nav_node.cpp)
 rosbuild_add_executable(lidar_navigator src/lidar_feature_extractors/lidar_obstacle_avoidance_and_navigator/lidar_navigator.cpp)

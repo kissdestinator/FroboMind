@@ -1,7 +1,7 @@
 Background\ ColorB=0
 Background\ ColorG=0
 Background\ ColorR=0
-Camera\ Config=80.6924 1.6298 1.92522 0.0599999
+Camera\ Config=121.003 2.01127 2.14815 0
 Camera\ Type=rviz::FixedOrientationOrthoViewController
 Fixed\ Frame=/map
 Grid.Alpha=0.5
@@ -19,6 +19,13 @@ Grid.OffsetZ=0
 Grid.Plane=0
 Grid.Plane\ Cell\ Count=50
 Grid.Reference\ Frame=<Fixed Frame>
+Imu.Alpha=1
+Imu.ColorB=0.8
+Imu.ColorG=0.2
+Imu.ColorR=0.8
+Imu.Enabled=0
+Imu.History\ Length=1
+Imu.Topic=/fmProcessors/razorIMU
 Inflated\ obstacles.Alpha=1
 Inflated\ obstacles.ColorB=1
 Inflated\ obstacles.ColorG=0.666667
@@ -35,6 +42,24 @@ Obstacles.ColorG=0
 Obstacles.ColorR=1
 Obstacles.Enabled=1
 Obstacles.Topic=/move_base/local_costmap/obstacles
+Odometry.Angle\ Tolerance=0.1
+Odometry.ColorB=0
+Odometry.ColorG=0.1
+Odometry.ColorR=1
+Odometry.Enabled=0
+Odometry.Keep=100
+Odometry.Length=1
+Odometry.Position\ Tolerance=0.1
+Odometry.Topic=/fmExtractors/wheel_odom
+Odometry2.Angle\ Tolerance=0.1
+Odometry2.ColorB=0
+Odometry2.ColorG=0.1
+Odometry2.ColorR=1
+Odometry2.Enabled=0
+Odometry2.Keep=100
+Odometry2.Length=1
+Odometry2.Position\ Tolerance=0.1
+Odometry2.Topic=/fmProcessors/odom_estimate
 Path.Alpha=1
 Path.ColorB=0
 Path.ColorG=1
@@ -47,9 +72,9 @@ Polygon.ColorG=0.333333
 Polygon.ColorR=1
 Polygon.Enabled=1
 Polygon.Topic=/move_base/local_costmap/robot_footprint
-Property\ Grid\ Splitter=506,78
-Property\ Grid\ State=expanded=.Global Options,.Global Status,Path.Enabled,Polygon.Enabled,Inflated obstacles.Enabled,Obstacles.Enabled;splitterratio=0.5
-QMainWindow=000000ff00000000fd0000000300000000000001640000029afc0200000001fb000000100044006900730070006c006100790073010000001d0000029a000000ee00ffffff00000001000001310000029afc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000001d000000a60000006700fffffffb0000000a0056006900650077007301000000c900000142000000bb00fffffffb0000001200530065006c0065006300740069006f006e0100000211000000a60000006700ffffff00000003000004ee0000003efc0100000001fb0000000800540069006d00650100000000000004ee000002bf00ffffff0000024d0000029a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+Property\ Grid\ Splitter=487,78
+Property\ Grid\ State=expanded=.Global Options,.Global Status,Path.Enabled,Polygon.Enabled,Inflated obstacles.Enabled,Obstacles.Enabled,Odometry.Enabled,Imu.Enabled,Odometry2.Enabled;splitterratio=0.5
+QMainWindow=000000ff00000000fd00000003000000000000014900000287fc0200000001fb000000100044006900730070006c006100790073010000001d00000287000000ee00ffffff000000010000013100000287fc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073000000001d000000a00000006700fffffffb0000000a00560069006500770073000000001d000001a9000000bb00fffffffb0000001200530065006c0065006300740069006f006e000000001d000002870000006700ffffff00000003000003cf0000003efc0100000001fb0000000800540069006d00650100000000000003cf000002bf00ffffff000002800000028700000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
 TF.All\ Enabled=0
 TF.Enabled=1
 TF.Frame\ Timeout=15
@@ -82,12 +107,21 @@ Name=Inflated obstacles
 [Display6]
 ClassName=rviz::GridCellsDisplay
 Name=Obstacles
+[Display7]
+ClassName=rviz::OdometryDisplay
+Name=Odometry
+[Display8]
+ClassName=rviz_plugin_tutorials::ImuDisplay
+Name=Imu
+[Display9]
+ClassName=rviz::OdometryDisplay
+Name=Odometry2
 [TF.Frames.]
 base_link.Enabled=1
 map.Enabled=1
 odom.Enabled=1
 [Window]
-Height=799
-Width=1278
-X=1200
+Height=744
+Width=975
+X=1144
 Y=-74

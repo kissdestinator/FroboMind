@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('fmProcessors')
-import rospy
+import rospy, tf
 from fmMsgs.msg import gyroscope
 from fmMsgs.msg import Vector3
 from fmMsgs.msg import kalman_output
@@ -314,10 +314,23 @@ def kalman_calc(event):
     pub_msg.ang_vel = x.value[1][0]
     pub_msg.ang_vel2 = x.value[2][0]
 
+    global pub, odo2
     if odo2:
-        global pub, odo2
+        rotationQuaternion = tf.transformations.quaternion_from_euler(0, 0, -1*((x.value[0][0]-pi) % (pi * 2)))
+        tfbr = tf.TransformBroadcaster()
+        tfbr.sendTransform(
+            (odo2.pose.pose.position.x, odo2.pose.pose.position.y, odo2.pose.pose.position.z),
+            rotationQuaternion,
+            rospy.Time.now(),
+            'base_link',
+            'odom')
+
+        
         pub_msg = odo2
-        pub_msg.pose.pose.orientation = tf.transformations.quaternion_from_euler(0, 0, x.value[0][0] % (pi * 2))
+        pub_msg.pose.pose.orientation.x = rotationQuaternion[0]
+        pub_msg.pose.pose.orientation.y = rotationQuaternion[1]
+        pub_msg.pose.pose.orientation.z = rotationQuaternion[2]
+        pub_msg.pose.pose.orientation.w = rotationQuaternion[3]
 
         pub.publish(pub_msg)
         lastInterruptTime = event.current_real.to_sec()
@@ -328,10 +341,10 @@ def kalman_calc(event):
 def update_Believes():
     global gyroAngVel,odoAngVel,gyroBelieve,odoBelieve
     if (gyroAngVel + odoAngVel < -0.02) or (gyroAngVel + odoAngVel > 0.02) :
-	gyroBelieve = 0.5
-	odoBelieve = 0.5
+        gyroBelieve = 0.5
+        odoBelieve = 0.5
     else:
-	gyroBelieve = 0.5
+        gyroBelieve = 0.5
         odoBelieve = 0.5
 
 def drift_correction(gyroAng):
@@ -360,7 +373,7 @@ def Gyro_odo_fusion():
     rospy.init_node('Razor_Kalman')
     rospy.Subscriber("/fmSensors/Gyroscope", gyroscope , gyro_callback)
     rospy.Subscriber("/fmExtractors/xyz_position", Vector3 , odo_callback)
-    rospy.Subscriber("/odom", Odometry , odo2_callback)
+    rospy.Subscriber("/fmExtractors/gtps_odom", Odometry , odo2_callback)
     rospy.Timer(rospy.Duration(0.02), kalman_calc, oneshot = False)
     rospy.spin()
 
