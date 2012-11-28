@@ -37,9 +37,6 @@ private:
 public:
   // Constructors
   //! Regular constructor.
-  Destination(int id = -1)
-    : _id(id) { }
-  //! Regular constructor.
   Destination(int id = -1, list<int> destinations = list<int>())
     : _id(id), _destinations(destinations) { }
 
