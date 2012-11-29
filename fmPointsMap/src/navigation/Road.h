@@ -58,6 +58,8 @@ public:
   Destination start() const {return _start;}
   //! Get the end destination
   Destination end() const {return _end;}
+  //! Get the Destination if the id is known, otherwise NULL
+  Destination dest_id(int id) const;
   //! Get the id of the road
   int id() const {return _id;}
   //! Get the angle of the road

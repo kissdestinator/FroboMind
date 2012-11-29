@@ -25,6 +25,16 @@ double Road::calcul_angle()
   return 361;
 }
 
+//! Get the Destination if the id is known, otherwise NULL
+Destination Road::dest_id(int id) const
+{
+  if(id == _start.id())
+    return _start;
+  if(id == _end.id())
+    return _end;
+  return NULL;
+}
+
 /*!
  * Calculate the distance between the two destinations attribute
  * from the lower id of any destination to the higher

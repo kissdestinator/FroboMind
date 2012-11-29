@@ -41,7 +41,9 @@ public:
   // Accessors
   //! Get the roads
   list<Road> roads() const {return _roads;}
-
+  
+  //! Return the Destination of the _id send as param
+  Destination find_destination(int id) const;
   //! Check if the distance between d1 position and d2 is fair enough.
   bool is_area_reached(Destination d1, Destination d2);
   //! Find the path from d1 to d2. *Not a prioritary function*

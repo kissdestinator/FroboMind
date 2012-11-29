@@ -13,8 +13,11 @@
  */
 
 #include "Navigation.h"
+#include "Calcul.h"
 #define X_HOME 400
 #define Y_HOME 1200
+//each time the robot move to 30 mm the angle is updated
+#define _SMALL_DIST_ 30
 
 using namespace std;
 
@@ -51,22 +54,26 @@ void Navigation::initiation() {
 * Update the angle value.
 * *This function will make the robot move*
 */
-void Navigation::update_angle() {
+void Navigation::update_angle()
+{
+  if(moved())
+  {
+    _current_angle = Calcul::angle(_old_position, _current_position);
+    _old_position = _current_position;
+  }
+}
+
+bool Navigation::moved() const
+{
+  return (_SMALL_DIST_ >= Cacul::distance(_old_position, _current_position));
 }
 
 /*!
- * Update the position.
+ * Update the position and the angle if the robot moved enough
  */
-void Navigation::update_position() {
-  fmSensors::GTPS srv;
-  if (_client.call(srv))
-  {
-    _current_position.set(srv.response.x,srv.response.y);
-    ROS_INFO("Position updated to (%d,%d)",
-	     _current_position.x(), _current_position.y());
-  }
-  else
-    ROS_ERROR("Failed to call service GTPS!");
+void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
+{
+  _current_position.set(msg->x, msg->y);
 }
 
 /*!
@@ -83,7 +90,6 @@ void Navigation::update_position() {
 */
 int Navigation::distance_to_destination()
 {
-  int disx = X_HOME - _current_position.x();
-  int disy = Y_HOME - _current_position.y();
-  return (int)((sqrt(pow(disx,2) + pow(disy,2))));  // absolute distance
+  return int(Cacul::distance(_current_position,
+			     _map.find_destination(_destination)));
 }

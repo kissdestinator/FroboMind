@@ -15,18 +15,14 @@
 #include "Map.h"
 using namespace std;
 
-//! Check if the distance between d1 position and d2 is fair enough.
-bool Map::is_area_reached(Destination d1, Destination d2)
+//! Return the Destination of the _id send as param
+Destination Map::find_destination(int id) const
 {
-  cout << "Map::is_area_reached is NOT implemented!! You lazy!! Start working!!" << endl;
-  return true;
-}
-
-//! Find the path from d1 to d2. *Not a prioritary function*
-list<Road> Map::find_path(Destination d1, Destination d2)
-{
-  cout << "Map::find_path is NOT implemented!! You fucking lazy!! THINK!!" << endl;
-  return list<Road>();
+  list<Road>::iterator it;
+  for (it=mylist.begin() ; it != mylist.end(); it++ )
+    if((*it).find_destination(id) != NULL)
+      return (*it).find_destination(id);
+  return NULL;
 }
 
 //-----------------------------------------------------------------------

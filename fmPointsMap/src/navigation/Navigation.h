@@ -14,8 +14,8 @@
 #ifndef _NAVIGATION_H_
 #define _NAVIGATION_H_
 
-#include "fmSensors/GTPS.h"	//Service to implement
-#include "Destination.h"
+#include "fmMsgs/gtps.h"	//Message from the topic
+#include "Calcul.h"
 #include "Map.h"
 #include "ros/ros.h"
 
@@ -34,6 +34,7 @@ class Navigation
 private:
   Map _map; //!< map with the points, and the roads
   Point _current_position;//!< last Destinator's known position
+  Point _old_position;//!< "old" Destinator's known position
   double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
   /**
    * The angle need to be updated as much as possible. However if it's done within a
@@ -42,13 +43,15 @@ private:
    * the old one is old enough! (using either the time stamp sent by the GTPS service)
    */
   int _destination; //!< current destination. We use the ID of the destination from the Map
-  ros::ServiceClient _client; //!< client to request the GTPS service and update the position
+  //!< Return true if the moved enough to update the angle
+  bool moved() const;
 
 public:
   // Constructors
   //! Regular constructor.
   Navigation(Map map = Map(), Point position = Point(), int current_angle = -1, int destination = 0)
-    : _map(map), _current_position(position), _current_angle(current_angle), _destination(destination) { }
+    : _map(map), _current_position(position), _current_angle(current_angle), _destination(destination)
+    { }
 
   // Accessors
   //! Get the map
@@ -65,20 +68,16 @@ public:
   void set_map(Map map) {_map = map;}
   //! Set a new destination. If destination not reachable from the current position find the shortest path.
   void set_destinations(int destinations) {_destination = destinations;}
-  void set_client(ros::NodeHandle n) { _client = n.serviceClient<fmSensors::GTPS>(_GTPS_SRV_); }
   //! Set the first angle, the orientation of the robot.
   //void set_orientation(double angle){_current_angle = angle;}
   //!Initiate the Navigation class, calculting the angle...
   void initiation();
   //!Update the current angle, will make the robot move!
   void update_angle();
-  //!Update the position
-  void update_position();
-
+  //! Method called at each message publish from gtps topic.
+  void update(const fmMsgs::gtps::ConstPtr& msg);
   //! Check if the distance between current position and destination is fair enough.
   bool is_area_reached();
-
-
   //! calculate the distance between the points paramaters.
   int distance_to_destination();
 };
