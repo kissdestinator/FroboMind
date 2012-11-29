@@ -67,7 +67,7 @@ public:
   void set_destinations(int destinations) {_destination = destinations;}
   void set_client(ros::NodeHandle n) { _client = n.serviceClient<fmSensors::GTPS>(_GTPS_SRV_); }
   //! Set the first angle, the orientation of the robot.
-  void set_orientation(double angle){_current_angle = angle;}
+  //void set_orientation(double angle){_current_angle = angle;}
   //!Initiate the Navigation class, calculting the angle...
   void initiation();
   //!Update the current angle, will make the robot move!
