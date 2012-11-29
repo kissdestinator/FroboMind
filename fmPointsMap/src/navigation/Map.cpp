@@ -16,27 +16,11 @@
 using namespace std;
 
 //! Return the Destination of the _id send as param
-Destination Map::find_destination(int id) const
+Destination Map::find_destination(int id)
 {
   list<Road>::iterator it;
-  for (it=mylist.begin() ; it != mylist.end(); it++ )
-    if((*it).find_destination(id) != NULL)
-      return (*it).find_destination(id);
+  for (it=_roads.begin() ; it != _roads.end(); it++ )
+    if((*it).find_dest(id) != NULL)
+      return (*it).find_dest(id);
   return NULL;
-}
-
-//-----------------------------------------------------------------------
-// IO operators
-//-----------------------------------------------------------------------
-
-/*!
- * We produce a printable form of the Map
- *
- * \param[in,out] os the output stream
- * \param[in] d the destination to print
- */
-ostream& operator<<(ostream& os, Destination d)
-{
-  os << "You didn't code the function lazy n3rd!";
-  return os;
 }

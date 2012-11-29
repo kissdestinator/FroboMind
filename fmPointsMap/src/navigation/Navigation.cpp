@@ -65,7 +65,7 @@ void Navigation::update_angle()
 
 bool Navigation::moved() const
 {
-  return (_SMALL_DIST_ >= Cacul::distance(_old_position, _current_position));
+  return (_SMALL_DIST_ >= Calcul::distance(_old_position, _current_position));
 }
 
 /*!
@@ -90,6 +90,6 @@ void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
 */
 int Navigation::distance_to_destination()
 {
-  return int(Cacul::distance(_current_position,
+  return int(Calcul::distance(_current_position,
 			     _map.find_destination(_destination)));
 }

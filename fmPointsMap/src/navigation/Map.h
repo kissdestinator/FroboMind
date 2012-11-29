@@ -43,15 +43,10 @@ public:
   list<Road> roads() const {return _roads;}
   
   //! Return the Destination of the _id send as param
-  Destination find_destination(int id) const;
+  Destination find_destination(int id);
   //! Check if the distance between d1 position and d2 is fair enough.
   bool is_area_reached(Destination d1, Destination d2);
   //! Find the path from d1 to d2. *Not a prioritary function*
-  list<Road> find_path(Destination d1, Destination d2);
-
-  // IO operations
-  //! Human-readably-text-formated print out a Map.
-  friend ostream& operator<<(ostream& os, Map m);
-};
+  list<Road> find_path(Destination d1, Destination d2);};
 
 #endif

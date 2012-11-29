@@ -26,7 +26,7 @@ double Road::calcul_angle()
 }
 
 //! Get the Destination if the id is known, otherwise NULL
-Destination Road::dest_id(int id) const
+Destination Road::find_dest(int id) const
 {
   if(id == _start.id())
     return _start;
