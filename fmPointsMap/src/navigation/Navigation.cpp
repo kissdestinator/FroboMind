@@ -65,7 +65,7 @@ void Navigation::update_angle()
 //!Update the current position
 void Navigation::update_position(int x, int y)
 {
-  _current_position.set(msg->x, msg->y);
+  _current_position.set(x, y);
 }
 
 bool Navigation::moved() const

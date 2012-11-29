@@ -14,11 +14,15 @@
 #ifndef _NAVIGATION_H_
 #define _NAVIGATION_H_
 
+#include "../../../fmControllers/src/motor_controller/motor_controller.h"
+#include "fmMsgs/motor_power.h"
 #include "fmMsgs/gtps.h"	//Message from the topic
 #include "Calcul.h"
 #include "Map.h"
 #include "ros/ros.h"
 
+#define _TOPIC_MOTOR_ "/fmControllers/motor_power"
+#define _MAX_MESSAGES_ 1
 #define _GTPS_SRV_ "gtps_service"
 
 using namespace std;
@@ -44,6 +48,9 @@ private:
    */
   int _destination; //!< current destination. We use the ID of the destination from the Map
   //!< Return true if the moved enough to update the angle
+  ros::Publisher _motor_power;
+
+  //!< Return true if the moved enough to update the angle
   bool moved() const;
 
   //!Update the current angle
@@ -53,9 +60,9 @@ private:
 public:
   // Constructors
   //! Regular constructor.
-  Navigation(Map map = Map(), Point position = Point(), int current_angle = -1, int destination = 0)
+  Navigation(ros::NodeHandle nh, Map map = Map(), Point position = Point(), int current_angle = -1, int destination = 0)
     : _map(map), _current_position(position), _current_angle(current_angle), _destination(destination)
-    { }
+    {_motor_power = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_, _MAX_MESSAGES_);}
 
   // Accessors
   //! Get the map
