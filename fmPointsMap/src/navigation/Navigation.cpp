@@ -62,6 +62,11 @@ void Navigation::update_angle()
     _old_position = _current_position;
   }
 }
+//!Update the current position
+void Navigation::update_position(int x, int y)
+{
+  _current_position.set(msg->x, msg->y);
+}
 
 bool Navigation::moved() const
 {
@@ -73,7 +78,8 @@ bool Navigation::moved() const
  */
 void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
 {
-  _current_position.set(msg->x, msg->y);
+  update_position(msg->x, msg->y);
+  update_angle();
 }
 
 /*!

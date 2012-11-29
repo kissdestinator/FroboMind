@@ -34,7 +34,7 @@ class Navigation
 private:
   Map _map; //!< map with the points, and the roads
   Point _current_position;//!< last Destinator's known position
-  Point _old_position;//!< "old" Destinator's known position
+  Point _old_position;//!< "old" Destinator's known position: needed to calculate the angle
   double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
   /**
    * The angle need to be updated as much as possible. However if it's done within a
@@ -46,6 +46,10 @@ private:
   //!< Return true if the moved enough to update the angle
   bool moved() const;
 
+  //!Update the current angle
+  void update_angle();
+  //!Update the current position
+  void update_position(int x, int y);
 public:
   // Constructors
   //! Regular constructor.
@@ -72,8 +76,6 @@ public:
   //void set_orientation(double angle){_current_angle = angle;}
   //!Initiate the Navigation class, calculting the angle...
   void initiation();
-  //!Update the current angle, will make the robot move!
-  void update_angle();
   //! Method called at each message publish from gtps topic.
   void update(const fmMsgs::gtps::ConstPtr& msg);
   //! Check if the distance between current position and destination is fair enough.

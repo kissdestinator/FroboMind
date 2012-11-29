@@ -19,6 +19,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   /* Declaration of the navigation system */
   Navigation nav;
+  ros::Subscriber sub = nh.subscribe(_GTPS_TOPIC_, _MAX_MESSAGES_, &Navigation::update, &nav);
 
   return 0;
 }
