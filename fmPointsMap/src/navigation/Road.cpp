@@ -11,7 +11,6 @@
  *
  * \brief Implementation of class Road.
  */
-
 #include "Road.h"
 using namespace std;
 //-----------------------------------------------------------------------
