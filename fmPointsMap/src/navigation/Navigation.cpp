@@ -19,7 +19,12 @@
 #define Y_HOME 1200
 //each time the robot move to 30 mm the angle is updated
 #define _SMALL_DIST_ 30
-#define _NO_TURNING_ _turning==false
+#define _NO_UPDATE_ _update==false
+#define _TURNING_ _turning==true
+#define _NO_BACKWARD_ _update==false
+#define _FREQUENCE_ 500
+
+
 using namespace std;
 
 //-----------------------------------------------------------------------
@@ -48,7 +53,41 @@ Destination Navigation::goal() const
  * *This function will make the robot move*
  */
 void Navigation::initiation() {
-  update_angle();
+  speed(0.2);
+
+  ros::Rate loop_rate(_FREQUENCE_);
+  while (ros::ok() && _current_angle == -1)
+  {
+    _motor_power_pub.publish(_motor_power_msg);
+    ros::spin();
+    loop_rate.sleep();
+  }
+  _update = false;
+  go_back();
+  _update = true;
+}
+
+//!< Set the speed to the msg *DOES NOT PUBLISH*
+void Navigation::speed(double speed)
+{
+  _motor_power_msg.power_right = (speed > -1) ? speed : -1;
+  _motor_power_msg.power_right = (speed <  1) ? speed :  1;
+  _motor_power_msg.power_left  = (speed > -1) ? speed : -1;
+  _motor_power_msg.power_left  = (speed >  1) ? speed :  1;
+}
+
+//! Make the robot return 3 cm backward without updating the angle
+void Navigation::go_back()
+{
+  speed(-0.2);
+
+  ros::Rate loop_rate(_FREQUENCE_);
+  while (ros::ok() || !moved())
+  {
+    _motor_power_pub.publish(_motor_power_msg);
+    ros::spin();
+    loop_rate.sleep();
+  }
 }
 
 /*!
@@ -57,10 +96,11 @@ void Navigation::initiation() {
 */
 void Navigation::update_angle()
 {
-  if(moved() && _NO_TURNING_)
+  if(moved() && _NO_UPDATE_ && !_TURNING_)
   {
     _current_angle = Calcul::angle(_old_position, _current_position);
     _old_position = _current_position;
+    ROS_INFO("current angle updated:%g", _current_angle);
   }
 }
 
@@ -73,7 +113,7 @@ void Navigation::update_position(int x, int y)
 bool Navigation::moved() const
 {
   return (_SMALL_DIST_ >= Calcul::distance(_old_position,
-					   _current_position));
+					    _current_position));
 }
 
 /*!
@@ -100,10 +140,10 @@ void Navigation::set_new_destination(const ConstPtr& msg)
 /*!
  * Calculate the angle between two points.
  * If 1st parameter is NULL, it takes the current position
-*/
+ */
 int Navigation::distance_to_destination()
 {
-  if(_NO_TURNING_)
+  if(!_TURNING_)
     return (_current_destination == NULL) ?
       int(Calcul::distance(_current_position,
 			   _current_destination))
