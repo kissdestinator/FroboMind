@@ -1,6 +1,5 @@
-
 //=======================================================================
-// Basic C++: classe Calcul
+// Basic C++: class Calcul
 //      Specification of class Calcul
 //-----------------------------------------------------------------------
 // Auzias Maël - Constantina Ioannou
@@ -19,7 +18,7 @@
 #include <math.h>
 #include "Destination.h"
 
-
+#define _RADIUS_ 200
 
 using namespace std;
 
@@ -54,10 +53,24 @@ public:
 /*!
  * Calculate the distance between two destinations
  * using a circle!
+ * Assuming that one of the wheels will stay
+ * at the same spot and the GT-PS is in the middle
+ * of the robot. We're also asuming just for now that 
+ * we turn only clockwise.
  */
-  static double distance_circle(/*??????*/)
+  static double distance_circle(double current_angle, Point current_position, Destination d1)
   {
-    return 0;
+    double dist = 0.0;
+    double angle_to_dest = angle(current_position, d1);
+    if (current_angle > angle_to_dest)
+      {
+       dist = ((current_angle - angle_to_dest)/180) * M_PI * _RADIUS_; 
+      }
+    else
+      {
+        dist = (((current_angle - angle_to_dest)+360)/180) * M_PI * _RADIUS_;
+      }
+    return dist;
   }
 
   /*!
