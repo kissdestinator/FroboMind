@@ -38,6 +38,8 @@ class Navigation
 private:
   Map _map; //!< map with the points, and the roads
   Point _current_position;//!< last Destinator's known position
+  Destination _current_destination;//!< Current Destinator's aim
+  Destination _current_destination_turning;//!< Current Destinator's aim while turning
   Point _old_position;//!< "old" Destinator's known position: needed to calculate the angle
   double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
   /**
@@ -47,6 +49,7 @@ private:
    * the old one is old enough! (using either the time stamp sent by the GTPS service)
    */
   int _destination; //!< current destination. We use the ID of the destination from the Map
+  bool _turning; //!< state of the robot
   //!< Return true if the moved enough to update the angle
   ros::Publisher _motor_power;
 
@@ -61,7 +64,7 @@ public:
   // Constructors
   //! Regular constructor.
   Navigation(ros::NodeHandle nh, Map map = Map(), Point position = Point(), int current_angle = -1, int destination = 0)
-    : _map(map), _current_position(position), _current_angle(current_angle), _destination(destination)
+    : _map(map), _current_position(position), _current_angle(current_angle), _destination(destination), _turning(false)
     {_motor_power = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_, _MAX_MESSAGES_);}
 
   // Accessors
@@ -85,6 +88,8 @@ public:
   void initiation();
   //! Method called at each message publish from gtps topic.
   void update(const fmMsgs::gtps::ConstPtr& msg);
+  //! Method called at each message publish from web node.
+  /*void set_new_destination(const ConstPtr& msg);*/
   //! Check if the distance between current position and destination is fair enough.
   bool is_area_reached();
   //! calculate the distance between the points paramaters.

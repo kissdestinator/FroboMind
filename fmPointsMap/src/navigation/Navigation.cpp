@@ -14,11 +14,12 @@
 
 #include "Navigation.h"
 #include "Calcul.h"
+
 #define X_HOME 400
 #define Y_HOME 1200
 //each time the robot move to 30 mm the angle is updated
 #define _SMALL_DIST_ 30
-
+#define _NO_TURNING_ _turning==false
 using namespace std;
 
 //-----------------------------------------------------------------------
@@ -70,7 +71,9 @@ void Navigation::update_position(int x, int y)
 
 bool Navigation::moved() const
 {
-  return (_SMALL_DIST_ >= Calcul::distance(_old_position, _current_position));
+  return (
+	  _SMALL_DIST_ >= Calcul::distance(_old_position, _current_position)
+	  && _NO_TURNING_);
 }
 
 /*!
@@ -82,13 +85,17 @@ void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
   update_angle();
 }
 
-/*!
-  * Calculate the angle between two points.
-  * If 1st parameter is NULL, it takes the current position
-  */
-//double Navigation::angle(Point p1, Point p2) {
-  //return 0.0;
-//}
+//! Method called at each message publish from web node.
+/**
+void Navigation::set_new_destination(const ConstPtr& msg)
+{
+  Destination new_dest = _map.find_destination(msg->id);
+  if(new_dest == NULL)
+    _current_destination = Destination(_current_position);
+  else
+    _current_destination = new_dest;
+}
+*/
 
 /*!
  * Calculate the angle between two points.
@@ -96,6 +103,12 @@ void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
 */
 int Navigation::distance_to_destination()
 {
-  return int(Calcul::distance(_current_position,
-			     _map.find_destination(_destination)));
+  if(_NO_TURNING_)
+    return (_current_destination == NULL) ?
+      int(Calcul::distance(_current_position,
+			   _current_destination))
+      : 0 ;//if no destination return 0
+  else
+    return 0;// int(Calcul::distance_circle(_current_position,
+		//		       _current_destination_turning));
 }
