@@ -89,7 +89,7 @@ public:
   //! Method called at each message publish from gtps topic.
   void update(const fmMsgs::gtps::ConstPtr& msg);
   //! Method called at each message publish from web node.
-  /*void set_new_destination(const ConstPtr& msg);*/
+  void set_new_destination(const fmMsgs:: gtps:: ConstPtr& msg);
   //! Check if the distance between current position and destination is fair enough.
   bool is_area_reached();
   //! calculate the distance between the points paramaters.
