@@ -33,7 +33,7 @@ class Calcul
 {
 public:
 /*!
- * Calculate the angle between the two destinations attribute
+ * Calculate the angle between the two Points attribute
  */
   static double distance(Point p1, Point p2){
     int disx = p2.x() - p1.x();
@@ -42,7 +42,7 @@ public:
   }
 
 /*!
- * Calculate the distance between the two destinations param
+ * Calculate the distance between the two Points param
  */
   static double angle(Point p1, Point p2){
     int difx = p2.x()-p1.x();
@@ -52,10 +52,10 @@ public:
   }
 
 /*!
- * Calculate the distance between two destinations
+ * Calculate the distance between two Points
  * using a circle!
  */
-  static double distance_circle(/*??????*/)
+  static double distance_circle(Point d1, Point d2)
   {
     return 0;
   }

@@ -57,12 +57,13 @@ void Navigation::initiation() {
 */
 void Navigation::update_angle()
 {
-  if(moved())
+  if(moved() && _NO_TURNING_)
   {
     _current_angle = Calcul::angle(_old_position, _current_position);
     _old_position = _current_position;
   }
 }
+
 //!Update the current position
 void Navigation::update_position(int x, int y)
 {
@@ -71,9 +72,8 @@ void Navigation::update_position(int x, int y)
 
 bool Navigation::moved() const
 {
-  return (
-	  _SMALL_DIST_ >= Calcul::distance(_old_position, _current_position)
-	  && _NO_TURNING_);
+  return (_SMALL_DIST_ >= Calcul::distance(_old_position,
+					   _current_position));
 }
 
 /*!
@@ -109,6 +109,6 @@ int Navigation::distance_to_destination()
 			   _current_destination))
       : 0 ;//if no destination return 0
   else
-    return 0;// int(Calcul::distance_circle(_current_position,
-		//		       _current_destination_turning));
+    return int(Calcul::distance_circle(_current_position,
+				       _current_destination_turning));
 }
