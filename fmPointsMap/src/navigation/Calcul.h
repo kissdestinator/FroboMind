@@ -17,7 +17,7 @@
 #define _CALCUL_H_
 
 #include <math.h>
-#include "Point.h"
+#include "Destination.h"
 
 
 
@@ -42,15 +42,33 @@ public:
   }
 
 /*!
- * Calculate the distance between the two destinations attribute
- * from the lower id of any destination to the higher
- * (the same real road has two different angle...)
+ * Calculate the distance between the two destinations param
  */
   static double angle(Point p1, Point p2){
     int difx = p2.x()-p1.x();
     int dify = p2.y()-p1.y();
     double angleDeg = atan2(dify, difx) * 180 / M_PI;
     return (angleDeg >= 0) ? angleDeg : (angleDeg+360);
+  }
+
+/*!
+ * Calculate the distance between two destinations
+ * using a circle!
+ */
+  static double distance_circle(/*??????*/)
+  {
+    return 0;
+  }
+
+  /*!
+   * Calculate the destination to reach to make the
+   * robot turn and face the good direction to the point
+   * id's destination is even if turn right faster
+   * 			  odd if turn left faster
+   */
+  static Destination turning_aim(/*??????*/)
+  {
+    return Destination();
   }
 };
 
