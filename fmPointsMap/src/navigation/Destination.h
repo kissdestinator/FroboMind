@@ -39,6 +39,10 @@ public:
   //! Regular constructor.
   Destination(int id = -1, list<int> destinations = list<int>())
     : _id(id), _destinations(destinations) { }
+  //! Point Constructors
+  Destination(Point p)
+    : _id(-1), _destinations(list<int>())
+    { _x = p.x(); _y = p.y(); }
 
   // Accessors
   //! Get this id.

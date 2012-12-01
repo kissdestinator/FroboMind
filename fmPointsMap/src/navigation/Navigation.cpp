@@ -87,15 +87,18 @@ void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
 
 //! Method called at each message publish from web node.
 
-void Navigation::set_new_destination(const fmMsgs::gtps:: ConstPtr& msg)
+void Navigation::set_new_destination(const fmMsgs:: web:: ConstPtr& msg)
 {
-  //Destination new_dest = _map.find_destination(msg->id);
-  //if(new_dest == NULL)
-   // _current_destination = Destination(_current_position);
-  //else
-   // _current_destination = new_dest;
+  Destination new_dest = _map.find_destination(msg->id);
+ if(new_dest == NULL)
+ {
+  _current_destination = Destination(_current_position);
+ }
+ else
+ {
+   _current_destination = new_dest;
+ }
 }
-
 
 /*!
  * Calculate the angle between two points.

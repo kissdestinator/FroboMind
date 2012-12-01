@@ -17,6 +17,7 @@
 #include "../../../fmControllers/src/motor_controller/motor_controller.h"
 #include "fmMsgs/motor_power.h"
 #include "fmMsgs/gtps.h"	//Message from the topic
+#include "fmMsgs/web.h" //Message from the web topic
 #include "Calcul.h"
 #include "Map.h"
 #include "ros/ros.h"
@@ -89,7 +90,7 @@ public:
   //! Method called at each message publish from gtps topic.
   void update(const fmMsgs::gtps::ConstPtr& msg);
   //! Method called at each message publish from web node.
-  void set_new_destination(const fmMsgs:: gtps:: ConstPtr& msg);
+  void set_new_destination(const fmMsgs:: web:: ConstPtr& msg);
   //! Check if the distance between current position and destination is fair enough.
   bool is_area_reached();
   //! calculate the distance between the points paramaters.
