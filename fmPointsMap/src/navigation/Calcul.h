@@ -18,7 +18,7 @@
 #include <math.h>
 #include "Destination.h"
 
-#define _RADIUS_ 200
+#define _CIRCLE_CIRCUM_ 1256.637
 
 using namespace std;
 
@@ -57,20 +57,22 @@ public:
  * at the same spot and the GT-PS is in the middle
  * of the robot. We're also asuming just for now that 
  * we turn only clockwise.
+ * NEW: If turning Destination ID is even turn clockwise,
+ * if odd anticlockwise.
  */
   static double distance_circle(double current_angle, Point current_position, Destination d1)
   {
     double dist = 0.0;
     double angle_to_dest = angle(current_position, d1);
-    if (current_angle > angle_to_dest)
+      if (current_angle > angle_to_dest)
       {
-       dist = ((current_angle - angle_to_dest)/180) * M_PI * _RADIUS_; 
+       dist = ((current_angle - angle_to_dest)/180) * _CIRCLE_CIRCUM_; 
       }
-    else
+      else
       {
-        dist = (((current_angle - angle_to_dest)+360)/180) * M_PI * _RADIUS_;
+        dist = (((current_angle - angle_to_dest)+360)/180) * _CIRCLE_CIRCUM_;
       }
-    return dist;
+    return (d1.id()%2)?(_CIRCLE_CIRCUM_ - dist):dist;
   }
 
   /*!
