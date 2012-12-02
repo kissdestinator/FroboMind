@@ -68,11 +68,15 @@ public:
       {
        dist = ((current_angle - angle_to_dest)/180) * _CIRCLE_CIRCUM_; 
       }
-      else
+      else if (current_angle < angle_to_dest)
       {
         dist = (((current_angle - angle_to_dest)+360)/180) * _CIRCLE_CIRCUM_;
       }
-    return (d1.id()%2)?(_CIRCLE_CIRCUM_ - dist):dist;
+      else // (current_angle == angle_to_dest)
+      {
+        dist = 0.0;
+      }
+    return (d1.id() % 2) ? (_CIRCLE_CIRCUM_ - dist) : dist;
   }
 
   /*!
@@ -81,8 +85,9 @@ public:
    * id's destination is even if turn right faster
    * 			  odd if turn left faster
    */
-  static Destination turning_aim(/*??????*/)
+  static Destination turning_aim(/*double current_angle, Point current_position, Destination d1*/)
   {
+    //double angle_to_dest = angle(current_position, d1);
     return Destination();
   }
 };
