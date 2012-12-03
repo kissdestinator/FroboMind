@@ -50,12 +50,17 @@ private:
 * the old one is old enough! (using either the time stamp sent by the GTPS service)
 */
   int _destination; //!< current destination. We use the ID of the destination from the Map
-  bool _turning; //!< state of the robot
-  //!< Return true if the moved enough to update the angle
-  ros::Publisher _motor_power;
+  bool _update; //!< if false do not update the angle
+  bool _turning; //!< if turning, no update angle
+  ros::Publisher _motor_power_pub;
+  fmMsgs::motor_power _motor_power_msg;  //!< Msg to publish to motor power topic
 
   //!< Return true if the moved enough to update the angle
   bool moved() const;
+  //!< Set the speed to the msg *DOES NOT PUBLISH*
+  void speed(double speed);
+  //!< Make the robot return 3cm back after init
+  void go_back();
 
   //!Update the current angle
   void update_angle();
@@ -64,9 +69,13 @@ private:
 public:
   // Constructors
   //! Regular constructor.
-  Navigation(ros::NodeHandle nh, Map map = Map(), Point position = Point(), int current_angle = -1, int destination = 0)
-    : _map(map), _current_position(position), _current_angle(current_angle), _destination(destination), _turning(false)
-    {_motor_power = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_, _MAX_MESSAGES_);}
+  Navigation(ros::NodeHandle nh,
+	     Map map = Map(),
+	     Point position = Point(),
+	     int destination = 0)
+    : _map(map), _current_position(position), _current_angle(-1),
+      _destination(destination), _update(true), _turning(false)
+    {_motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_, _MAX_MESSAGES_);}
 
   // Accessors
   //! Get the map
