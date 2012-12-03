@@ -66,7 +66,7 @@ private:
   //!< Set the speed to the msg *DOES NOT PUBLISH*
   void speed(double speed);
   //!< Make the robot return 3cm back after init
-  void go_back()
+  void go_back();
 
   //!Update the current angle
   void update_angle();
