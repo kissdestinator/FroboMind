@@ -91,15 +91,15 @@ public:
     double angle_to_dest = angle(current_position, d1);          
     Destination d2; 
     d2.add_destination(d1.id());
-    d2.set(d1.x() + _RADIUS_ * cos(angle_to_dest * M_PI / 180), d1.y() + _RADIUS_ * sin(angle_to_dest * M_PI / 180));
+    d2.set(current_position.x() + _RADIUS_ * cos(angle_to_dest * M_PI / 180), current_position.y() + _RADIUS_ * sin(angle_to_dest * M_PI / 180));
     double angle_diff = current_angle - angle_to_dest;
     if (fabs(angle_diff) >= 180)
     {
-      (angle_diff > 0) ? d1.set_id(-3) : d1.set_id(-2);
+      (angle_diff > 0) ? d2.set_id(-3) : d2.set_id(-2);
     }
     else
     {
-      (angle_diff >= 0) ? d1.set_id(-2) : d1.set_id(-3);
+      (angle_diff >= 0) ? d2.set_id(-2) : d2.set_id(-3);
     }
     return d2;
   }
