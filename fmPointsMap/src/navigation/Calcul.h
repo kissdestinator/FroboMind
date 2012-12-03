@@ -19,6 +19,7 @@
 #include "Destination.h"
 
 #define _CIRCLE_CIRCUM_ 1256.637
+#define _RADIUS_ 200
 
 using namespace std;
 
@@ -58,7 +59,7 @@ public:
  * of the robot. We're also asuming just for now that 
  * we turn only clockwise.
  * NEW: If turning Destination ID is even turn clockwise,
- * if odd anticlockwise.
+ * if odd - anticlockwise.
  */
   static double distance_circle(double current_angle, Point current_position, Destination d1)
   {
@@ -85,10 +86,22 @@ public:
    * id's destination is even if turn right faster
    * 			  odd if turn left faster
    */
-  static Destination turning_aim(/*double current_angle, Point current_position, Destination d1*/)
+  static Destination turning_aim(double current_angle, Point current_position, Destination d1)
   {
-    //double angle_to_dest = angle(current_position, d1);
-    return Destination();
+    double angle_to_dest = angle(current_position, d1);          
+    Destination d2; 
+    d2.add_destination(d1.id());
+    d2.set(d1.x() + _RADIUS_ * cos(angle_to_dest * M_PI / 180), d1.y() + _RADIUS_ * sin(angle_to_dest * M_PI / 180));
+    double angle_diff = current_angle - angle_to_dest;
+    if (fabs(angle_diff) >= 180)
+    {
+      (angle_diff > 0) ? d1.set_id(-3) : d1.set_id(-2);
+    }
+    else
+    {
+      (angle_diff >= 0) ? d1.set_id(-2) : d1.set_id(-3);
+    }
+    return d2;
   }
 };
 
