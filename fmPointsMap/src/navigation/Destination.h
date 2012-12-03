@@ -1,16 +1,16 @@
 //=======================================================================
 // Basic C++: classe Point
-//      Specification of class Point
+// Specification of class Point
 //-----------------------------------------------------------------------
 // Auzias Maël - Constantina Ioannou
 // For the project: http://bit.ly/kiss-web
 //=======================================================================
 
 /*!
- * \file Destination.h
- *
- * \brief Definition of class Destination.
- */
+* \file Destination.h
+*
+* \brief Definition of class Destination.
+*/
 
 #ifndef _DEST_H_
 #define _DEST_H_
@@ -22,12 +22,12 @@
 using namespace std;
 
 /*!
- * \brief Class Destination.
- *
- * Represent a derivated class from point
- * that has an id and list of destination's id
- * reachable to allow the representation of roads.
- */
+* \brief Class Destination.
+*
+* Represent a derivated class from point
+* that has an id and list of destination's id
+* reachable to allow the representation of roads.
+*/
 class Destination: public Point
 {
 private:
