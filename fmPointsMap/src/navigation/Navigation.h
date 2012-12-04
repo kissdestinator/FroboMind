@@ -42,16 +42,17 @@ private:
   Destination _current_destination;//!< Current Destinator's aim
   Destination _current_destination_turning;//!< Current Destinator's aim while turning
   Point _old_position;//!< "old" Destinator's known position: needed to calculate the angle
-  double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
+  volatile double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
   /**
-* The angle need to be updated as much as possible. However if it's done within a
-* too short time the value could be useless.
-* Then we use the "Point _old_position" to update with the _current_position if
-* the old one is old enough! (using either the time stamp sent by the GTPS service)
-*/
+   * The angle need to be updated as much as possible. However if it's done within a
+   * too short time the value could be useless.
+   * Then we use the "Point _old_position" to update with the _current_position if
+   * the old one is old enough! (using either the time stamp sent by the GTPS service)
+   */
   int _destination; //!< current destination. We use the ID of the destination from the Map
   bool _update; //!< if false do not update the angle
   bool _turning; //!< if turning, no update angle
+  bool _listening; //! false before the end of the initialisation
   ros::Publisher _motor_power_pub;
   fmMsgs::motor_power _motor_power_msg;  //!< Msg to publish to motor power topic
 
@@ -62,10 +63,20 @@ private:
   //!< Make the robot return 3cm back after init
   void go_back();
 
-  //!Update the current angle
+  //! Update the current angle
   void update_angle();
-  //!Update the current position
+  //! Update the current position
   void update_position(int x, int y);
+  //! Initiate the Navigation class, calculting the angle...
+  void initialisation();
+  //! Correct the angle
+  void face_destination();
+  //! Go forward to the destination
+  void go();
+  //! Make the robot reach the destination's area
+  void move_to_destination();
+  
+
 public:
   // Constructors
   //! Regular constructor.
@@ -75,7 +86,7 @@ public:
 	     int destination = 0)
     : _map(map), _current_position(position), _current_angle(-1),
       _destination(destination), _update(true), _turning(false)
-    {_motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_, _MAX_MESSAGES_);}
+    {_motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_, _MAX_MESSAGES_); _listening = false;}
 
   // Accessors
   //! Get the map
@@ -92,10 +103,8 @@ public:
   void set_map(Map map) {_map = map;}
   //! Set a new destination. If destination not reachable from the current position find the shortest path.
   void set_destinations(int destinations) {_destination = destinations;}
-  //! Set the first angle, the orientation of the robot.
-  //void set_orientation(double angle){_current_angle = angle;}
-  //!Initiate the Navigation class, calculting the angle...
-  void initiation();
+  //! Start the routine
+  void start();
   //! Method called at each message publish from gtps topic.
   void update(const fmMsgs::gtps::ConstPtr& msg);
   //! Method called at each message publish from web node.

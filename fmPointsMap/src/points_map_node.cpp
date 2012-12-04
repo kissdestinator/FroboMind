@@ -15,5 +15,6 @@ int main(int argc, char **argv)
   Navigation nav(nh);
   ros::Subscriber sub = nh.subscribe(_GTPS_TOPIC_, _MAX_MESSAGES_, &Navigation::update, &nav);
 
+  nav.start();
   return 0;
 }

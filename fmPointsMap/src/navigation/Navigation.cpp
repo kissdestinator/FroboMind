@@ -18,11 +18,12 @@
 #define X_HOME 400
 #define Y_HOME 1200
 //each time the robot move to 30 mm the angle is updated
-#define _SMALL_DIST_ 30
-#define _NO_UPDATE_ _update==false
-#define _TURNING_ _turning==true
-#define _NO_BACKWARD_ _update==false
-#define _FREQUENCE_ 500
+#define _SMALL_DIST_ 	30
+#define _UPDATE_ 	_update==true
+#define _TURNING_ 	_turning==true
+#define _NO_BACKWARD_ 	_update==false
+#define _FREQUENCE_ 	500
+#define _AREA_ 		30
 
 using namespace std;
 
@@ -51,8 +52,12 @@ Destination Navigation::goal() const
  * the initialisation date
  * *This function will make the robot move*
  */
-void Navigation::initiation() {
+void Navigation::initialisation() {
   speed(0.2);
+
+  _current_destination = NULL;
+  _current_destination_turning = NULL;
+  _current_angle = NULL;
 
   ros::Rate loop_rate(_FREQUENCE_);
   while (ros::ok() && _current_angle == -1)
@@ -95,7 +100,7 @@ void Navigation::go_back()
 */
 void Navigation::update_angle()
 {
-  if(moved() && _NO_UPDATE_ && !_TURNING_)
+  if(moved() && _UPDATE_ && !_TURNING_)
   {
     _current_angle = Calcul::angle(_old_position, _current_position);
     _old_position = _current_position;
@@ -125,24 +130,24 @@ void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
 }
 
 //! Method called at each message publish from web node.
-
-void Navigation::set_new_destination(const fmMsgs:: web:: ConstPtr& msg)
+void Navigation::set_new_destination(const fmMsgs::web:: ConstPtr& msg)
 {
+  if(_listening) {
   Destination new_dest = _map.find_destination(msg->id);
- if(new_dest == NULL)
- {
-  _current_destination = Destination(_current_position);
- }
- else
- {
-   _current_destination = new_dest;
- }
+  if(new_dest == NULL)
+    _current_destination = Destination(_current_position);
+  else
+    _current_destination = new_dest;
+  ROS_INFO("Current destination updated: (%d,%d).",
+	   _current_destination.x(),
+	   _current_destination.y());
+  }
 }
 
 /*!
-* Calculate the angle between two points.
-* If 1st parameter is NULL, it takes the current position
-*/
+ * Calculate the angle between two points.
+ * If 1st parameter is NULL, it takes the current position
+ */
 int Navigation::distance_to_destination()
 {
   if(!_TURNING_)
@@ -151,6 +156,44 @@ int Navigation::distance_to_destination()
 			   _current_destination))
       : 0 ;//if no destination return 0
   else
-    return 0;//int(Calcul::distance_circle(_current_position,
-		//		       _current_destination_turning));
+    return int(Calcul::distance_circle(_current_angle, _current_position,
+				       _current_destination_turning));
+}
+
+//! Correct the angle
+void Navigation::face_destination()
+{
+  
+}
+
+//! Go forward to the destination
+void Navigation::go()
+{
+  
+  
+}
+
+//! Make the robot reach the destination's area
+void Navigation::move_to_destination()
+{
+  _listening = false;//one destination a time
+  while(distance_to_destination() > _AREA_)
+  {
+    face_destination();//Correct the angle
+    go();//Go forward to the destination
+  }
+}
+
+//! Start the routine
+void Navigation::start()
+{
+  initialisation();
+  _listening = true; // we start listening to te web node
+  ROS_INFO("Navigation.cpp entering start():while loop");
+  while (ros::ok())
+  {
+    _listening = true;
+    if(distance_to_destination() > _AREA_)
+      move_to_destination();
+  }
 }
