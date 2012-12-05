@@ -50,6 +50,8 @@ public:
   void setY(int y) {_y = y;}
   //! Set x and y coordinate
   void set(int x, int y) {_x = x; _y = y;}
+  //! Return true if default value
+  bool is_default() { return (_x == -1 && _y == -1);}
 
   // Relational operators
   //! Equality operator on Point

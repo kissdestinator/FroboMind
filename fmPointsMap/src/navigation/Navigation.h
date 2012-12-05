@@ -53,13 +53,18 @@ private:
   bool _update; //!< if false do not update the angle
   bool _turning; //!< if turning, no update angle
   bool _listening; //! false before the end of the initialisation
-  ros::Publisher _motor_power_pub;
+  ros::Publisher _motor_power_pub; //!< Publisher to 
   fmMsgs::motor_power _motor_power_msg;  //!< Msg to publish to motor power topic
 
   //!< Return true if the moved enough to update the angle
   bool moved() const;
+  /*!
+   * Return greater than 0 if all the
+   * default attribute's value has been changed
+   */
+  int check_default_value();
   //!< Set the speed to the msg *DOES NOT PUBLISH*
-  void speed(double speed);
+  void speed(double right, double left);
   //!< Make the robot return 3cm back after init
   void go_back();
 
@@ -81,9 +86,9 @@ public:
   // Constructors
   //! Regular constructor.
   Navigation(ros::NodeHandle nh,
-	     Map map = Map(),
-	     Point position = Point(),
-	     int destination = 0)
+	      Map map = Map(),
+	      Point position = Point(),
+	      int destination = -1)
     : _map(map), _current_position(position), _current_angle(-1),
       _destination(destination), _update(true), _turning(false)
     {_motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_, _MAX_MESSAGES_); _listening = false;}
@@ -92,9 +97,9 @@ public:
   //! Get the map
   Map map() const {return _map;}
   //! Get the Destinator's faced direction in degree
-  double orientation() const {return _current_angle;}
+  double orientation() {return _current_angle;}
   //! Get the Destinator's current position
-  Point position() const {return _current_position;}
+  Point position() {return _current_position;}
   //! Get the current destination
   Destination goal() const;
 
