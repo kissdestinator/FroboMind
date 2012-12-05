@@ -173,30 +173,26 @@ void Navigation::set_new_destination(const fmMsgs::web:: ConstPtr& msg)
  */
 int Navigation::distance_to_destination()
 {
-  if(!_TURNING_)
     return (_current_destination == NULL) ?
       int(Calcul::distance(_current_position,
 			   _current_destination))
       : 0 ;//if no destination return 0
-  else
-    return int(Calcul::distance_circle(_current_position,
-				       _current_destination_turning));
 }
 
 //! Correct the angle
 void Navigation::face_destination()
 {
-  double turn = 0.3;
-  double stop = 0;
   _turning = true;
+  double turn = 1;
+  double stop = -0.5;
   _current_destination_turning = Calcul::turning_aim(_current_angle,
 						      _current_position,
 						      _current_destination);
   if(_current_destination_turning.id() == _CLOCKWISE_)
-    while(distance_to_destination() > _AREA_)
+    while(distance_to_destination() > _AREA_TURNING_)
       speed(stop, turn);//stop the right move the left
   else
-    while(distance_to_destination() > _AREA_)
+    while(distance_to_destination() > _AREA_TURNING_)
       speed(turn, stop);//stop the left move the right
 
   _turning = false;
@@ -213,11 +209,8 @@ void Navigation::go()
 void Navigation::move_to_destination()
 {
   _listening = false;//one destination a time
-  while(distance_to_destination() > _AREA_)
-  {
-    face_destination();//Correct the angle
-    go();//Go forward to the destination
-  }
+  face_destination();//Correct the angle
+  go();//Go forward to the destination
 }
 
 //! Start the routine
