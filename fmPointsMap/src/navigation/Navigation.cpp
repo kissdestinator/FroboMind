@@ -53,7 +53,7 @@ Destination Navigation::goal() const
  * *This function will make the robot move*
  */
 void Navigation::initialisation() {
-  speed(0.2,0.2);
+  speed(0.8,0.8);
 
   _current_destination = NULL;
   _current_destination_turning = NULL;
@@ -106,7 +106,7 @@ void Navigation::speed(double right, double left)
 //! Make the robot return 3 cm backward without updating the angle
 void Navigation::go_back()
 {
-  speed(-0.2,-0.2);
+  speed(-0.8,-0.8);
 
   ros::Rate loop_rate(_FREQUENCE_);
   while (ros::ok() || !moved())
