@@ -39,9 +39,11 @@ public:
   Map(list<Destination> roads = list<Destination>())
     : _destinations(roads) { }
 
-  // Accessors
-  //! Get the roads
-  list<Destination> roads() const {return _destinations;}
+  /*!
+   * Return the Destination according the id sent
+   * If not on the list return a destination with id : -1
+   */
+  Destination destination(int id);
   /*!
    * If Destinatior is within a destination's area
    * the destination's id is returned else -1 

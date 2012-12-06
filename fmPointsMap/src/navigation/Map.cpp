@@ -18,6 +18,22 @@
 using namespace std;
 
 /*!
+ * Return the Destination according the id sent
+ * If not on the list return a destination with id : -1
+ */
+Destination Map::destination(int id)
+{
+  Destination d;
+  for (list<Destination>::iterator it=_destinations.begin();
+       it!=_destinations.end(); ++it)
+  {
+    if((*it).id() == id)
+      return (*it);
+  }
+  return d;
+}
+
+/*!
   * If Destinatior is within a destination's area
   * the destination's id is returned else -1 
   */

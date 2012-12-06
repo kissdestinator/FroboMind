@@ -27,7 +27,7 @@
 #define _GTPS_SRV_ "gtps_service"
 #define _SMALL_DIST_ 	30
 #define _NO_BACKWARD_ 	_update==false
-#define _IS_NOT_GOOD_ 	> 0
+#define _IS_NOT_GOOD_ 	< 0
 #define _FREQUENCE_ 	500
 #define _AREA_ 		300
 #define _AREA_TURNING_	50

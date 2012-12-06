@@ -16,6 +16,35 @@
 
 using namespace std;
 
+//! Method called at each message publish from web node.
+void Navigation::set_new_destination(const fmMsgs::web:: ConstPtr& msg)
+{
+  if(_listening) {
+  Destination new_dest = _map.destination(msg->id);
+  //If the destination doesn't exist,destination is set to current position
+  if(new_dest.id() == -1)
+  {
+    _current_destination = Destination(_current_position);
+    ROS_INFO("[Navigation::set_new_destination] id=%d is unknown", msg->id);
+  }
+  else
+    _current_destination = new_dest;
+    ROS_INFO("Current destination updated: (%d,%d).",
+	     _current_destination.x(),
+	     _current_destination.y());
+  }
+  else
+    ROS_INFO("[Navigation::set_new_destination] id=%d is not listened",
+	     msg->id);
+}
+
+//!< Return true if the moved enough to update the angle
+bool Navigation::moved() const
+{
+  return (_SMALL_DIST_ >= Calcul::distance(_old_position,
+					    _current_position));
+}
+
 /*!
 * Update the angle value.
 * *This function will make the robot move*
@@ -26,7 +55,8 @@ void Navigation::update_angle()
   {
     _current_angle = Calcul::angle(_old_position, _current_position);
     _old_position = _current_position;
-    ROS_INFO("current angle updated:%g", _current_angle);
+    ROS_INFO("[Navigation::update_angle] current angle updated:%g",
+	     _current_angle);
   }
 }
 
@@ -34,12 +64,6 @@ void Navigation::update_angle()
 void Navigation::update_position(int x, int y)
 {
   _current_position.set(x, y);
-}
-
-bool Navigation::moved() const
-{
-  return (_SMALL_DIST_ >= Calcul::distance(_old_position,
-					    _current_position));
 }
 
 /*!
