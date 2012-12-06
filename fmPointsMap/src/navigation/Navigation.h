@@ -25,6 +25,13 @@
 #define _TOPIC_MOTOR_ "/fmControllers/motor_power"
 #define _MAX_MESSAGES_ 1
 #define _GTPS_SRV_ "gtps_service"
+#define _SMALL_DIST_ 	30
+#define _NO_BACKWARD_ 	_update==false
+#define _IS_NOT_GOOD_ 	> 0
+#define _FREQUENCE_ 	500
+#define _AREA_ 		300
+#define _AREA_TURNING_	50
+
 
 using namespace std;
 
@@ -50,8 +57,7 @@ private:
    * the old one is old enough! (using either the time stamp sent by the GTPS service)
    */
   int _destination; //!< current destination. We use the ID of the destination from the Map
-  bool _update; //!< if false do not update the angle
-  bool _turning; //!< if turning, no update angle
+  bool _update_angle; //!< if false do not update the angle (while turning + going backward)
   bool _listening; //! false before the end of the initialisation
   ros::Publisher _motor_power_pub; //!< Publisher to 
   fmMsgs::motor_power _motor_power_msg;  //!< Msg to publish to motor power topic
@@ -72,8 +78,6 @@ private:
   void update_angle();
   //! Update the current position
   void update_position(int x, int y);
-  //! Initiate the Navigation class, calculting the angle...
-  void initialisation();
   //! Correct the angle
   void face_destination();
   //! Go forward to the destination
@@ -85,27 +89,8 @@ private:
 public:
   // Constructors
   //! Regular constructor.
-  Navigation(ros::NodeHandle nh,
-	      Map map = Map(),
-	      Point position = Point(),
-	      int destination = -1)
-    : _map(map), _current_position(position), _current_angle(-1),
-      _destination(destination), _update(true), _turning(false)
-    {_motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_, _MAX_MESSAGES_); _listening = false;}
-
-  // Accessors
-  //! Get the map
-  Map map() const {return _map;}
-  //! Get the Destinator's faced direction in degree
-  double orientation() {return _current_angle;}
-  //! Get the Destinator's current position
-  Point position() {return _current_position;}
-  //! Get the current destination
-  Destination goal() const;
-
+  Navigation(ros::NodeHandle nh, Map map);
   // Mutators
-  //! Set a new map.
-  void set_map(Map map) {_map = map;}
   //! Set a new destination. If destination not reachable from the current position find the shortest path.
   void set_destinations(int destinations) {_destination = destinations;}
   //! Start the routine
@@ -114,10 +99,6 @@ public:
   void update(const fmMsgs::gtps::ConstPtr& msg);
   //! Method called at each message publish from web node.
   void set_new_destination(const fmMsgs:: web:: ConstPtr& msg);
-  //! Check if the distance between current position and destination is fair enough.
-  bool is_area_reached();
-  //! calculate the distance between the points paramaters.
-  int distance_to_destination();
 };
 
 #endif

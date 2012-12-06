@@ -12,15 +12,22 @@
  * \brief Implementation of class Map.
  */
 
+#define _SMALL_DIST_ 50
+
 #include "Map.h"
 using namespace std;
 
-//! Return the Destination of the _id send as param
-Destination Map::find_destination(int id)
+/*!
+  * If Destinatior is within a destination's area
+  * the destination's id is returned else -1 
+  */
+int Map::area(Point current_position)
 {
-  list<Road>::iterator it;
-  for (it=_roads.begin() ; it != _roads.end(); it++ )
-    if((*it).find_dest(id) != NULL)
-      return (*it).find_dest(id);
-  return NULL;
+  for (list<Destination>::iterator it=_destinations.begin();
+       it!=_destinations.end(); ++it)
+  {
+    if(Calcul::distance(current_position, (*it)) < _SMALL_DIST_)
+      return (*it).id();
+  }
+  return -1;
 }

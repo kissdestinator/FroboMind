@@ -16,7 +16,8 @@
 #define _MAP_H_
 
 #include <list>
-#include "Road.h"
+#include "Destination.h"
+#include "Calcul.h"
 
 using namespace std;
 
@@ -30,23 +31,21 @@ using namespace std;
 class Map
 {
 private:
-  list<Road> _roads; //!< *All* the roads from the csv file
+  list<Destination> _destinations; //!< *All* the roads from the csv file
 
 public:
   // Constructors
   //! Regular constructor.
-  Map(list<Road> roads = list<Road>())
-    : _roads(roads) { }
+  Map(list<Destination> roads = list<Destination>())
+    : _destinations(roads) { }
 
   // Accessors
   //! Get the roads
-  list<Road> roads() const {return _roads;}
-  
-  //! Return the Destination of the _id send as param
-  Destination find_destination(int id);
-  //! Check if the distance between d1 position and d2 is fair enough.
-  bool is_area_reached(Destination d1, Destination d2);
-  //! Find the path from d1 to d2. *Not a prioritary function*
-  list<Road> find_path(Destination d1, Destination d2);};
-
+  list<Destination> roads() const {return _destinations;}
+  /*!
+   * If Destinatior is within a destination's area
+   * the destination's id is returned else -1 
+   */
+  int area(Point current_position);
+};
 #endif

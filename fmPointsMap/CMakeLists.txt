@@ -28,8 +28,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_executable(points_map_node src/points_map_node.cpp)
 rosbuild_add_executable(points_map_node src/navigation/Navigation.cpp)
+rosbuild_add_executable(points_map_node src/navigation/Navigation_routine.cpp)
+rosbuild_add_executable(points_map_node src/navigation/Navigation_update.cpp)
 rosbuild_add_executable(points_map_node src/navigation/Map.cpp)
-rosbuild_add_executable(points_map_node src/navigation/Road.cpp)
 rosbuild_add_executable(points_map_node src/navigation/Destination.cpp)
 rosbuild_add_executable(points_map_node src/navigation/Point.cpp)
 

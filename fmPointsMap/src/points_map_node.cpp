@@ -13,21 +13,13 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   
   /** test **/
-  Destination start;
-  Point p(141,643);
-  Destination end(p);
-  end.set_id(0);
-  Road r(start, end, 0);
-  list<Road> roads;
-  roads.push_front(r);
-  Map map(roads);
-  
+  Map map;
   /** test **/
   
   /* Declaration of the navigation system */
-  Navigation nav(nh);
+  Navigation nav(nh, map);
   ros::Subscriber sub = nh.subscribe(_GTPS_TOPIC_, _MAX_MESSAGES_, &Navigation::update, &nav);
-  nav.set_map(map);
   nav.start();
+
   return 0;
 }
