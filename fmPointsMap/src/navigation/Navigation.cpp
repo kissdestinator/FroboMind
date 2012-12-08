@@ -28,8 +28,8 @@ Navigation::Navigation(ros::NodeHandle nh, Map map)
   ROS_INFO("[Navigation::Navigation] constructing");
   _motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_,
 						        _MAX_MESSAGES_);
-  //ros::Rate loop_rate(_FREQUENCE_);
-/*
+  ros::Rate loop_rate(_FREQUENCE_);
+
   // initialisation of the angle
   speed(0.6,0.6);
   while(ros::ok() && _current_angle <= -1)
@@ -44,7 +44,7 @@ Navigation::Navigation(ros::NodeHandle nh, Map map)
     //ROS_INFO("[Navigation::Navigation] snor");
   }
   ROS_INFO("[Navigation::Navigation] leaving loop");
-*/
+
   go_back();
 
 }
