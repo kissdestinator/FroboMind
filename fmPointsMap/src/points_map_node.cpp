@@ -19,8 +19,8 @@ int main(int argc, char **argv)
   /* Declaration of the navigation system */
   Navigation nav(nh, map);
   ros::Subscriber sub = nh.subscribe(_GTPS_TOPIC_, _MAX_MESSAGES_, &Navigation::update, &nav);
- // nav.start();
-  ros::spin();
+  nav.start();
+  //ros::spin();
 
   return 0;
 }

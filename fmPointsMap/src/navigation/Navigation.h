@@ -49,7 +49,7 @@ private:
   Destination _current_destination;//!< Current Destinator's aim
   Destination _current_destination_turning;//!< Current Destinator's aim while turning
   Point _old_position;//!< "old" Destinator's known position: needed to calculate the angle
-  volatile double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
+  double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
   /**
    * The angle need to be updated as much as possible. However if it's done within a
    * too short time the value could be useless.
@@ -85,7 +85,6 @@ private:
   void go();
   //! Make the robot reach the destination's area
   void move_to_destination();
-  
 
 public:
   // Constructors

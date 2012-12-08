@@ -24,7 +24,7 @@ Navigation::Navigation(ros::NodeHandle nh, Map map)
 : _map(map), _current_position(Point()), _current_angle(-1),
   _destination(-1), _update_angle(true), _listening(false), _not_first_update(false)
 {
-/*
+
   ROS_INFO("[Navigation::Navigation] constructing");
   _motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_,
 						        _MAX_MESSAGES_);
@@ -32,8 +32,9 @@ Navigation::Navigation(ros::NodeHandle nh, Map map)
 
   // initialisation of the angle
   speed(0.6,0.6);
-  while(ros::ok() && _current_angle == -1)
+  while(ros::ok() && _current_angle <= -1)
   {
+    ROS_INFO("[Navigation::Navigation] angle: %g", _current_angle);
     //ROS_INFO("[Navigation::Navigation] looping");
     _motor_power_pub.publish(_motor_power_msg);
     //ROS_INFO("[Navigation::Navigation] publish");
@@ -45,7 +46,7 @@ Navigation::Navigation(ros::NodeHandle nh, Map map)
   ROS_INFO("[Navigation::Navigation] leaving loop");
 
   go_back();
-*/
+
 }
 
 //! Make the robot return 3 cm backward without updating the angle

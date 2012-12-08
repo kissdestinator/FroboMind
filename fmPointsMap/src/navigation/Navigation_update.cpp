@@ -41,7 +41,7 @@ void Navigation::set_new_destination(const fmMsgs::web:: ConstPtr& msg)
 //!< Return true if the moved enough to update the angle
 bool Navigation::moved() const
 {
-//  ROS_INFO("[Navigation::moved] Distance: %g", Calcul::distance(_old_position,_current_position));
+//  ROS_INFO("[Navigati.on::moved] Distance: %g", Calcul::distance(_old_position,_current_position));
   return (_SMALL_DIST_ <= Calcul::distance(_old_position,
 					    _current_position));
 }
@@ -52,7 +52,7 @@ bool Navigation::moved() const
 */
 void Navigation::update_angle()
 {
-  if(moved() && _update_angle && _not_first_update)
+  if(moved() && _update_angle)
   {
     _current_angle = Calcul::angle(_old_position, _current_position);
     _old_position = _current_position;
@@ -72,8 +72,13 @@ void Navigation::update_position(int x, int y)
 */
 void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
 {
-  //ROS_INFO("[Navigation::update] Old position: (%d, %d) New position: (%d, %d)", _old_position.x(), _old_position.y(), _current_position.x(), _current_position.y() );
   update_position(msg->x, msg->y);
-  update_angle();
-  _not_first_update = true;
+  if (!_not_first_update)
+  {
+    _old_position=_current_position;
+    _not_first_update = true;
+  }
+  else
+    update_angle();
+  ROS_INFO("[Navigation::update] Old position: (%d, %d) New position: (%d, %d)", _old_position.x(), _old_position.y(), _current_position.x(), _current_position.y() );
 }
