@@ -37,12 +37,14 @@ void Navigation::go_back()
   ros::Rate loop_rate(_FREQUENCE_);
 
   speed(-0.6,-0.6);
+  ROS_INFO("[Navigation::go_back] entering loop");
   while (ros::ok() && !moved())
   {
     _motor_power_pub.publish(_motor_power_msg);
     ros::spinOnce();
     loop_rate.sleep();
   }
+  ROS_INFO("[Navigation::go_back] leaving loop");
 
   _update_angle = true;
 }
@@ -55,7 +57,7 @@ void Navigation::initialisation()
   speed(0.6,0.6);
   while(ros::ok() && _current_angle <= -1)
   {
-    ROS_INFO("[Navigation::Navigation] angle: %g", _current_angle);
+   // ROS_INFO("[Navigation::Navigation] angle: %g", _current_angle);
     //ROS_INFO("[Navigation::Navigation] looping");
     _motor_power_pub.publish(_motor_power_msg);
     //ROS_INFO("[Navigation::Navigation] publish");
@@ -64,7 +66,7 @@ void Navigation::initialisation()
     loop_rate.sleep();
     //ROS_INFO("[Navigation::Navigation] snor");
   }
-  ROS_INFO("[Navigation::Navigation] leaving loop");
+  ROS_INFO("[Navigation::initialisation] leaving loop");
 
   go_back(); 
 }
@@ -76,7 +78,7 @@ void Navigation::start()
   int error = -1;
   if((error = check_default_value()) _IS_NOT_GOOD_)
   {
-    ROS_ERROR("[Navigation::start] Unusabled value:%d", error);
+    ROS_ERROR("[Navigation::start] Unusable value:%d", error);
     exit -1;
   }
   
