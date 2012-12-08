@@ -59,6 +59,7 @@ private:
   int _destination; //!< current destination. We use the ID of the destination from the Map
   bool _update_angle; //!< if false do not update the angle (while turning + going backward)
   bool _listening; //! false before the end of the initialisation
+  bool _not_first_update;  // skips first update of angle
   ros::Publisher _motor_power_pub; //!< Publisher to 
   fmMsgs::motor_power _motor_power_msg;  //!< Msg to publish to motor power topic
 

@@ -22,8 +22,9 @@ using namespace std;
 
 Navigation::Navigation(ros::NodeHandle nh, Map map)
 : _map(map), _current_position(Point()), _current_angle(-1),
-  _destination(-1), _update_angle(true), _listening(false)
+  _destination(-1), _update_angle(true), _listening(false), _not_first_update(false)
 {
+/*
   ROS_INFO("[Navigation::Navigation] constructing");
   _motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_,
 						        _MAX_MESSAGES_);
@@ -31,14 +32,20 @@ Navigation::Navigation(ros::NodeHandle nh, Map map)
 
   // initialisation of the angle
   speed(0.6,0.6);
-  while (ros::ok() && _current_angle == -1)
+  while(ros::ok() && _current_angle == -1)
   {
+    //ROS_INFO("[Navigation::Navigation] looping");
     _motor_power_pub.publish(_motor_power_msg);
-    ros::spin();
+    //ROS_INFO("[Navigation::Navigation] publish");
+    ros::spinOnce();
+    //ROS_INFO("[Navigation::Navigation] spin");
     loop_rate.sleep();
+    //ROS_INFO("[Navigation::Navigation] snor");
   }
+  ROS_INFO("[Navigation::Navigation] leaving loop");
 
   go_back();
+*/
 }
 
 //! Make the robot return 3 cm backward without updating the angle
@@ -103,7 +110,7 @@ void Navigation::speed(double right, double left)
   right = (right > -1) ? right : -1;
   right = (right <  1) ? right :  1;
   left  = (left  > -1) ?  left : -1;
-  left  = (left  >  1) ?  left :  1;
+  left  = (left  <  1) ?  left :  1;
 
   ROS_INFO("[Navigation::speed] speed set to: right=%g, left=%g",
 	   right, left);
