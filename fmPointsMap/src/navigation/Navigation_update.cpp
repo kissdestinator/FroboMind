@@ -75,6 +75,7 @@ void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
   update_position(msg->x, msg->y);
   if (!_not_first_update)
   {
+    ros::Rate loop_rate(_FREQUENCE_);
       // initialisation of the angle
   speed(0.6,0.6);
   while(ros::ok() && _current_angle <= -1)
