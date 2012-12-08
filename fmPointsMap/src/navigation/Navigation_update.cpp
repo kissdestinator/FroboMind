@@ -75,6 +75,20 @@ void Navigation::update(const fmMsgs::gtps::ConstPtr& msg)
   update_position(msg->x, msg->y);
   if (!_not_first_update)
   {
+      // initialisation of the angle
+  speed(0.6,0.6);
+  while(ros::ok() && _current_angle <= -1)
+  {
+    ROS_INFO("[Navigation::Navigation] angle: %g", _current_angle);
+    //ROS_INFO("[Navigation::Navigation] looping");
+    _motor_power_pub.publish(_motor_power_msg);
+    //ROS_INFO("[Navigation::Navigation] publish");
+    ros::spinOnce();
+    //ROS_INFO("[Navigation::Navigation] spin");
+    loop_rate.sleep();
+    //ROS_INFO("[Navigation::Navigation] snor");
+  }
+  ROS_INFO("[Navigation::Navigation] leaving loop");
     _old_position=_current_position;
     _not_first_update = true;
   }
