@@ -74,6 +74,8 @@ private:
   void speed(double right, double left);
   //!< Make the robot return 3cm back after init
   void go_back();
+  //!< Intit Destinator by making him move
+  void initialisation();
 
   //! Update the current angle
   void update_angle();

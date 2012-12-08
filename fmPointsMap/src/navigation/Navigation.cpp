@@ -28,25 +28,6 @@ Navigation::Navigation(ros::NodeHandle nh, Map map)
   ROS_INFO("[Navigation::Navigation] constructing");
   _motor_power_pub = nh.advertise<fmMsgs::motor_power>(_TOPIC_MOTOR_,
 						        _MAX_MESSAGES_);
-  ros::Rate loop_rate(_FREQUENCE_);
-
-  // initialisation of the angle
-  speed(0.6,0.6);
-  while(ros::ok() && _current_angle <= -1)
-  {
-    ROS_INFO("[Navigation::Navigation] angle: %g", _current_angle);
-    //ROS_INFO("[Navigation::Navigation] looping");
-    _motor_power_pub.publish(_motor_power_msg);
-    //ROS_INFO("[Navigation::Navigation] publish");
-    ros::spinOnce();
-    //ROS_INFO("[Navigation::Navigation] spin");
-    loop_rate.sleep();
-    //ROS_INFO("[Navigation::Navigation] snor");
-  }
-  ROS_INFO("[Navigation::Navigation] leaving loop");
-
-  go_back();
-
 }
 
 //! Make the robot return 3 cm backward without updating the angle
@@ -66,9 +47,32 @@ void Navigation::go_back()
   _update_angle = true;
 }
 
+void Navigation::initialisation()
+{
+  ros::Rate loop_rate(_FREQUENCE_);
+
+  // initialisation of the angle
+  speed(0.6,0.6);
+  while(ros::ok() && _current_angle <= -1)
+  {
+    ROS_INFO("[Navigation::Navigation] angle: %g", _current_angle);
+    //ROS_INFO("[Navigation::Navigation] looping");
+    _motor_power_pub.publish(_motor_power_msg);
+    //ROS_INFO("[Navigation::Navigation] publish");
+    ros::spinOnce();
+    //ROS_INFO("[Navigation::Navigation] spin");
+    loop_rate.sleep();
+    //ROS_INFO("[Navigation::Navigation] snor");
+  }
+  ROS_INFO("[Navigation::Navigation] leaving loop");
+
+  go_back(); 
+}
+
 //! Start the routine
 void Navigation::start()
 {
+  initialisation();
   int error = -1;
   if((error = check_default_value()) _IS_NOT_GOOD_)
   {
