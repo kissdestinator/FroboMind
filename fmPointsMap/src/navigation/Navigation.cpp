@@ -67,8 +67,10 @@ void Navigation::initialisation()
     //ROS_INFO("[Navigation::Navigation] snor");
   }
   ROS_INFO("[Navigation::initialisation] leaving loop");
-
   go_back(); 
+  //Check if we are at a known destination
+  //calculate the distance from all the destination.
+  //find the closer destination and initialize the id.
 }
 
 //! Start the routine
