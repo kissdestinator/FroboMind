@@ -31,6 +31,7 @@
 #define _FREQUENCE_ 	500
 #define _AREA_ 		300
 #define _AREA_TURNING_	50
+//#define _DIST_ 100
 
 
 using namespace std;
@@ -50,6 +51,7 @@ private:
   Destination _current_destination_turning;//!< Current Destinator's aim while turning
   Point _old_position;//!< "old" Destinator's known position: needed to calculate the angle
   double _current_angle; //!< current angle (in degree, not radian, according to the trigonometric's direction)
+  
   /**
    * The angle need to be updated as much as possible. However if it's done within a
    * too short time the value could be useless.
@@ -76,6 +78,8 @@ private:
   void go_back();
   //!< Intit Destinator by making him move
   void initialisation();
+  //!< Check if at  known destination
+  bool is_known_destination();
 
   //! Update the current angle
   void update_angle();

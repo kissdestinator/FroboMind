@@ -68,9 +68,32 @@ void Navigation::initialisation()
   }
   ROS_INFO("[Navigation::initialisation] leaving loop");
   go_back(); 
-  //Check if we are at a known destination
+  if (is_known_destination())
+  {
+    //dosomething
+  }
+  else
+  {
+    //dosomethingelse
+  }
+  //Check if we are at a known destination.
   //calculate the distance from all the destination.
   //find the closer destination and initialize the id.
+}
+ //!< Check if at  known destination
+bool Navigation::is_known_destination()
+{
+  int destination_found = _map.area(_current_position);
+  if ( destination_found == -1)
+  {
+    ROS_ERROR("[Navigation::is_known_destination] I'm lost!");
+    return false;
+  }
+  else
+  {
+    ROS_INFO("[Navigation::is_known_destination] destination found %d",destination_found);
+    return true;
+  }
 }
 
 //! Start the routine
