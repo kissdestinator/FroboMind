@@ -91,7 +91,7 @@ int Navigation::is_known_destination()
 {
   int destination_found = _map.area(_current_position);
   if ( destination_found == -1)
-    ROS_ERROR("[Navigation::is_known_destination] I'm lost!");
+    ROS_INFO("[Navigation::is_known_destination] I'm lost!");
   else
     ROS_INFO("[Navigation::is_known_destination] destination found %d",destination_found);
   return destination_found;
@@ -109,7 +109,7 @@ void Navigation::start()
   }
 
   //Everything is ok, we can start the routine:
-  ROS_INFO("[Navigation::start] entering in the loop");
+  ROS_INFO("[Navigation::start] entering in the main loop");
   while (ros::ok())
   {
     _listening = true;

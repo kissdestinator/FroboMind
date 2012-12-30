@@ -11,8 +11,8 @@
  *
  * \brief Implementation of class Map.
  */
-
-#define _SMALL_DIST_ 50
+//Robot size + 10 %
+#define _SMALL_DIST_ 300
 
 #include "Map.h"
 using namespace std;
