@@ -18,6 +18,10 @@
 #include <iostream>
 #include <list>
 #include "Point.h"
+//Above used in Calcul.h + Navigation
+#define _CLOCKWISE_ -2
+#define _COUNTERWISE_ -3
+
 
 using namespace std;
 

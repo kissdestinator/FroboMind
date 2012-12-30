@@ -20,8 +20,6 @@
 
 #define _CIRCLE_CIRCUM_ 1256.637
 #define _RADIUS_ 200
-#define _CLOCKWISE_ -2
-#define _COUNTERWISE_ -3
 
 using namespace std;
 
@@ -35,7 +33,7 @@ class Calcul
 {
 public:
 /*!
-* Calculate the angle between the two destinations attribute
+* Calculate the distance between the two destinations param
 */
   static double distance(Point p1, Point p2){
     int disx = p2.x() - p1.x();
@@ -44,7 +42,7 @@ public:
   }
 
 /*!
-* Calculate the distance between the two destinations param
+* Calculate the angle between the two destinations param
 */
   static double angle(Point p1, Point p2){
     int difx = p2.x()-p1.x();

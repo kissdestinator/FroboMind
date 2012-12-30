@@ -36,7 +36,7 @@ void Navigation::go_back()
   _update_angle = false;
   ros::Rate loop_rate(_FREQUENCE_);
 
-  speed(_BACKWARD_);
+  _GO_BACKWARD_
   ROS_INFO("[Navigation::go_back] entering loop");
   while (ros::ok() && !moved())
   {
@@ -54,7 +54,7 @@ void Navigation::initialisation()
   ros::Rate loop_rate(_FREQUENCE_);
 
   // initialisation of the angle
-  speed(_FORWARD_);
+  _GO_FORWARD_
   while(ros::ok() && _current_angle <= -1)
   {
    // ROS_INFO("[Navigation::Navigation] angle: %g", _current_angle);
@@ -67,10 +67,12 @@ void Navigation::initialisation()
     //ROS_INFO("[Navigation::Navigation] snor");
   }
   ROS_INFO("[Navigation::initialisation] leaving loop");
-  go_back(); 
-  if (is_known_destination() > -1)
+  go_back();
+  int destination = -2;
+  if((destination = is_known_destination()) > -1)
   {
-    //do nothing but leave the function and wait
+    _current_destination = _current_position;
+    _destination = destination;
   }
   else
   {//Go to destination 0
@@ -79,14 +81,13 @@ void Navigation::initialisation()
     ROS_INFO("[Navigation::initialisation] _current_destination:#%d(%d, %d)",
 	  _current_destination.id(),
 	  _current_destination.x(),
-	  _current_destination.y()
-    );
+	  _current_destination.y());
     go();
   }
   //Check if we are at a known destination.
   //else go to 0-id-ed destination.
 }
- //!< Check if at  known destination
+ //!< Check if Desinator is at known destination
 int Navigation::is_known_destination()
 {
   int destination_found = _map.area(_current_position);
@@ -95,28 +96,6 @@ int Navigation::is_known_destination()
   else
     ROS_INFO("[Navigation::is_known_destination] destination found %d",destination_found);
   return destination_found;
-}
-
-//! Start the routine
-void Navigation::start()
-{
-  initialisation();
-  int error = -1;
-  if((error = check_default_value()) _IS_NOT_GOOD_)
-  {
-    ROS_ERROR("[Navigation::start] Unusable value:%d", error);
-    ros::shutdown();
-  }
-
-  //Everything is ok, we can start the routine:
-  ROS_INFO("[Navigation::start] entering in the main loop");
-  while (ros::ok())
-  {
-    _listening = true;
-    //if Destinator is *NOT* in the destination's area set
-    if(_destination != _map.area(_current_position))
-      go();
-  }
 }
 
 int Navigation::check_default_value()
@@ -149,4 +128,26 @@ void Navigation::speed(double right, double left)
 	   right, left);
   _motor_power_msg.power_right = right;
   _motor_power_msg.power_left  = left;
+}
+
+//! Start the routine
+void Navigation::start()
+{
+  initialisation();
+  int error = -1;
+  if((error = check_default_value()) _IS_NOT_GOOD_)
+  {
+    ROS_ERROR("[Navigation::start] Unusable value:%d", error);
+    ros::shutdown();
+  }
+
+  //Everything is ok, we can start the routine:
+  ROS_INFO("[Navigation::start] entering in the main loop");
+  while (ros::ok())
+  {
+    _listening = true;
+    //if Destinator is *NOT* in the destination's area set
+    if(_destination != _map.area(_current_position))
+      go();
+  }
 }

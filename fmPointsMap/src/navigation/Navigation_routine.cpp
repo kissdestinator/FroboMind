@@ -19,6 +19,29 @@ using namespace std;
 //! Correct the angle
 void Navigation::face_destination()
 {
+  Destination dest_turning = Calcul::turning_aim(_current_angle,
+						  _current_position,
+						  _current_destination);
+
+  _update_angle = false;//DO NOT update the angle while turning
+  ROS_INFO("[Navigation::face_destination] angle update ignored");
+  if(dest_turning.id() == _CLOCKWISE_)
+    _TURN_RIGHT_
+  else//dest_turning.id() == _COUNTERWISE_
+    _TURN_LEFT_
+
+  //Turn until destination is reached
+  ros::Rate loop_rate(_FREQUENCE_);
+  while(ros::ok()
+     && Calcul::distance(_current_position, _current_destination) <= _AREA_TURNING_)
+  {
+    _motor_power_pub.publish(_motor_power_msg);
+    ros::spinOnce();
+    loop_rate.sleep();
+  }
+  _update_angle = true;
+  ROS_INFO("[Navigation::face_destination] angle update listened");
+
   //use current position and destination position to calculate the new_angle aimed
   // when you calculate the new_angle compare it with your current angle. 
   //if your new_angle is the same with your current_angle

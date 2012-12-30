@@ -25,15 +25,17 @@
 #define _TOPIC_MOTOR_ "/fmControllers/motor_power"
 #define _MAX_MESSAGES_ 1
 #define _GTPS_SRV_ "gtps_service"
-#define _SMALL_DIST_ 	30
+#define _SMALL_DIST_ 	30 //Used to check if useful to update the angle
 #define _NO_BACKWARD_ 	_update==false
 #define _IS_NOT_GOOD_ 	< 0
 #define _FREQUENCE_ 	500
 #define _AREA_ 		300
 #define _AREA_TURNING_	50
-#define _FORWARD_ 	0.6,0.6
-#define _BACKWARD_ 	-0.6,-0.6
-//#define _DIST_ 100
+#define _GO_FORWARD_ 	speed( 0.60, 0.60);
+#define _GO_BACKWARD_ 	speed(-0.60,-0.60);
+#define _TURN_RIGHT_ 	speed( 0.55,-0.30);
+#define _TURN_LEFT_ 	speed(-0.30, 0.55);
+
 
 
 using namespace std;
