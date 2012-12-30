@@ -42,7 +42,7 @@ int Map::area(Point current_position)
   for (list<Destination>::iterator it=_destinations.begin();
        it!=_destinations.end(); ++it)
   {
-    if(Calcul::distance(current_position, (*it)) < _SMALL_DIST_)
+    if(Calcul::distance(current_position, (*it)) <= _SMALL_DIST_)
       return (*it).id();
   }
   return -1;

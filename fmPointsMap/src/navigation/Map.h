@@ -16,6 +16,7 @@
 #define _MAP_H_
 
 #include <list>
+#include "ros/ros.h"
 #include "Destination.h"
 #include "Calcul.h"
 
@@ -37,7 +38,13 @@ public:
   // Constructors
   //! Regular constructor.
   Map(list<Destination> roads = list<Destination>())
-    : _destinations(roads) { }
+    : _destinations(roads) {
+      //Next coordinates had been choosen as destinations point:
+      _destinations.push_front(Destination(0,  141,  643));
+      _destinations.push_front(Destination(1, 2255,  660));
+      _destinations.push_front(Destination(2, 3480, 1730));
+      _destinations.push_front(Destination(3, 3815,  778));
+    }
 
   /*!
    * Return the Destination according the id sent

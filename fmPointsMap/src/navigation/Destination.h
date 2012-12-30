@@ -43,6 +43,10 @@ public:
   Destination(Point p)
     : _id(-1), _destinations(list<int>())
     { _x = p.x(); _y = p.y(); }
+  //! Coordinates Constructors
+  Destination(int id, int x, int y)
+    : _id(id), _destinations(list<int>())
+    { _x = x; _y = y; }
 
   // Accessors
   //! Get this id.

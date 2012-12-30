@@ -49,7 +49,11 @@ void Navigation::go()
   //check your current destination and your angle
   //check if you arrived or not
   // if you arrived then stop.
-  
+  ROS_INFO("[Navigation::go] GOTO _current_destination:#%d(%d, %d)",
+	  _current_destination.id(),
+	  _current_destination.x(),
+	  _current_destination.y()
+    );
 }
 
 //! Make the robot reach the destination's area

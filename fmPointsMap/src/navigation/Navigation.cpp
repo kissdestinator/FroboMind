@@ -36,7 +36,7 @@ void Navigation::go_back()
   _update_angle = false;
   ros::Rate loop_rate(_FREQUENCE_);
 
-  speed(-0.6,-0.6);
+  speed(_BACKWARD_);
   ROS_INFO("[Navigation::go_back] entering loop");
   while (ros::ok() && !moved())
   {
@@ -54,7 +54,7 @@ void Navigation::initialisation()
   ros::Rate loop_rate(_FREQUENCE_);
 
   // initialisation of the angle
-  speed(0.6,0.6);
+  speed(_FORWARD_);
   while(ros::ok() && _current_angle <= -1)
   {
    // ROS_INFO("[Navigation::Navigation] angle: %g", _current_angle);
@@ -68,32 +68,33 @@ void Navigation::initialisation()
   }
   ROS_INFO("[Navigation::initialisation] leaving loop");
   go_back(); 
-  if (is_known_destination())
+  if (is_known_destination() > -1)
   {
-    //dosomething
+    //do nothing but leave the function and wait
   }
   else
-  {
-    //dosomethingelse
+  {//Go to destination 0
+    _listening = false;
+    _current_destination = _map.destination(0);
+    ROS_INFO("[Navigation::initialisation] _current_destination:#%d(%d, %d)",
+	  _current_destination.id(),
+	  _current_destination.x(),
+	  _current_destination.y()
+    );
+    go();
   }
   //Check if we are at a known destination.
-  //calculate the distance from all the destination.
-  //find the closer destination and initialize the id.
+  //else go to 0-id-ed destination.
 }
  //!< Check if at  known destination
-bool Navigation::is_known_destination()
+int Navigation::is_known_destination()
 {
   int destination_found = _map.area(_current_position);
   if ( destination_found == -1)
-  {
     ROS_ERROR("[Navigation::is_known_destination] I'm lost!");
-    return false;
-  }
   else
-  {
     ROS_INFO("[Navigation::is_known_destination] destination found %d",destination_found);
-    return true;
-  }
+  return destination_found;
 }
 
 //! Start the routine
@@ -104,9 +105,9 @@ void Navigation::start()
   if((error = check_default_value()) _IS_NOT_GOOD_)
   {
     ROS_ERROR("[Navigation::start] Unusable value:%d", error);
-    exit -1;
+    ros::shutdown();
   }
-  
+
   //Everything is ok, we can start the routine:
   ROS_INFO("[Navigation::start] entering in the loop");
   while (ros::ok())
@@ -114,7 +115,7 @@ void Navigation::start()
     _listening = true;
     //if Destinator is *NOT* in the destination's area set
     if(_destination != _map.area(_current_position))
-      move_to_destination();
+      go();
   }
 }
 
@@ -128,7 +129,7 @@ int Navigation::check_default_value()
   }
   if(_current_angle == -1)
   {
-    ROS_ERROR("current angle,");
+    ROS_ERROR("current angle ");
     error -= 10;
   }
   if(error > 0)

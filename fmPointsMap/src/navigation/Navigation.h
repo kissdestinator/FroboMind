@@ -31,6 +31,8 @@
 #define _FREQUENCE_ 	500
 #define _AREA_ 		300
 #define _AREA_TURNING_	50
+#define _FORWARD_ 	0.6,0.6
+#define _BACKWARD_ 	-0.6,-0.6
 //#define _DIST_ 100
 
 
@@ -79,7 +81,7 @@ private:
   //!< Intit Destinator by making him move
   void initialisation();
   //!< Check if at  known destination
-  bool is_known_destination();
+  int is_known_destination();
 
   //! Update the current angle
   void update_angle();
