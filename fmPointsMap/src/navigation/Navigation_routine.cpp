@@ -32,9 +32,14 @@ void Navigation::face_destination()
 
   //Turn until destination is reached
   ros::Rate loop_rate(_FREQUENCE_);
+ROS_INFO("Before spinning!!%d",Calcul::distance(dest_turning,_current_position));
   while(ros::ok()
-     && Calcul::distance(_current_position, _current_destination) <= _AREA_TURNING_)
+     && Calcul::distance(_current_position, dest_turning) <= _AREA_TURNING_)
   {
+//calculating distance is always the same as _current_position.x()
+ROS_INFO("current position %d,%d",_current_position.x(),_current_position.y());
+ROS_INFO("Spinning!!%d", Calcul::distance(_current_position,dest_turning));
+ROS_INFO("dest_turning%d,%d",dest_turning.x(),dest_turning.y());
     _motor_power_pub.publish(_motor_power_msg);
     ros::spinOnce();
     loop_rate.sleep();

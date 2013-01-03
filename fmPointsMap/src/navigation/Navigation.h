@@ -33,8 +33,8 @@
 #define _AREA_TURNING_	50
 #define _GO_FORWARD_ 	speed( 0.60, 0.60);
 #define _GO_BACKWARD_ 	speed(-0.60,-0.60);
-#define _TURN_RIGHT_ 	speed( 0.55,-0.30);
-#define _TURN_LEFT_ 	speed(-0.30, 0.55);
+#define _TURN_RIGHT_ 	speed( 0.80,-0.50);
+#define _TURN_LEFT_ 	speed(-0.50, 0.80);
 
 
 
